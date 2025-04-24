@@ -1,0 +1,72 @@
+{
+  "live": [
+    {
+      "id": "1",
+      "title": "라이브 방송 1",
+      "description": "실시간으로 진행되는 라이브 방송입니다.",
+      "category": "토크",
+      "thumbnail": "/placeholder.svg?height=300&width=400",
+      "streamer": {
+        "id": "user1",
+        "name": "스트리머1",
+        "avatar": "/placeholder.svg?height=40&width=40"
+      },
+      "viewers": 1234,
+      "startedAt": "2023-04-22T09:30:00Z",
+      "isLive": true
+    },
+    {
+      "id": "2",
+      "title": "라이브 방송 2",
+      "description": "게임 방송입니다.",
+      "category": "게임",
+      "thumbnail": "/placeholder.svg?height=300&width=400",
+      "streamer": {
+        "id": "user2",
+        "name": "스트리머2",
+        "avatar": "/placeholder.svg?height=40&width=40"
+      },
+      "viewers": 5678,
+      "startedAt": "2023-04-22T10:00:00Z",
+      "isLive": true
+    }
+  ],
+  "liveDetail": {
+    "id": "1",
+    "title": "라이브 방송 1",
+    "description": "실시간으로 진행되는 라이브 방송입니다.",
+    "category": "토크",
+    "streamUrl": "/placeholder.svg?height=720&width=1280",
+    "streamer": {
+      "id": "user1",
+      "name": "스트리머1",
+      "avatar": "/placeholder.svg?height=40&width=40",
+      "followers": 12345
+    },
+    "viewers": 1234,
+    "startedAt": "2023-04-22T09:30:00Z",
+    "isLive": true,
+    "chat": [
+      {
+        "id": "chat1",
+        "user": {
+          "id": "user5",
+          "name": "시청자1",
+          "avatar": "/placeholder.svg?height=30&width=30"
+        },
+        "message": "안녕하세요! 방송 잘 보고 있어요.",
+        "sentAt": "2023-04-22T09:35:00Z"
+      },
+      {
+        "id": "chat2",
+        "user": {
+          "id": "user6",
+          "name": "시청자2",
+          "avatar": "/placeholder.svg?height=30&width=30"
+        },
+        "message": "오늘 주제가 뭔가요?",
+        "sentAt": "2023-04-22T09:36:00Z"
+      }
+    ]
+  }
+}

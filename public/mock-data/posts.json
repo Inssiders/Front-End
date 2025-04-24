@@ -1,0 +1,140 @@
+{
+  "posts": [
+    {
+      "id": "1",
+      "title": "인싸이더 게시글 1: 일상 카테고리",
+      "excerpt": "이 게시글은 인싸이더 플랫폼에서 인기 있는 일상 내용을 다루고 있습니다. 다양한 주제와 재미있는 이야기를 확인해보세요.",
+      "content": "<p>안녕하세요, 인싸이더 여러분!</p><p>오늘은 일상에서 찾은 소소한 행복에 대해 이야기해보려고 합니다. 바쁜 일상 속에서도 작은 행복을 발견하는 것이 중요하죠.</p><p>여러분은 어떤 순간에 행복을 느끼시나요? 댓글로 공유해주세요!</p>",
+      "category": "일상",
+      "author": {
+        "id": "user1",
+        "name": "사용자1",
+        "avatar": "/placeholder.svg?height=40&width=40"
+      },
+      "publishedAt": "2023-04-20T09:30:00Z",
+      "comments": 24,
+      "likes": 156,
+      "views": 789,
+      "image": "/placeholder.svg?height=200&width=400"
+    },
+    {
+      "id": "2",
+      "title": "인싸이더 게시글 2: 유머 카테고리",
+      "excerpt": "이 게시글은 인싸이더 플랫폼에서 인기 있는 유머 내용을 다루고 있습니다. 웃음이 가득한 이야기를 확인해보세요.",
+      "content": "<p>안녕하세요, 인싸이더 여러분!</p><p>오늘은 제가 겪은 재미있는 에피소드를 공유하려고 합니다. 지난 주말, 친구들과 캠핑을 갔는데...</p><p>여러분도 재미있는 경험이 있으시면 댓글로 공유해주세요!</p>",
+      "category": "유머",
+      "author": {
+        "id": "user2",
+        "name": "사용자2",
+        "avatar": "/placeholder.svg?height=40&width=40"
+      },
+      "publishedAt": "2023-04-19T14:20:00Z",
+      "comments": 42,
+      "likes": 287,
+      "views": 1243,
+      "image": null
+    },
+    {
+      "id": "3",
+      "title": "인싸이더 게시글 3: 정보 카테고리",
+      "excerpt": "이 게시글은 인싸이더 플랫폼에서 인기 있는 정보 내용을 다루고 있습니다. 유용한 정보와 팁을 확인해보세요.",
+      "content": "<p>안녕하세요, 인싸이더 여러분!</p><p>오늘은 생산성을 높이는 5가지 방법에 대해 알아보겠습니다.</p><ol><li>하루를 계획하기</li><li>중요한 일부터 처리하기</li><li>집중 시간 확보하기</li><li>적절한 휴식 취하기</li><li>디지털 디톡스 실천하기</li></ol><p>여러분만의 생산성 팁이 있다면 댓글로 공유해주세요!</p>",
+      "category": "정보",
+      "author": {
+        "id": "user3",
+        "name": "사용자3",
+        "avatar": "/placeholder.svg?height=40&width=40"
+      },
+      "publishedAt": "2023-04-18T11:15:00Z",
+      "comments": 18,
+      "likes": 203,
+      "views": 876,
+      "image": "/placeholder.svg?height=200&width=400"
+    }
+  ],
+  "postDetail": {
+    "id": "1",
+    "title": "인싸이더 게시글 1: 트렌드와 인사이트",
+    "content": "<p>안녕하세요, 인싸이더 여러분!</p><p>오늘은 최근 인기를 끌고 있는 트렌드와 그에 대한 인사이트를 공유하려고 합니다. 요즘 MZ세대 사이에서 화제가 되고 있는 이 트렌드는 소셜 미디어를 통해 빠르게 확산되고 있습니다.</p><p>특히 인스타그램과 틱톡에서 관련 콘텐츠가 폭발적으로 증가하고 있으며, 많은 인플루언서들이 이 트렌드를 활용한 콘텐츠를 제작하고 있습니다.</p><p>이러한 트렌드가 인기를 끄는 이유는 무엇일까요? 전문가들은 다음과 같은 요인을 지목합니다:</p><ul><li>접근성이 높고 누구나 쉽게 참여할 수 있다</li><li>시각적으로 매력적이고 공유하기 좋은 콘텐츠를 만들 수 있다</li><li>자신의 개성을 표현하기에 적합하다</li><li>커뮤니티 의식을 형성하고 소속감을 제공한다</li></ul><p>여러분은 이 트렌드에 대해 어떻게 생각하시나요? 댓글로 여러분의 의견을 공유해주세요!</p>",
+    "category": "트렌드",
+    "author": {
+      "id": "123",
+      "name": "트렌드헌터",
+      "avatar": "/placeholder.svg?height=40&width=40",
+      "followers": 1240
+    },
+    "publishedAt": "2023-04-20T09:30:00Z",
+    "comments": 42,
+    "likes": 315,
+    "views": 1872,
+    "image": "/placeholder.svg?height=400&width=800",
+    "commentsList": [
+      {
+        "id": "c1",
+        "author": {
+          "id": "user5",
+          "name": "댓글러1",
+          "avatar": "/placeholder.svg?height=30&width=30"
+        },
+        "content": "정말 유익한 글이네요! 저도 이 트렌드에 관심이 많았는데 잘 정리해주셔서 감사합니다.",
+        "publishedAt": "2023-04-20T10:15:00Z",
+        "likes": 24,
+        "replies": [
+          {
+            "id": "r1",
+            "author": {
+              "id": "123",
+              "name": "트렌드헌터",
+              "avatar": "/placeholder.svg?height=30&width=30"
+            },
+            "content": "관심 가져주셔서 감사합니다! 앞으로도 좋은 정보 공유하겠습니다.",
+            "publishedAt": "2023-04-20T10:30:00Z",
+            "likes": 5
+          }
+        ]
+      },
+      {
+        "id": "c2",
+        "author": {
+          "id": "user6",
+          "name": "댓글러2",
+          "avatar": "/placeholder.svg?height=30&width=30"
+        },
+        "content": "저는 이 트렌드가 일시적인 현상이라고 생각해요. 곧 새로운 트렌드가 나타날 것 같습니다.",
+        "publishedAt": "2023-04-20T11:45:00Z",
+        "likes": 8,
+        "replies": []
+      }
+    ],
+    "relatedPosts": [
+      {
+        "id": "2",
+        "title": "MZ세대의 소비 트렌드 분석",
+        "excerpt": "MZ세대의 소비 패턴과 선호하는 브랜드에 대한 분석",
+        "category": "트렌드",
+        "image": "/placeholder.svg?height=150&width=250",
+        "author": {
+          "name": "경제분석가",
+          "avatar": "/placeholder.svg?height=30&width=30"
+        },
+        "publishedAt": "2023-04-15T14:20:00Z",
+        "comments": 18,
+        "likes": 142
+      },
+      {
+        "id": "3",
+        "title": "2023년 상반기 인기 콘텐츠 총정리",
+        "excerpt": "올해 상반기 가장 인기 있었던 콘텐츠와 그 이유",
+        "category": "트렌드",
+        "image": "/placeholder.svg?height=150&width=250",
+        "author": {
+          "name": "콘텐츠리뷰어",
+          "avatar": "/placeholder.svg?height=30&width=30"
+        },
+        "publishedAt": "2023-04-10T09:15:00Z",
+        "comments": 27,
+        "likes": 198
+      }
+    ]
+  }
+}

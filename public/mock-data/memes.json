@@ -1,0 +1,81 @@
+{
+  "memes": [
+    {
+      "id": "1",
+      "title": "인기 밈 1",
+      "description": "요즘 인기 있는 밈입니다.",
+      "category": "유머",
+      "image": "/placeholder.svg?height=300&width=400",
+      "author": {
+        "id": "user1",
+        "name": "밈제작자1",
+        "avatar": "/placeholder.svg?height=40&width=40"
+      },
+      "publishedAt": "2023-04-22T09:30:00Z",
+      "likes": 2345,
+      "shares": 678,
+      "comments": 123
+    },
+    {
+      "id": "2",
+      "title": "인기 밈 2",
+      "description": "SNS에서 화제가 된 밈입니다.",
+      "category": "시사",
+      "image": "/placeholder.svg?height=300&width=400",
+      "author": {
+        "id": "user2",
+        "name": "밈제작자2",
+        "avatar": "/placeholder.svg?height=40&width=40"
+      },
+      "publishedAt": "2023-04-21T14:20:00Z",
+      "likes": 1987,
+      "shares": 456,
+      "comments": 98
+    }
+  ],
+  "memeDetail": {
+    "id": "1",
+    "title": "인기 밈 1",
+    "description": "요즘 인기 있는 밈입니다.",
+    "category": "유머",
+    "image": "/placeholder.svg?height=500&width=800",
+    "author": {
+      "id": "user1",
+      "name": "밈제작자1",
+      "avatar": "/placeholder.svg?height=40&width=40",
+      "followers": 12345
+    },
+    "publishedAt": "2023-04-22T09:30:00Z",
+    "likes": 2345,
+    "shares": 678,
+    "comments": 123,
+    "commentsList": [
+      {
+        "id": "c1",
+        "author": {
+          "id": "user5",
+          "name": "댓글러1",
+          "avatar": "/placeholder.svg?height=30&width=30"
+        },
+        "content": "너무 웃겨요! 😂",
+        "publishedAt": "2023-04-22T10:15:00Z",
+        "likes": 45
+      }
+    ],
+    "relatedMemes": [
+      {
+        "id": "2",
+        "title": "인기 밈 2",
+        "description": "SNS에서 화제가 된 밈입니다.",
+        "category": "시사",
+        "image": "/placeholder.svg?height=150&width=250",
+        "author": {
+          "name": "밈제작자2",
+          "avatar": "/placeholder.svg?height=30&width=30"
+        },
+        "publishedAt": "2023-04-21T14:20:00Z",
+        "likes": 1987
+      }
+    ]
+  }
+}

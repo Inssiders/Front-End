@@ -1,0 +1,152 @@
+{
+  "creatorStudio": {
+    "user": {
+      "id": "user1",
+      "username": "사용자1",
+      "name": "홍길동",
+      "avatar": "/placeholder.svg?height=100&width=100",
+      "followers": 1234,
+      "totalViews": 56789,
+      "totalLikes": 12345,
+      "totalComments": 6789
+    },
+    "content": [
+      {
+        "id": "c1",
+        "title": "내 첫 번째 게시글",
+        "excerpt": "인싸이더에 처음으로 작성한 게시글입니다.",
+        "category": "일상",
+        "image": "/placeholder.svg?height=200&width=400",
+        "publishedAt": "2023-03-10T09:30:00Z",
+        "comments": 12,
+        "likes": 45,
+        "views": 123,
+        "status": "published"
+      },
+      {
+        "id": "c2",
+        "title": "작성 중인 게시글",
+        "excerpt": "아직 작성 중인 게시글입니다.",
+        "category": "정보",
+        "image": null,
+        "updatedAt": "2023-04-20T14:20:00Z",
+        "status": "draft"
+      }
+    ],
+    "drafts": [
+      {
+        "id": "d1",
+        "title": "작성 중인 게시글",
+        "excerpt": "아직 작성 중인 게시글입니다.",
+        "category": "정보",
+        "image": null,
+        "updatedAt": "2023-04-20T14:20:00Z"
+      }
+    ],
+    "analytics": {
+      "views": {
+        "today": 123,
+        "week": 789,
+        "month": 3456,
+        "total": 56789
+      },
+      "likes": {
+        "today": 45,
+        "week": 234,
+        "month": 1234,
+        "total": 12345
+      },
+      "comments": {
+        "today": 12,
+        "week": 78,
+        "month": 345,
+        "total": 6789
+      },
+      "followers": {
+        "today": 5,
+        "week": 34,
+        "month": 123,
+        "total": 1234
+      },
+      "topContent": [
+        {
+          "id": "c1",
+          "title": "내 첫 번째 게시글",
+          "views": 123,
+          "likes": 45,
+          "comments": 12
+        }
+      ]
+    },
+    "settings": {
+      "profile": {
+        "name": "홍길동",
+        "bio": "안녕하세요! 인싸이더에서 활동하고 있는 홍길동입니다.",
+        "avatar": "/placeholder.svg?height=100&width=100",
+        "coverImage": "/placeholder.svg?height=400&width=1200",
+        "socialMedia": {
+          "instagram": "user1",
+          "twitter": "user1",
+          "youtube": "user1"
+        }
+      },
+      "notifications": {
+        "email": true,
+        "push": true,
+        "comments": true,
+        "likes": true,
+        "followers": true
+      }
+    }
+  },
+  "creatorStudioDetail": {
+    "id": "c1",
+    "title": "내 첫 번째 게시글",
+    "content": "<p>안녕하세요! 인싸이더에 처음으로 작성한 게시글입니다.</p><p>앞으로 다양한 주제로 글을 작성할 예정이니 많은 관심 부탁드립니다.</p>",
+    "category": "일상",
+    "image": "/placeholder.svg?height=400&width=800",
+    "publishedAt": "2023-03-10T09:30:00Z",
+    "comments": 12,
+    "likes": 45,
+    "views": 123,
+    "status": "published",
+    "analytics": {
+      "viewsOverTime": [
+        { "date": "2023-03-10", "views": 50 },
+        { "date": "2023-03-11", "views": 30 },
+        { "date": "2023-03-12", "views": 20 },
+        { "date": "2023-03-13", "views": 15 },
+        { "date": "2023-03-14", "views": 8 }
+      ],
+      "likesOverTime": [
+        { "date": "2023-03-10", "likes": 20 },
+        { "date": "2023-03-11", "likes": 15 },
+        { "date": "2023-03-12", "likes": 5 },
+        { "date": "2023-03-13", "likes": 3 },
+        { "date": "2023-03-14", "likes": 2 }
+      ],
+      "commentsOverTime": [
+        { "date": "2023-03-10", "comments": 5 },
+        { "date": "2023-03-11", "comments": 3 },
+        { "date": "2023-03-12", "comments": 2 },
+        { "date": "2023-03-13", "comments": 1 },
+        { "date": "2023-03-14", "comments": 1 }
+      ],
+      "demographics": {
+        "age": [
+          { "group": "18-24", "percentage": 30 },
+          { "group": "25-34", "percentage": 40 },
+          { "group": "35-44", "percentage": 20 },
+          { "group": "45+", "percentage": 10 }
+        ],
+        "gender": [{ "group": "남성", "percentage": 55 }, { "group": "여성", "percentage": 45 }],
+        "location": [
+          { "country": "대한민국", "percentage": 80 },
+          { "country": "미국", "percentage": 10 },
+          { "country": "일본", "percentage": 5 },
+          { "country": "기타", "percentage": 5 }
+        ]
+      }
+    }
+  }
+}

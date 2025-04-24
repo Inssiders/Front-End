@@ -1,0 +1,23 @@
+{
+  "name": "인싸이더 - 트렌드의 모든 것",
+  "short_name": "인싸이더",
+  "description": "인싸 문화, 밈, 인플루언서, 연예인을 중심으로 한 트렌디한 플랫폼",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#9333ea",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
