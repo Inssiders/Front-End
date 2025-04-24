@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { ProfileTabs } from "./profile-tabs"
-import { ProfilePosts } from "./profile-posts"
-import { ProfileChallenges } from "./profile-challenges"
-import { ProfileSaved } from "./profile-saved"
-import { ProfileLikes } from "./profile-likes"
-import { ProfileActivity } from "./profile-activity"
+import { useEffect, useState } from "react";
+import ProfileActivity from "./profile-activity";
+import ProfileChallenges from "./profile-challenges";
+import ProfileLikes from "./profile-likes";
+import ProfilePosts from "./profile-posts";
+import ProfileSaved from "./profile-saved";
+import { ProfileTabs } from "./profile-tabs";
 
 interface ProfileDetailProps {
-  id: string
+  id: string;
 }
 
 export function ProfileDetail({ id }: ProfileDetailProps) {
-  const [profile, setProfile] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("posts")
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("posts");
 
   useEffect(() => {
     // Simulate fetching profile data
@@ -45,43 +45,43 @@ export function ProfileDetail({ id }: ProfileDetailProps) {
           ],
           isFollowing: false,
           isCurrentUser: false,
-        }
+        };
 
-        setProfile(data)
-        setLoading(false)
+        setProfile(data);
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching profile:", error)
-        setLoading(false)
+        console.error("Error fetching profile:", error);
+        setLoading(false);
       }
-    }
+    };
 
-    fetchProfile()
-  }, [id])
+    fetchProfile();
+  }, [id]);
 
   if (loading) {
-    return <div className="p-8 text-center">로딩 중...</div>
+    return <div className="p-8 text-center">로딩 중...</div>;
   }
 
   if (!profile) {
-    return <div className="p-8 text-center">프로필을 찾을 수 없습니다.</div>
+    return <div className="p-8 text-center">프로필을 찾을 수 없습니다.</div>;
   }
 
   const renderTabContent = () => {
     switch (activeTab) {
       case "posts":
-        return <ProfilePosts id={id} />
+        return <ProfilePosts id={id} />;
       case "challenges":
-        return <ProfileChallenges id={id} />
+        return <ProfileChallenges id={id} />;
       case "saved":
-        return <ProfileSaved id={id} />
+        return <ProfileSaved id={id} />;
       case "likes":
-        return <ProfileLikes id={id} />
+        return <ProfileLikes id={id} />;
       case "activity":
-        return <ProfileActivity id={id} />
+        return <ProfileActivity id={id} />;
       default:
-        return <ProfilePosts id={id} />
+        return <ProfilePosts id={id} />;
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -100,11 +100,15 @@ export function ProfileDetail({ id }: ProfileDetailProps) {
 
               <div className="flex gap-4 mb-6">
                 <div className="text-center">
-                  <p className="font-bold">{profile.followers.toLocaleString()}</p>
+                  <p className="font-bold">
+                    {profile.followers.toLocaleString()}
+                  </p>
                   <p className="text-gray-500 text-sm">팔로워</p>
                 </div>
                 <div className="text-center">
-                  <p className="font-bold">{profile.following.toLocaleString()}</p>
+                  <p className="font-bold">
+                    {profile.following.toLocaleString()}
+                  </p>
                   <p className="text-gray-500 text-sm">팔로잉</p>
                 </div>
                 <div className="text-center">
@@ -132,14 +136,19 @@ export function ProfileDetail({ id }: ProfileDetailProps) {
               <div className="bg-gray-50 p-4 rounded-lg w-full mb-6">
                 <h2 className="font-bold mb-2">소개</h2>
                 <p className="text-gray-700 mb-4">{profile.bio}</p>
-                <p className="text-gray-500 text-sm">가입일: {profile.joinDate}</p>
+                <p className="text-gray-500 text-sm">
+                  가입일: {profile.joinDate}
+                </p>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg w-full mb-6">
                 <h2 className="font-bold mb-3">배지</h2>
                 <div className="flex flex-wrap gap-2">
                   {profile.badges.map((badge: any) => (
-                    <div key={badge.id} className="flex items-center bg-white p-2 rounded-full">
+                    <div
+                      key={badge.id}
+                      className="flex items-center bg-white p-2 rounded-full"
+                    >
                       <span className="mr-1">{badge.icon}</span>
                       <span className="text-sm">{badge.name}</span>
                     </div>
@@ -150,7 +159,9 @@ export function ProfileDetail({ id }: ProfileDetailProps) {
               <div className="bg-gray-50 p-4 rounded-lg w-full">
                 <div className="flex justify-between items-center mb-2">
                   <h2 className="font-bold">포인트</h2>
-                  <p className="font-bold text-blue-500">{profile.points.toLocaleString()}</p>
+                  <p className="font-bold text-blue-500">
+                    {profile.points.toLocaleString()}
+                  </p>
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="text-gray-500 text-sm">레벨</p>
@@ -160,7 +171,11 @@ export function ProfileDetail({ id }: ProfileDetailProps) {
             </div>
 
             <div className="md:w-2/3 mt-8 md:mt-0 md:pl-8">
-              <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} isCurrentUser={profile.isCurrentUser} />
+              <ProfileTabs
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                isCurrentUser={profile.isCurrentUser}
+              />
 
               <div className="mt-6">{renderTabContent()}</div>
             </div>
@@ -168,5 +183,5 @@ export function ProfileDetail({ id }: ProfileDetailProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
