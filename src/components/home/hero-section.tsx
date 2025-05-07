@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, TrendingUp, Sparkles, Users } from "lucide-react"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles, TrendingUp, Users } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function HeroSection() {
-  const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [bgShapes, setBgShapes] = useState<any[]>([]);
 
   const slides = [
     {
@@ -31,14 +32,28 @@ export default function HeroSection() {
       icon: <Users className="h-6 w-6 text-purple-500" />,
       color: "from-purple-500 to-pink-600",
     },
-  ]
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [slides.length])
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
+  useEffect(() => {
+    const shapes = Array.from({ length: 20 }).map(() => ({
+      width: Math.random() * 100 + 50,
+      height: Math.random() * 100 + 50,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      y: Math.random() * 100 - 50,
+      x: Math.random() * 100 - 50,
+      scale: Math.random() + 0.5,
+      duration: Math.random() * 10 + 10,
+    }));
+    setBgShapes(shapes);
+  }, []);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
@@ -47,23 +62,23 @@ export default function HeroSection() {
 
       {/* 배경 애니메이션 요소들 */}
       <div className="absolute inset-0 overflow-hidden z-0">
-        {[...Array(20)].map((_, i) => (
+        {bgShapes.map((shape, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full bg-gradient-to-r from-pink-200 to-purple-200 dark:from-pink-900/20 dark:to-purple-900/20 opacity-30"
             style={{
-              width: Math.random() * 100 + 50,
-              height: Math.random() * 100 + 50,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              width: shape.width,
+              height: shape.height,
+              left: shape.left,
+              top: shape.top,
             }}
             animate={{
-              y: [0, Math.random() * 100 - 50],
-              x: [0, Math.random() * 100 - 50],
-              scale: [1, Math.random() + 0.5, 1],
+              y: [0, shape.y],
+              x: [0, shape.x],
+              scale: [1, shape.scale, 1],
             }}
             transition={{
-              duration: Math.random() * 10 + 10,
+              duration: shape.duration,
               repeat: Number.POSITIVE_INFINITY,
               repeatType: "reverse",
             }}
@@ -89,7 +104,11 @@ export default function HeroSection() {
             >
               {slides[currentSlide].icon}
               <span className="ml-2 text-sm font-medium text-gray-800 dark:text-gray-200">
-                {currentSlide === 0 ? "NEW" : currentSlide === 1 ? "HOT" : "TREND"}
+                {currentSlide === 0
+                  ? "NEW"
+                  : currentSlide === 1
+                  ? "HOT"
+                  : "TREND"}
               </span>
             </motion.div>
 
@@ -101,7 +120,13 @@ export default function HeroSection() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r text-transparent bg-clip-text"
               style={{
-                backgroundImage: `linear-gradient(to right, ${slides[currentSlide].color.split(" ")[0].replace("from-", "")}, ${slides[currentSlide].color.split(" ")[1].replace("to-", "")})`,
+                backgroundImage: `linear-gradient(to right, ${slides[
+                  currentSlide
+                ].color
+                  .split(" ")[0]
+                  .replace("from-", "")}, ${slides[currentSlide].color
+                  .split(" ")[1]
+                  .replace("to-", "")})`,
               }}
             >
               {slides[currentSlide].title}
@@ -124,7 +149,10 @@ export default function HeroSection() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-white rounded-full">
+              <Button
+                size="lg"
+                className="bg-purple-600 hover:bg-purple-700 text-white rounded-full"
+              >
                 시작하기
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -147,7 +175,9 @@ export default function HeroSection() {
                     key={index}
                     onClick={() => setCurrentSlide(index)}
                     className={`w-3 h-3 rounded-full transition-all ${
-                      currentSlide === index ? "bg-purple-600 w-6" : "bg-gray-300 dark:bg-gray-700"
+                      currentSlide === index
+                        ? "bg-purple-600 w-6"
+                        : "bg-gray-300 dark:bg-gray-700"
                     }`}
                     aria-label={`슬라이드 ${index + 1}`}
                   />
@@ -164,59 +194,34 @@ export default function HeroSection() {
           >
             <div className="relative mx-auto max-w-md">
               {/* 모바일 디바이스 프레임 */}
-              <div className="relative rounded-[2.5rem] border-8 border-gray-800 dark:border-gray-700 overflow-hidden shadow-2xl">
-                <div className="absolute top-0 inset-x-0 h-6 bg-gray-800 dark:bg-gray-700 z-10 rounded-t-lg"></div>
-
-                {/* 앱 스크린샷 */}
-                <motion.div
-                  key={`screen-${currentSlide}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="aspect-[9/19] bg-white overflow-hidden"
-                >
-                  <img
-                    src={`/placeholder.svg?height=800&width=400&text=인싸이더 앱 화면 ${currentSlide + 1}`}
-                    alt={`인싸이더 앱 화면 ${currentSlide + 1}`}
-                    className="w-full h-full object-cover"
+              <div className="relative rounded-[2.5rem] border-[12px] border-gray-800 dark:border-gray-700 bg-black overflow-hidden shadow-2xl w-[360px] h-[780px] flex flex-col items-center">
+                {/* 상단 노치 */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-5 bg-gray-900 rounded-b-2xl z-20 mt-1"></div>
+                {/* 사이드 버튼 */}
+                <div className="absolute left-0 top-24 w-1.5 h-16 bg-gray-700 rounded-r-xl z-20"></div>
+                <div className="absolute right-0 top-40 w-1.5 h-10 bg-gray-700 rounded-l-xl z-20"></div>
+                {/* iframe으로 실제 페이지 표시 */}
+                <div className="relative flex-1 w-full flex flex-col">
+                  <iframe
+                    src="http://localhost:3000/trending"
+                    title="인싸이더 트렌딩"
+                    className="w-full h-full rounded-[2rem] border-0 bg-white dark:bg-gray-900"
+                    style={{
+                      minHeight: 0,
+                      minWidth: 0,
+                      flex: 1,
+                      overflow: "auto",
+                    }}
+                    allow="clipboard-write; encrypted-media; picture-in-picture;"
                   />
-                </motion.div>
-
-                {/* 홈 버튼 */}
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gray-800 dark:bg-gray-700 rounded-full"></div>
+                </div>
+                {/* 홈 인디케이터 */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-20 h-2 bg-gray-300 dark:bg-gray-700 rounded-full opacity-80 z-20"></div>
               </div>
-
-              {/* 장식 요소들 */}
-              <motion.div
-                animate={{
-                  rotate: [0, 10, 0, -10, 0],
-                  y: [0, -5, 0, 5, 0],
-                }}
-                transition={{
-                  duration: 10,
-                  repeat: Number.POSITIVE_INFINITY,
-                  repeatType: "loop",
-                }}
-                className="absolute -top-10 -right-10 w-24 h-24 bg-gradient-to-br from-pink-400 to-purple-500 rounded-2xl opacity-70 blur-xl"
-              />
-
-              <motion.div
-                animate={{
-                  rotate: [0, -10, 0, 10, 0],
-                  y: [0, 5, 0, -5, 0],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Number.POSITIVE_INFINITY,
-                  repeatType: "loop",
-                }}
-                className="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-tr from-indigo-400 to-purple-500 rounded-full opacity-70 blur-xl"
-              />
             </div>
           </motion.div>
         </div>
       </div>
     </div>
-  )
+  );
 }

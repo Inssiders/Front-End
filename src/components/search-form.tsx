@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Search } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import { useState } from "react";
 
 export function SearchForm() {
-  const [query, setQuery] = useState("")
+  const [query, setQuery] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // 검색 로직 구현
-    console.log("Searching for:", query)
-  }
+    console.log("Searching for:", query);
+  };
 
   return (
     <form onSubmit={handleSubmit} className="relative w-full">
@@ -35,5 +35,5 @@ export function SearchForm() {
         검색
       </Button>
     </form>
-  )
+  );
 }
