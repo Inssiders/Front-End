@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+@layer base {
+  :root {
+    --background: 40 30% 96%;
+    --foreground: 30 25% 15%;
+
+    --card: 40 30% 96%;
+    --card-foreground: 30 25% 15%;
+
+    --popover: 40 30% 96%;
+    --popover-foreground: 30 25% 15%;
+
+    --primary: 30 25% 15%;
+    --primary-foreground: 40 30% 96%;
+
+    --secondary: 35 25% 88%;
+    --secondary-foreground: 30 25% 15%;
+
+    --muted: 35 25% 88%;
+    --muted-foreground: 30 10% 40%;
+
+    --accent: 35 25% 88%;
+    --accent-foreground: 30 25% 15%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 40 30% 96%;
+
+    --border: 30 15% 85%;
+    --input: 30 15% 85%;
+    --ring: 30 25% 15%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 30 25% 15%;
+    --foreground: 40 30% 96%;
+
+    --card: 30 25% 15%;
+    --card-foreground: 40 30% 96%;
+
+    --popover: 30 25% 15%;
+    --popover-foreground: 40 30% 96%;
+
+    --primary: 40 30% 96%;
+    --primary-foreground: 30 25% 15%;
+
+    --secondary: 30 15% 25%;
+    --secondary-foreground: 40 30% 96%;
+
+    --muted: 30 15% 25%;
+    --muted-foreground: 30 10% 70%;
+
+    --accent: 30 15% 25%;
+    --accent-foreground: 40 30% 96%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 40 30% 96%;
+
+    --border: 30 15% 25%;
+    --input: 30 15% 25%;
+    --ring: 40 30% 96%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Dynamic grid layout */
+.auto-rows-[120px] {
+  grid-auto-rows: 120px;
+}
+
+/* Transition for showing/hiding frames */
+.opacity-0 {
+  transition: opacity 0.3s ease;
+}
+
+.opacity-100 {
+  transition: opacity 0.3s ease;
+}
