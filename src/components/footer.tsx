@@ -1,13 +1,10 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Instagram, Twitter, Youtube, Send } from "lucide-react"
+import Link from "next/link";
 
 export default function Footer() {
   return (
     <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="container mx-auto px-4 py-4">
+        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
             <Link href="/" className="inline-block mb-4">
               <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
@@ -15,7 +12,8 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              인싸 문화, 밈, 인플루언서, 연예인을 중심으로 한 트렌디하고 캐주얼한 웹사이트
+              인싸 문화, 밈, 인플루언서, 연예인을 중심으로 한 트렌디하고
+              캐주얼한 웹사이트
             </p>
             <div className="flex space-x-4">
               <Button variant="ghost" size="icon" aria-label="Instagram">
@@ -31,7 +29,9 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">카테고리</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+              카테고리
+            </h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -77,7 +77,9 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">서비스</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+              서비스
+            </h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -123,8 +125,12 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">뉴스레터 구독</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">최신 트렌드와 인싸 소식을 받아보세요</p>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+              뉴스레터 구독
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              최신 트렌드와 인싸 소식을 받아보세요
+            </p>
             <div className="flex">
               <Input
                 type="email"
@@ -136,23 +142,32 @@ export default function Footer() {
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="border-t border-gray-200 dark:border-gray-800 mt-12 pt-8 text-center text-gray-600 dark:text-gray-400 text-sm">
+        <div className="border-gray-200 dark:border-gray-800 text-center text-gray-600 dark:text-gray-400 text-sm">
           <p>© 2024 인싸이더. All rights reserved.</p>
           <div className="mt-2 space-x-4">
-            <Link href="/terms" className="hover:text-purple-600 dark:hover:text-purple-400">
+            <Link
+              href="/terms"
+              className="hover:text-purple-600 dark:hover:text-purple-400"
+            >
               이용약관
             </Link>
-            <Link href="/privacy" className="hover:text-purple-600 dark:hover:text-purple-400">
+            <Link
+              href="/privacy"
+              className="hover:text-purple-600 dark:hover:text-purple-400"
+            >
               개인정보처리방침
             </Link>
-            <Link href="/contact" className="hover:text-purple-600 dark:hover:text-purple-400">
+            <Link
+              href="/contact"
+              className="hover:text-purple-600 dark:hover:text-purple-400"
+            >
               문의하기
             </Link>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
