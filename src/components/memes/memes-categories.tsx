@@ -1,33 +1,27 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Search, SlidersHorizontal } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { MEME_CATEGORIES } from "@/utils/constant";
+import { motion } from "framer-motion";
+import { Search, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
 
 export default function MemesCategories() {
-  const [activeCategory, setActiveCategory] = useState("all")
-  const [showSearch, setShowSearch] = useState(false)
-
-  const categories = [
-    { id: "all", name: "전체" },
-    { id: "funny", name: "유머" },
-    { id: "kpop", name: "K-POP" },
-    { id: "drama", name: "드라마" },
-    { id: "animals", name: "동물" },
-    { id: "reaction", name: "리액션" },
-    { id: "text", name: "텍스트" },
-    { id: "celebrity", name: "연예인" },
-  ]
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-gray-950 sticky top-16 z-30 border-b border-gray-200 dark:border-gray-800">
+    <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
-            {categories.map((category) => (
-              <motion.div key={category.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <div className="flex items-center overflow-y-auto overflow-x-auto md:overflow-hidden pb-2 md:pb-0 w-full md:w-auto">
+            {MEME_CATEGORIES.map((category) => (
+              <motion.div
+                key={category.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
                   variant={activeCategory === category.id ? "default" : "ghost"}
                   className={`rounded-full mr-2 ${
@@ -70,12 +64,17 @@ export default function MemesCategories() {
                 <Search className="h-4 w-4" />
               </Button>
             )}
-            <Button variant="outline" size="icon" className="rounded-full" aria-label="필터">
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full"
+              aria-label="필터"
+            >
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

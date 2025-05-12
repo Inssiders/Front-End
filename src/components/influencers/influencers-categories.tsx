@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Search, SlidersHorizontal } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
+import { Search, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
 
 export default function InfluencersCategories() {
-  const [activeCategory, setActiveCategory] = useState("all")
-  const [showSearch, setShowSearch] = useState(false)
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [showSearch, setShowSearch] = useState(false);
 
   const categories = [
     { id: "all", name: "전체" },
@@ -19,15 +19,19 @@ export default function InfluencersCategories() {
     { id: "travel", name: "여행" },
     { id: "fitness", name: "피트니스" },
     { id: "gaming", name: "게임" },
-  ]
+  ];
 
   return (
     <div className="bg-white dark:bg-gray-950 sticky top-16 z-30 border-b border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
+          <div className="flex items-center overflow-x-auto md:overflow-x-hidden pb-2 md:pb-0 w-full md:w-auto">
             {categories.map((category) => (
-              <motion.div key={category.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                key={category.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
                   variant={activeCategory === category.id ? "default" : "ghost"}
                   className={`rounded-full mr-2 ${
@@ -70,12 +74,17 @@ export default function InfluencersCategories() {
                 <Search className="h-4 w-4" />
               </Button>
             )}
-            <Button variant="outline" size="icon" className="rounded-full" aria-label="필터">
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full"
+              aria-label="필터"
+            >
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

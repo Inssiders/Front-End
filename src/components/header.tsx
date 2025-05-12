@@ -5,52 +5,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import {
-  Award,
-  Bell,
-  Menu,
-  Search,
-  Sparkles,
-  Star,
-  TrendingUp,
-  Users,
-  Video,
-  X,
-} from "lucide-react";
+import { Bell, Menu, Search, Sparkles, X } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const navItems = [
-  {
-    name: "트렌딩",
-    href: "/trending",
-    icon: <TrendingUp className="h-4 w-4 mr-2" />,
-  },
+  // {
+  //   name: "트렌딩",
+  //   href: "/trending",
+  //   icon: <TrendingUp className="h-4 w-4 mr-2" />,
+  // },
   { name: "밈", href: "/memes", icon: <Sparkles className="h-4 w-4 mr-2" /> },
-  {
-    name: "인플루언서",
-    href: "/influencers",
-    icon: <Users className="h-4 w-4 mr-2" />,
-  },
-  {
-    name: "연예인",
-    href: "/celebrities",
-    icon: <Star className="h-4 w-4 mr-2" />,
-  },
-  {
-    name: "챌린지",
-    href: "/challenges",
-    icon: <Award className="h-4 w-4 mr-2" />,
-  },
-  { name: "라이브", href: "/live", icon: <Video className="h-4 w-4 mr-2" /> },
+  // {
+  //   name: "인플루언서",
+  //   href: "/influencers",
+  //   icon: <Users className="h-4 w-4 mr-2" />,
+  // },
+  // {
+  //   name: "연예인",
+  //   href: "/celebrities",
+  //   icon: <Star className="h-4 w-4 mr-2" />,
+  // },
+  // {
+  //   name: "챌린지",
+  //   href: "/challenges",
+  //   icon: <Award className="h-4 w-4 mr-2" />,
+  // },
+  // { name: "라이브", href: "/live", icon: <Video className="h-4 w-4 mr-2" /> },
 ];
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [showHeader, setShowHeader] = useState(true);
+  const lastScrollY = useRef(0);
   const { data: session } = useSession();
   const pathname = usePathname();
   const isMobile = useMobile();
@@ -58,6 +49,19 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
+      if (window.scrollY < 10) {
+        setShowHeader(true);
+        lastScrollY.current = window.scrollY;
+        return;
+      }
+      if (window.scrollY > lastScrollY.current) {
+        // 아래로 스크롤
+        setShowHeader(false);
+      } else {
+        // 위로 스크롤
+        setShowHeader(true);
+      }
+      lastScrollY.current = window.scrollY;
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -66,10 +70,11 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b",
         isScrolled
           ? "bg-white/80 backdrop-blur-md shadow-sm dark:bg-gray-900/80"
-          : "bg-transparent"
+          : "bg-transparent",
+        showHeader ? "translate-y-0" : "-translate-y-full"
       )}
     >
       <div className="container mx-auto px-4">
