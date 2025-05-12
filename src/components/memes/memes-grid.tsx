@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Heart, MessageCircle, Share2, Bookmark } from "lucide-react"
-import Link from "next/link"
-import MemesLoading from "./memes-loading"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { Bookmark, Heart, MessageCircle, Share2 } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import MemesLoading from "./memes-loading";
 
 // 밈 데이터 (실제로는 API에서 가져올 것)
-const memesData = [
+export const memesData = [
   {
     id: 1,
     title: "아무말 대잔치 밈 시리즈",
@@ -131,49 +131,75 @@ const memesData = [
     isLiked: false,
     isBookmarked: true,
   },
-]
+];
 
-export default function MemesGrid() {
-  const [memes, setMemes] = useState(memesData)
-  const [loading, setLoading] = useState(true)
+interface Meme {
+  id: number;
+  title: string;
+  category: string;
+  image: string;
+  author: { name: string; avatar: string };
+  likes: number;
+  comments: number;
+  shares: number;
+  isLiked: boolean;
+  isBookmarked: boolean;
+}
+
+interface MemesGridProps {
+  memes?: Meme[];
+  loading?: boolean;
+}
+
+export default function MemesGrid({ memes, loading }: MemesGridProps) {
+  const [internalMemes, setInternalMemes] = useState(memes ?? memesData);
+  const [internalLoading, setInternalLoading] = useState(loading ?? true);
 
   useEffect(() => {
-    // 데이터 로딩 시뮬레이션
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 1000)
+    if (typeof loading === "boolean") {
+      setInternalLoading(loading);
+    } else {
+      // 데이터 로딩 시뮬레이션
+      setInternalLoading(true);
+      const timer = setTimeout(() => {
+        setInternalLoading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
 
-    return () => clearTimeout(timer)
-  }, [])
+  useEffect(() => {
+    if (memes) setInternalMemes(memes);
+  }, [memes]);
 
   const toggleLike = (id: number) => {
-    setMemes((prevMemes) =>
+    setInternalMemes((prevMemes) =>
       prevMemes.map((meme) => {
         if (meme.id === id) {
           return {
             ...meme,
             isLiked: !meme.isLiked,
             likes: meme.isLiked ? meme.likes - 1 : meme.likes + 1,
-          }
+          };
         }
-        return meme
-      }),
-    )
-  }
+        return meme;
+      })
+    );
+  };
 
   const toggleBookmark = (id: number) => {
-    setMemes((prevMemes) =>
+    setInternalMemes((prevMemes) =>
       prevMemes.map((meme) => {
         if (meme.id === id) {
           return {
             ...meme,
             isBookmarked: !meme.isBookmarked,
-          }
+          };
         }
-        return meme
-      }),
-    )
-  }
+        return meme;
+      })
+    );
+  };
 
   const container = {
     hidden: { opacity: 0 },
@@ -183,15 +209,15 @@ export default function MemesGrid() {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
+  };
 
-  if (loading) {
-    return <MemesLoading />
+  if (internalLoading) {
+    return <MemesLoading />;
   }
 
   return (
@@ -202,7 +228,7 @@ export default function MemesGrid() {
         animate="show"
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
       >
-        {memes.map((meme) => (
+        {internalMemes.map((meme) => (
           <motion.div key={meme.id} variants={item}>
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900 h-full">
               <div className="relative">
@@ -212,14 +238,20 @@ export default function MemesGrid() {
                   className="w-full aspect-square object-cover"
                 />
                 <div className="absolute top-3 left-3">
-                  <Badge className="bg-purple-600 hover:bg-purple-700">{meme.category}</Badge>
+                  <Badge className="bg-purple-600 hover:bg-purple-700">
+                    {meme.category}
+                  </Badge>
                 </div>
                 <button
                   className="absolute top-3 right-3 bg-black/30 hover:bg-black/50 text-white p-1.5 rounded-full transition-colors"
                   onClick={() => toggleBookmark(meme.id)}
                   aria-label="북마크"
                 >
-                  <Bookmark className={`h-4 w-4 ${meme.isBookmarked ? "fill-current text-yellow-400" : ""}`} />
+                  <Bookmark
+                    className={`h-4 w-4 ${
+                      meme.isBookmarked ? "fill-current text-yellow-400" : ""
+                    }`}
+                  />
                 </button>
               </div>
 
@@ -233,10 +265,17 @@ export default function MemesGrid() {
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center">
                     <Avatar className="h-6 w-6 mr-2">
-                      <AvatarImage src={meme.author.avatar || "/placeholder.svg"} alt={meme.author.name} />
-                      <AvatarFallback>{meme.author.name.substring(0, 2)}</AvatarFallback>
+                      <AvatarImage
+                        src={meme.author.avatar || "/placeholder.svg"}
+                        alt={meme.author.name}
+                      />
+                      <AvatarFallback>
+                        {meme.author.name.substring(0, 2)}
+                      </AvatarFallback>
                     </Avatar>
-                    <span className="text-xs text-gray-700 dark:text-gray-300">{meme.author.name}</span>
+                    <span className="text-xs text-gray-700 dark:text-gray-300">
+                      {meme.author.name}
+                    </span>
                   </div>
                 </div>
 
@@ -247,7 +286,11 @@ export default function MemesGrid() {
                     }`}
                     onClick={() => toggleLike(meme.id)}
                   >
-                    <Heart className={`h-3 w-3 mr-1 ${meme.isLiked ? "fill-current" : ""}`} />
+                    <Heart
+                      className={`h-3 w-3 mr-1 ${
+                        meme.isLiked ? "fill-current" : ""
+                      }`}
+                    />
                     {meme.likes.toLocaleString()}
                   </button>
                   <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
@@ -265,5 +308,5 @@ export default function MemesGrid() {
         ))}
       </motion.div>
     </div>
-  )
+  );
 }

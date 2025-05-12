@@ -1,7 +1,7 @@
-import Link from "next/link"
+import Link from "next/link";
 
 interface RelatedMemesProps {
-  id: string
+  id: string;
 }
 
 export function RelatedMemes({ id }: RelatedMemesProps) {
@@ -9,12 +9,12 @@ export function RelatedMemes({ id }: RelatedMemesProps) {
   const relatedMemes = Array(4)
     .fill(0)
     .map((_, i) => ({
-      id: `meme-${i + 1}`,
+      id: `${i + 1}`,
       title: `관련 밈 ${i + 1}`,
       image: `/placeholder.svg?height=300&width=300`,
       likes: Math.floor(Math.random() * 1000),
       comments: Math.floor(Math.random() * 100),
-    }))
+    }));
 
   return (
     <div className="mt-12">
@@ -48,5 +48,5 @@ export function RelatedMemes({ id }: RelatedMemesProps) {
         ))}
       </div>
     </div>
-  )
+  );
 }
