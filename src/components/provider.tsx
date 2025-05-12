@@ -7,7 +7,7 @@ import { SessionProvider } from "next-auth/react";
 import { Suspense } from "react";
 import Footer from "./footer";
 import Header from "./header";
-import { FullPageLoader } from "./loader";
+import { Web3CubeLoader } from "./loader";
 
 interface Props {
   children?: React.ReactNode;
@@ -25,7 +25,7 @@ export const NextProvider = ({ children }: Props) => {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        <Suspense fallback={<FullPageLoader />}>{children}</Suspense>
+        <Suspense fallback={<Web3CubeLoader />}>{children}</Suspense>
       </SessionProvider>
     </QueryClientProvider>
   );
