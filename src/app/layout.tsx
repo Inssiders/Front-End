@@ -1,9 +1,4 @@
-import Footer from "@/components/footer";
-import Header from "@/components/header";
-import NextAuthSessionProvider from "@/components/session-provider";
-import { ThemeProvider } from "@/components/theme-provider";
-import { DataSourceProvider } from "@/contexts/data-source-context";
-import { Analytics } from "@vercel/analytics/react";
+import { NextLayout, NextProvider } from "@/components/provider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type React from "react";
@@ -28,23 +23,9 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body>
-        <NextAuthSessionProvider>
-          <DataSourceProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <div className="flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1 mt-16">{children}</main>
-                <Footer />
-                <Analytics />
-              </div>
-            </ThemeProvider>
-          </DataSourceProvider>
-        </NextAuthSessionProvider>
+        <NextProvider>
+          <NextLayout>{children}</NextLayout>
+        </NextProvider>
       </body>
     </html>
   );
