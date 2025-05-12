@@ -1,19 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Resizable } from "./resizable";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "./resizable";
 
-const meta: Meta<typeof Resizable> = {
+const meta: Meta<typeof ResizablePanelGroup> = {
   title: "UI/Resizable",
-  component: Resizable,
+  component: ResizablePanelGroup,
   tags: ["autodocs"],
 };
 export default meta;
 
-type Story = StoryObj<typeof Resizable>;
+type Story = StoryObj<typeof ResizablePanelGroup>;
 
 export const Default: Story = {
   render: () => (
-    <Resizable style={{ width: 200, height: 100, border: "1px solid #ccc" }}>
-      <div style={{ padding: 16 }}>Resizable Content</div>
-    </Resizable>
+    <ResizablePanelGroup direction="horizontal" className="h-full w-full">
+      <ResizablePanel>
+        <div style={{ padding: 16 }}>Resizable Content</div>
+      </ResizablePanel>
+      <ResizableHandle />
+    </ResizablePanelGroup>
   ),
 };
