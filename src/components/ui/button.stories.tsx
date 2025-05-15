@@ -33,3 +33,39 @@ export const Ghost: Story = {
     variant: "ghost",
   },
 };
+
+export const Hover: Story = {
+  args: {
+    children: "Hover 상태",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "마우스를 올리면 색상이 변하는 hover 효과를 확인할 수 있습니다.",
+      },
+    },
+  },
+  render: (args) => (
+    <Button {...args} style={{ transition: "all 0.2s" }}>
+      {args.children}
+    </Button>
+  ),
+};
+
+export const Active: Story = {
+  args: {
+    children: "Active 상태",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "버튼을 클릭(Active)했을 때의 스타일을 확인할 수 있습니다.",
+      },
+    },
+  },
+  render: (args) => (
+    <Button {...args} style={{ boxShadow: "0 0 0 2px #6366f1" }}>
+      {args.children}
+    </Button>
+  ),
+};

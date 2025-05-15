@@ -4,9 +4,9 @@
  */
 export function isOnline(): boolean {
   if (typeof navigator !== "undefined") {
-    return navigator.onLine
+    return navigator.onLine;
   }
-  return true // Default to true in SSR context
+  return true; // Default to true in SSR context
 }
 
 /**
@@ -16,18 +16,18 @@ export function isOnline(): boolean {
  */
 export async function canFetch(url: string): Promise<boolean> {
   try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     const response = await fetch(url, {
       method: "HEAD",
       signal: controller.signal,
-    })
+    });
 
-    clearTimeout(timeoutId)
-    return response.ok
+    clearTimeout(timeoutId);
+    return response.ok;
   } catch (error) {
-    return false
+    return false;
   }
 }
 
@@ -36,5 +36,5 @@ export async function canFetch(url: string): Promise<boolean> {
  * @returns Promise resolving to boolean indicating if the API is reachable
  */
 export async function isApiReachable(): Promise<boolean> {
-  return canFetch("/api/health")
+  return canFetch("/api/health");
 }

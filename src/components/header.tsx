@@ -5,35 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { Bell, Menu, Search, Sparkles, X } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { Menu, Search, Sparkles, X } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const navItems = [
-  // {
-  //   name: "트렌딩",
-  //   href: "/trending",
-  //   icon: <TrendingUp className="h-4 w-4 mr-2" />,
-  // },
   { name: "밈", href: "/memes", icon: <Sparkles className="h-4 w-4 mr-2" /> },
-  // {
-  //   name: "인플루언서",
-  //   href: "/influencers",
-  //   icon: <Users className="h-4 w-4 mr-2" />,
-  // },
-  // {
-  //   name: "연예인",
-  //   href: "/celebrities",
-  //   icon: <Star className="h-4 w-4 mr-2" />,
-  // },
-  // {
-  //   name: "챌린지",
-  //   href: "/challenges",
-  //   icon: <Award className="h-4 w-4 mr-2" />,
-  // },
-  // { name: "라이브", href: "/live", icon: <Video className="h-4 w-4 mr-2" /> },
 ];
 
 export default function Header() {
@@ -45,6 +24,8 @@ export default function Header() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const isMobile = useMobile();
+  const router = useRouter();
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,37 +48,75 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Add click outside to close dropdown
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    function handleClick(e: MouseEvent) {
+      const dropdown = document.getElementById("mobile-menu-dropdown");
+      if (dropdown && !dropdown.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [isMenuOpen]);
+
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (search.trim()) {
+      router.push(`/search?q=${encodeURIComponent(search.trim())}`);
+      setIsMenuOpen(false);
+    }
+  }
+
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b shadow-sm backdrop-blur-md",
         isScrolled
-          ? "bg-white/80 backdrop-blur-md shadow-sm dark:bg-gray-900/80"
-          : "bg-transparent",
+          ? "bg-white/90 dark:bg-gray-900/90"
+          : "bg-white/70 dark:bg-gray-900/70",
         showHeader ? "translate-y-0" : "-translate-y-full"
       )}
     >
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
-                인싸이더
-              </span>
-            </Link>
+        <div className="flex h-16 items-center justify-between gap-2 w-full">
+          {/* Logo */}
+          <Link href="/" className="flex items-center min-w-[100px]">
+            <span className="text-2xl font-extrabold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text tracking-tight select-none">
+              인싸이더
+            </span>
+          </Link>
+
+          {/* Mobile Search (centered) */}
+          <div className="flex-1 flex justify-center items-center md:hidden">
+            <form onSubmit={handleSearchSubmit} className="w-full max-w-xs">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Input
+                  type="search"
+                  placeholder="트렌드 검색..."
+                  className="pl-10 pr-3 py-2 rounded-full bg-gray-100 border-0 focus-visible:ring-2 focus-visible:ring-purple-400 dark:bg-gray-800 text-base transition-all"
+                  aria-label="트렌드 검색"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+            </form>
           </div>
 
+          {/* Desktop Nav */}
           {!isMobile && (
-            <nav className="hidden md:flex items-center space-x-1">
+            <nav className="flex-1 flex justify-center items-center gap-2">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "px-3 py-2 rounded-full text-sm font-medium flex items-center transition-all",
+                    "px-4 py-2 rounded-full text-sm font-semibold flex items-center transition-all duration-150",
                     pathname === item.href
-                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/50"
+                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-200 shadow"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/60"
                   )}
                 >
                   {item.icon}
@@ -107,133 +126,138 @@ export default function Header() {
             </nav>
           )}
 
-          <div className="flex items-center space-x-2">
-            <div className="relative hidden md:block w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="search"
-                placeholder="트렌드 검색..."
-                className="pl-10 rounded-full bg-gray-100 border-0 focus-visible:ring-purple-500 dark:bg-gray-800"
-              />
-            </div>
+          {/* Desktop Search */}
+          <div className="hidden md:flex items-center w-64 max-w-xs relative">
+            <form onSubmit={handleSearchSubmit} className="w-full">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="search"
+                  placeholder="트렌드 검색..."
+                  className="pl-10 pr-3 py-2 rounded-full bg-gray-100 border-0 focus-visible:ring-2 focus-visible:ring-purple-400 dark:bg-gray-800 text-sm"
+                  aria-label="트렌드 검색"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+            </form>
+          </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative"
-              aria-label="알림"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </Button>
-
-            {/* 프로필/로그인 드롭다운 */}
+          {/* Desktop Profile/Login */}
+          <div className="hidden md:flex items-center ml-2">
             <div className="relative">
-              <button
-                onClick={() => setIsProfileMenuOpen((v) => !v)}
-                className="focus:outline-none"
-                aria-label="프로필 메뉴 열기"
+              {session ? (
+                <button
+                  onClick={() => setIsProfileMenuOpen((v) => !v)}
+                  className="focus:outline-none"
+                  aria-label="프로필 메뉴 열기"
+                >
+                  <Avatar className="h-9 w-9 border-2 border-purple-200 hover:border-purple-400 transition-all">
+                    <AvatarImage
+                      src="/placeholder.svg?height=36&width=36"
+                      alt="프로필"
+                    />
+                    <AvatarFallback>MZ</AvatarFallback>
+                  </Avatar>
+                </button>
+              ) : (
+                <Link
+                  href="/signin"
+                  className="px-4 py-2 text-sm font-semibold rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                >
+                  로그인
+                </Link>
+              )}
+              {session && isProfileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-900 rounded-xl shadow-lg py-2 z-50 border border-gray-100 dark:border-gray-800">
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                  >
+                    프로필
+                  </Link>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    onClick={() => {
+                      signOut({ callbackUrl: "/" });
+                      setIsProfileMenuOpen(false);
+                    }}
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden ml-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          >
+            {isMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMenuOpen && (
+        <div
+          className="absolute left-1/2 top-16 z-50 w-full flex justify-center md:hidden"
+          style={{ transform: "translateX(-50%)" }}
+        >
+          <div className="bg-white dark:bg-gray-900 shadow-xl rounded-2xl mt-2 px-6 py-6 flex flex-col gap-4 items-center w-11/12 max-w-sm border border-gray-100 dark:border-gray-800 transition-all duration-300 animate-dropdown">
+            {/* Close Button */}
+            <button
+              className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+              aria-label="메뉴 닫기"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            {/* Main Actions: 밈, 로그인/프로필 */}
+            <Link
+              href="/memes"
+              className="w-full px-6 py-4 rounded-full text-lg font-bold flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow hover:scale-105 active:scale-95 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              onClick={() => setIsMenuOpen(false)}
+              aria-label="밈 페이지로 이동"
+            >
+              <Sparkles className="h-6 w-6 mr-2" />밈
+            </Link>
+            {session ? (
+              <Link
+                href="/profile"
+                className="w-full px-6 py-4 rounded-full text-lg font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-purple-400"
+                onClick={() => setIsMenuOpen(false)}
+                aria-label="프로필 페이지로 이동"
               >
-                <Avatar className="h-8 w-8 border-2 border-purple-200 hover:border-purple-400 transition-all">
+                <Avatar className="h-7 w-7 border border-purple-200 mr-2">
                   <AvatarImage
-                    src="/placeholder.svg?height=32&width=32"
+                    src="/placeholder.svg?height=28&width=28"
                     alt="프로필"
                   />
                   <AvatarFallback>MZ</AvatarFallback>
                 </Avatar>
-              </button>
-              {isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 rounded-xl shadow-lg py-2 z-50 border border-gray-100 dark:border-gray-800">
-                  {session ? (
-                    <>
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                      >
-                        프로필
-                      </Link>
-                      <button
-                        className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={() => {
-                          signOut({ callbackUrl: "/" });
-                          setIsProfileMenuOpen(false);
-                        }}
-                      >
-                        로그아웃
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={() => {
-                          signIn();
-                          setIsProfileMenuOpen(false);
-                        }}
-                      >
-                        로그인
-                      </button>
-                      <Link
-                        href="/signup"
-                        className="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                      >
-                        회원가입
-                      </Link>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="메뉴"
-            >
-              {isMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* 모바일 메뉴 */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 shadow-lg">
-          <div className="container mx-auto px-4 py-3">
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="search"
-                placeholder="트렌드 검색..."
-                className="pl-10 rounded-full bg-gray-100 border-0 focus-visible:ring-purple-500 dark:bg-gray-800"
-              />
-            </div>
-            <nav className="flex flex-col space-y-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "px-3 py-3 rounded-lg text-sm font-medium flex items-center",
-                    pathname === item.href
-                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/50"
-                  )}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.icon}
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
+                프로필
+              </Link>
+            ) : (
+              <Link
+                href="/signin"
+                className="w-full px-6 py-4 rounded-full text-lg font-bold flex items-center justify-center bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-200 shadow hover:bg-purple-200 dark:hover:bg-purple-800 hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-purple-400"
+                onClick={() => setIsMenuOpen(false)}
+                aria-label="로그인 페이지로 이동"
+              >
+                로그인
+              </Link>
+            )}
           </div>
         </div>
       )}
