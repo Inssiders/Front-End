@@ -43,7 +43,7 @@ export default function ThreeScene({
 
     if (scrollProgress < 0.33) {
       // First section: Bottom left to center
-      const t = scrollProgress / 0.33;
+      const t = scrollProgress / 0.333;
       newPosition = [
         -1.5 + t * 1.5, // Move from left (-1.5) to center (0)
         -1 + t * 1, // Move from bottom (-1) to center (0)

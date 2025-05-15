@@ -1,242 +1,385 @@
 "use client";
 
-import type React from "react";
-
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Pause, Play, Volume2, VolumeX } from "lucide-react";
-import { JSX, useEffect, useState } from "react";
+import { FrameComponent } from "./dynamic-video-frame-component.tsx";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
-interface VideoItem {
+const GRID_SIZE = 12;
+const CELL_SIZE = 60; // pixels per grid cell
+
+interface Frame {
   id: number;
-  title: string;
-  thumbnail: string;
-  size: "small" | "medium" | "large";
+  video: string;
+  defaultPos: { x: number; y: number; w: number; h: number };
+  corner: string;
+  edgeHorizontal: string;
+  edgeVertical: string;
+  mediaSize: number;
+  borderThickness: number;
+  borderSize: number;
+  autoplayMode: "all" | "hover";
+  isHovered: boolean;
 }
 
-const videoData: VideoItem[] = [
+const initialFrames: Frame[] = [
   {
     id: 1,
-    title: "Funny Cat",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-    size: "medium",
+    video:
+      "https://static.cdn-luma.com/files/981e483f71aa764b/Company%20Thing%20Exported.mp4",
+    defaultPos: { x: 0, y: 0, w: 4, h: 4 },
+    corner:
+      "https://static.cdn-luma.com/files/bcf576df9c38b05f/1_corner_update.png",
+    edgeHorizontal:
+      "https://static.cdn-luma.com/files/bcf576df9c38b05f/1_vert_update.png",
+    edgeVertical:
+      "https://static.cdn-luma.com/files/bcf576df9c38b05f/1_hori_update.png",
+    mediaSize: 1,
+    borderThickness: 0,
+    borderSize: 80,
+    autoplayMode: "all",
+    isHovered: false,
   },
   {
     id: 2,
-    title: "Dancing Dog",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-    size: "small",
+    video:
+      "https://static.cdn-luma.com/files/58ab7363888153e3/WebGL%20Exported%20(1).mp4",
+    defaultPos: { x: 4, y: 0, w: 4, h: 4 },
+    corner:
+      "https://static.cdn-luma.com/files/bcf576df9c38b05f/2_corner_update.png",
+    edgeHorizontal:
+      "https://static.cdn-luma.com/files/bcf576df9c38b05f/2_vert_update.png",
+    edgeVertical:
+      "https://static.cdn-luma.com/files/bcf576df9c38b05f/2_hori_update.png",
+    mediaSize: 1,
+    borderThickness: 0,
+    borderSize: 80,
+    autoplayMode: "all",
+    isHovered: false,
   },
   {
     id: 3,
-    title: "Epic Fail",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-    size: "large",
+    video:
+      "https://static.cdn-luma.com/files/58ab7363888153e3/Jitter%20Exported%20Poster.mp4",
+    defaultPos: { x: 8, y: 0, w: 4, h: 4 },
+    corner:
+      "https://static.cdn-luma.com/files/3d36d1e0dba2476c/3_Corner_update.png",
+    edgeHorizontal:
+      "https://static.cdn-luma.com/files/3d36d1e0dba2476c/3_hori_update.png",
+    edgeVertical:
+      "https://static.cdn-luma.com/files/3d36d1e0dba2476c/3_Vert_update.png",
+    mediaSize: 1,
+    borderThickness: 0,
+    borderSize: 80,
+    autoplayMode: "all",
+    isHovered: false,
   },
   {
     id: 4,
-    title: "Cute Baby",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-    size: "small",
+    video:
+      "https://static.cdn-luma.com/files/58ab7363888153e3/Exported%20Web%20Video.mp4",
+    defaultPos: { x: 0, y: 4, w: 4, h: 4 },
+    corner:
+      "https://static.cdn-luma.com/files/9e67e05f37e52522/4_corner_update.png",
+    edgeHorizontal:
+      "https://static.cdn-luma.com/files/9e67e05f37e52522/4_hori_update.png",
+    edgeVertical:
+      "https://static.cdn-luma.com/files/9e67e05f37e52522/4_vert_update.png",
+    mediaSize: 1,
+    borderThickness: 0,
+    borderSize: 80,
+    autoplayMode: "all",
+    isHovered: false,
   },
   {
     id: 5,
-    title: "Prank Time",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-    size: "medium",
+    video:
+      "https://static.cdn-luma.com/files/58ab7363888153e3/Logo%20Exported.mp4",
+    defaultPos: { x: 4, y: 4, w: 4, h: 4 },
+    corner:
+      "https://static.cdn-luma.com/files/9e67e05f37e52522/5_corner_update.png",
+    edgeHorizontal:
+      "https://static.cdn-luma.com/files/9e67e05f37e52522/5_hori_update.png",
+    edgeVertical:
+      "https://static.cdn-luma.com/files/9e67e05f37e52522/5_verti_update.png",
+    mediaSize: 1,
+    borderThickness: 0,
+    borderSize: 80,
+    autoplayMode: "all",
+    isHovered: false,
   },
   {
     id: 6,
-    title: "Sports Blooper",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-    size: "small",
+    video:
+      "https://static.cdn-luma.com/files/58ab7363888153e3/Animation%20Exported%20(4).mp4",
+    defaultPos: { x: 8, y: 4, w: 4, h: 4 },
+    corner: "https://static.cdn-luma.com/files/1199340587e8da1d/6_corner.png",
+    edgeHorizontal:
+      "https://static.cdn-luma.com/files/1199340587e8da1d/6_corner-1.png",
+    edgeVertical:
+      "https://static.cdn-luma.com/files/1199340587e8da1d/6_vert.png",
+    mediaSize: 1,
+    borderThickness: 0,
+    borderSize: 80,
+    autoplayMode: "all",
+    isHovered: false,
   },
   {
     id: 7,
-    title: "Reaction Meme",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-    size: "large",
+    video:
+      "https://static.cdn-luma.com/files/58ab7363888153e3/Illustration%20Exported%20(1).mp4",
+    defaultPos: { x: 0, y: 8, w: 4, h: 4 },
+    corner: "https://static.cdn-luma.com/files/b80b5aa00ccc33bd/7_corner.png",
+    edgeHorizontal:
+      "https://static.cdn-luma.com/files/b80b5aa00ccc33bd/7_hori.png",
+    edgeVertical:
+      "https://static.cdn-luma.com/files/b80b5aa00ccc33bd/7_vert.png",
+    mediaSize: 1,
+    borderThickness: 0,
+    borderSize: 80,
+    autoplayMode: "all",
+    isHovered: false,
   },
   {
     id: 8,
-    title: "Gaming Moment",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-    size: "medium",
+    video:
+      "https://static.cdn-luma.com/files/58ab7363888153e3/Art%20Direction%20Exported.mp4",
+    defaultPos: { x: 4, y: 8, w: 4, h: 4 },
+    corner: "https://static.cdn-luma.com/files/981e483f71aa764b/8_corner.png",
+    edgeHorizontal:
+      "https://static.cdn-luma.com/files/981e483f71aa764b/8_hori.png",
+    edgeVertical:
+      "https://static.cdn-luma.com/files/981e483f71aa764b/8_verticle.png",
+    mediaSize: 1,
+    borderThickness: 0,
+    borderSize: 80,
+    autoplayMode: "all",
+    isHovered: false,
   },
   {
     id: 9,
-    title: "Unexpected Turn",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-    size: "small",
+    video:
+      "https://static.cdn-luma.com/files/58ab7363888153e3/Product%20Video.mp4",
+    defaultPos: { x: 8, y: 8, w: 4, h: 4 },
+    corner: "https://static.cdn-luma.com/files/981e483f71aa764b/9_corner.png",
+    edgeHorizontal:
+      "https://static.cdn-luma.com/files/981e483f71aa764b/9_hori.png",
+    edgeVertical:
+      "https://static.cdn-luma.com/files/981e483f71aa764b/9_vert.png",
+    mediaSize: 1,
+    borderThickness: 0,
+    borderSize: 80,
+    autoplayMode: "all",
+    isHovered: false,
   },
 ];
 
-interface DynamicVideoGridProps {
-  showFrames?: boolean;
-  onToggleShowFrames?: (show: boolean) => void;
-}
-
-export default function DynamicVideoGrid({
-  showFrames = true,
-  onToggleShowFrames,
-}: DynamicVideoGridProps): JSX.Element {
-  const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
-  const [playingVideos, setPlayingVideos] = useState<Set<number>>(new Set());
-  const [mutedVideos, setMutedVideos] = useState<Set<number>>(
-    new Set(videoData.map((v) => v.id))
+export default function DynamicFrameLayout() {
+  const [frames, setFrames] = useState<Frame[]>(initialFrames);
+  const [hovered, setHovered] = useState<{ row: number; col: number } | null>(
+    null
   );
-  const [areFramesVisible, setAreFramesVisible] = useState<boolean>(showFrames);
+  const [hoverSize, setHoverSize] = useState(6);
+  const [gapSize, setGapSize] = useState(4);
+  const [showControls, setShowControls] = useState(false);
+  const [cleanInterface, setCleanInterface] = useState(true);
+  const [showFrames, setShowFrames] = useState(false); // Update: showFrames starts as false
+  const [autoplayMode, setAutoplayMode] = useState<"all" | "hover">("all");
 
-  useEffect(() => {
-    setAreFramesVisible(showFrames);
-  }, [showFrames]);
-
-  const handleMouseEnter = (id: number) => {
-    setHoveredVideo(id);
-  };
-
-  const handleMouseLeave = (id: number) => {
-    setHoveredVideo(null);
-  };
-
-  const toggleVideoPlay = (id: number, event?: React.MouseEvent) => {
-    event?.stopPropagation();
-
-    const newPlayingVideos = new Set(playingVideos);
-
-    if (playingVideos.has(id)) {
-      newPlayingVideos.delete(id);
-    } else {
-      newPlayingVideos.add(id);
+  const getRowSizes = () => {
+    if (hovered === null) {
+      return "4fr 4fr 4fr";
     }
-
-    setPlayingVideos(newPlayingVideos);
+    const { row } = hovered;
+    const nonHoveredSize = (12 - hoverSize) / 2;
+    return [0, 1, 2]
+      .map((r) => (r === row ? `${hoverSize}fr` : `${nonHoveredSize}fr`))
+      .join(" ");
   };
 
-  const toggleMute = (id: number, event?: React.MouseEvent) => {
-    event?.stopPropagation();
-
-    const newMutedVideos = new Set(mutedVideos);
-
-    if (mutedVideos.has(id)) {
-      newMutedVideos.delete(id);
-    } else {
-      newMutedVideos.add(id);
+  const getColSizes = () => {
+    if (hovered === null) {
+      return "4fr 4fr 4fr";
     }
-
-    setMutedVideos(newMutedVideos);
+    const { col } = hovered;
+    const nonHoveredSize = (12 - hoverSize) / 2;
+    return [0, 1, 2]
+      .map((c) => (c === col ? `${hoverSize}fr` : `${nonHoveredSize}fr`))
+      .join(" ");
   };
 
-  const playAllVideos = () => {
-    const allIds = videoData.map((video) => video.id);
-    setPlayingVideos(new Set(allIds));
+  const getTransformOrigin = (x: number, y: number) => {
+    const vertical = y === 0 ? "top" : y === 4 ? "center" : "bottom";
+    const horizontal = x === 0 ? "left" : x === 4 ? "center" : "right";
+    return `${vertical} ${horizontal}`;
   };
 
-  const pauseAllVideos = () => {
-    setPlayingVideos(new Set());
+  const updateFrameProperty = (
+    id: number,
+    property: keyof Frame,
+    value: number
+  ) => {
+    setFrames(
+      frames.map((frame) =>
+        frame.id === id ? { ...frame, [property]: value } : frame
+      )
+    );
   };
 
-  const toggleShowFrames = () => {
-    const newValue = !areFramesVisible;
-    setAreFramesVisible(newValue);
-    if (onToggleShowFrames) {
-      onToggleShowFrames(newValue);
+  const toggleControls = () => {
+    setShowControls(!showControls);
+  };
+
+  const toggleCleanInterface = () => {
+    setCleanInterface(!cleanInterface);
+    if (!cleanInterface) {
+      setShowControls(false);
     }
   };
 
-  // Get size classes based on video size
-  const getSizeClasses = (size: "small" | "medium" | "large") => {
-    switch (size) {
-      case "small":
-        return "col-span-1 row-span-1";
-      case "medium":
-        return "col-span-1 row-span-2 sm:col-span-2 sm:row-span-1";
-      case "large":
-        return "col-span-1 row-span-2 sm:col-span-2 sm:row-span-2";
-      default:
-        return "col-span-1 row-span-1";
-    }
+  const updateCodebase = () => {
+    console.log("Updating codebase with current values:");
+    console.log("Hover Size:", hoverSize);
+    console.log("Gap Size:", gapSize);
+    console.log("Frames:", frames);
+    // Here you would typically make an API call to update the codebase
+    // For now, we'll just log the values
   };
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between mb-4">
-        <div className="flex gap-2">
-          <button
-            onClick={playAllVideos}
-            className="px-4 py-2 bg-cream-100 text-mocha-900 rounded-lg hover:bg-cream-200 transition-colors text-sm"
-          >
-            Play All
-          </button>
-          <button
-            onClick={pauseAllVideos}
-            className="px-4 py-2 border border-cream-200 text-cream-100 rounded-lg hover:bg-mocha-700 transition-colors text-sm"
-          >
-            Pause All
-          </button>
+    <div className="space-y-4 w-full h-full">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="autoplay-toggle"
+              checked={autoplayMode === "all"}
+              onCheckedChange={(checked) =>
+                setAutoplayMode(checked ? "all" : "hover")
+              }
+            />
+            <label htmlFor="autoplay-toggle" className="text-sm text-black/70">
+              {autoplayMode === "all" ? "Auto On" : "Auto Off"}
+            </label>
+          </div>
         </div>
-        <button
-          onClick={toggleShowFrames}
-          className="px-4 py-2 border border-cream-200 text-cream-100 rounded-lg hover:bg-mocha-700 transition-colors text-sm"
-        >
-          {areFramesVisible ? "Hide Frames" : "Show Frames"}
-        </button>
       </div>
+      {!cleanInterface && (
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-white">
+            Dynamic Frame Layout
+          </h2>
+          <div className="space-x-2">
+            <Button onClick={toggleControls}>
+              {showControls ? "Hide Controls" : "Show Controls"}
+            </Button>
+            <Button onClick={updateCodebase}>Update Codebase</Button>
+            <Button onClick={toggleCleanInterface}>
+              {cleanInterface ? "Show UI" : "Hide UI"}
+            </Button>
+          </div>
+        </div>
+      )}
+      {!cleanInterface && showControls && (
+        <>
+          <div className="space-y-2">
+            <label
+              htmlFor="hover-size"
+              className="block text-sm font-medium text-gray-200"
+            >
+              Hover Size: {hoverSize}
+            </label>
+            <Slider
+              id="hover-size"
+              min={4}
+              max={8}
+              step={0.1}
+              value={[hoverSize]}
+              onValueChange={(value) => setHoverSize(value[0])}
+            />
+          </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="gap-size"
+              className="block text-sm font-medium text-gray-200"
+            >
+              Gap Size: {gapSize}px
+            </label>
+            <Slider
+              id="gap-size"
+              min={0}
+              max={20}
+              step={1}
+              value={[gapSize]}
+              onValueChange={(value) => setGapSize(value[0])}
+            />
+          </div>
+        </>
+      )}
+      <div
+        className="relative w-full h-full"
+        style={{
+          display: "grid",
+          gridTemplateRows: getRowSizes(),
+          gridTemplateColumns: getColSizes(),
+          gap: `${gapSize}px`,
+          transition:
+            "grid-template-rows 0.4s ease, grid-template-columns 0.4s ease",
+        }}
+      >
+        {frames.map((frame) => {
+          const row = Math.floor(frame.defaultPos.y / 4);
+          const col = Math.floor(frame.defaultPos.x / 4);
+          const transformOrigin = getTransformOrigin(
+            frame.defaultPos.x,
+            frame.defaultPos.y
+          );
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 auto-rows-[120px]">
-        {videoData.map((video) => (
-          <motion.div
-            key={video.id}
-            className={`${getSizeClasses(
-              video.size
-            )} relative rounded-lg overflow-hidden bg-mocha-700 ${
-              !areFramesVisible
-                ? "opacity-0 pointer-events-none"
-                : "opacity-100"
-            }`}
-            onMouseEnter={() => handleMouseEnter(video.id)}
-            onMouseLeave={() => handleMouseLeave(video.id)}
-            whileHover={{ scale: 1.1, zIndex: 10 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
-            {/* Empty video container with just the thumbnail */}
-            <div className="w-full h-full">
-              <img
-                src={video.thumbnail || "/placeholder.svg"}
-                alt={video.title}
-                className="w-full h-full object-cover"
+          return (
+            <motion.div
+              key={frame.id}
+              className="relative"
+              style={{
+                transformOrigin,
+                transition: "transform 0.4s ease",
+              }}
+              onMouseEnter={() => setHovered({ row, col })}
+              onMouseLeave={() => setHovered(null)}
+            >
+              <FrameComponent
+                video={frame.video}
+                width="100%"
+                height="100%"
+                className="absolute inset-0"
+                corner={frame.corner}
+                edgeHorizontal={frame.edgeHorizontal}
+                edgeVertical={frame.edgeVertical}
+                mediaSize={frame.mediaSize}
+                borderThickness={frame.borderThickness}
+                borderSize={frame.borderSize}
+                onMediaSizeChange={(value) =>
+                  updateFrameProperty(frame.id, "mediaSize", value)
+                }
+                onBorderThicknessChange={(value) =>
+                  updateFrameProperty(frame.id, "borderThickness", value)
+                }
+                onBorderSizeChange={(value) =>
+                  updateFrameProperty(frame.id, "borderSize", value)
+                }
+                showControls={showControls && !cleanInterface}
+                label={`Frame ${frame.id}`}
+                showFrame={showFrames}
+                autoplayMode={autoplayMode}
+                isHovered={
+                  hovered?.row === Math.floor(frame.defaultPos.y / 4) &&
+                  hovered?.col === Math.floor(frame.defaultPos.x / 4)
+                }
               />
-            </div>
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 p-2">
-              <h3 className="text-cream-100 font-medium text-sm truncate">
-                {video.title}
-              </h3>
-            </div>
-            <div className="absolute top-2 right-2 flex gap-1">
-              <button
-                onClick={(e) => toggleVideoPlay(video.id, e)}
-                className="bg-cream-100/30 hover:bg-cream-100/50 rounded-full p-1.5 backdrop-blur-sm transition-colors"
-              >
-                {playingVideos.has(video.id) ? (
-                  <Pause className="w-3 h-3 text-cream-100" />
-                ) : (
-                  <Play className="w-3 h-3 text-cream-100" />
-                )}
-              </button>
-              <button
-                onClick={(e) => toggleMute(video.id, e)}
-                className="bg-cream-100/30 hover:bg-cream-100/50 rounded-full p-1.5 backdrop-blur-sm transition-colors"
-              >
-                {mutedVideos.has(video.id) ? (
-                  <VolumeX className="w-3 h-3 text-cream-100" />
-                ) : (
-                  <Volume2 className="w-3 h-3 text-cream-100" />
-                )}
-              </button>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
