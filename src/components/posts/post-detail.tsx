@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  autoplayYouTubeOnHover,
-  resetYouTubeThumbnail,
-} from "@/lib/youtube-autoplay";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -27,9 +23,6 @@ interface PostDetailProps {
 }
 
 export function PostDetail({ post }: PostDetailProps) {
-  const [showFullDesc, setShowFullDesc] = useState(false);
-  const [descClamped, setDescClamped] = useState(false);
-  const descRef = useRef<HTMLDivElement>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
@@ -43,34 +36,6 @@ export function PostDetail({ post }: PostDetailProps) {
   // 댓글 데이터 추출 (post.comments, post.comments_list, post.comment_list 등 지원)
   const comments =
     post.comments_list || post.comments || post.comment_list || [];
-
-  useEffect(() => {
-    if (descRef.current) {
-      // 3줄 이상인지 체크
-      setDescClamped(
-        descRef.current.scrollHeight > descRef.current.clientHeight + 2
-      );
-    }
-
-    // Initialize video with thumbnail
-    if (videoContainerRef.current && post.post_media_url) {
-      resetYouTubeThumbnail(videoContainerRef.current, post.post_media_url);
-    }
-  }, [post?.post_content, post.post_media_url]);
-
-  // Handle video container hover
-  const handleVideoHover = useCallback(() => {
-    if (videoContainerRef.current && post.post_media_url) {
-      autoplayYouTubeOnHover(videoContainerRef.current, post.post_media_url);
-    }
-  }, [post.post_media_url]);
-
-  // Handle video container mouse leave
-  const handleVideoLeave = useCallback(() => {
-    if (videoContainerRef.current && post.post_media_url) {
-      resetYouTubeThumbnail(videoContainerRef.current, post.post_media_url);
-    }
-  }, [post.post_media_url]);
 
   // 공유하기
   const handleShare = useCallback(async () => {
@@ -111,8 +76,6 @@ export function PostDetail({ post }: PostDetailProps) {
         <div className="md:w-3/5 relative bg-gray-50 md:rounded-l-lg md:rounded-r-none">
           <div
             ref={videoContainerRef}
-            onMouseEnter={handleVideoHover}
-            onMouseLeave={handleVideoLeave}
             className="absolute inset-0 w-full h-full"
             style={{ aspectRatio: "16/9" }}
           />
