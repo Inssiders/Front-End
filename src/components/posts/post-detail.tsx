@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { RelatedMemes } from "./related-memes";
+import { RelatedPosts } from "./related-posts";
 
-interface MemeDetailProps {
+interface PostDetailProps {
   id: string;
 }
 
-export function MemeDetail({ id }: MemeDetailProps) {
-  const [meme, setMeme] = useState<any>(null);
+export function PostDetail({ id }: PostDetailProps) {
+  const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [descClamped, setDescClamped] = useState(false);
@@ -22,14 +22,14 @@ export function MemeDetail({ id }: MemeDetailProps) {
     // Fetch meme data from public/mock-data/memes-data.json
     const fetchMeme = async () => {
       try {
-        const response = await fetch("/mock-data/memes-data.json");
-        const allMemes = await response.json();
-        const found = allMemes.find((m: any) => String(m.id) === String(id));
-        setMeme(found || null);
+        const response = await fetch("/mock-data/posts-data.json");
+        const allPosts = await response.json();
+        const found = allPosts.find((p: any) => String(p.id) === String(id));
+        setPost(found || null);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching meme:", error);
-        setMeme(null);
+        console.error("Error fetching post:", error);
+        setPost(null);
         setLoading(false);
       }
     };
@@ -43,7 +43,7 @@ export function MemeDetail({ id }: MemeDetailProps) {
         descRef.current.scrollHeight > descRef.current.clientHeight + 2
       );
     }
-  }, [meme?.content]);
+  }, [post?.content]);
 
   // 공유하기
   const handleShare = useCallback(async () => {
@@ -71,7 +71,7 @@ export function MemeDetail({ id }: MemeDetailProps) {
     return <div className="p-8 text-center">로딩 중...</div>;
   }
 
-  if (!meme) {
+  if (!post) {
     return <div className="p-8 text-center">밈을 찾을 수 없습니다.</div>;
   }
 
@@ -80,10 +80,12 @@ export function MemeDetail({ id }: MemeDetailProps) {
       <div className="bg-white rounded-lg shadow-md overflow-hidden w-full mx-auto md:flex md:flex-row md:h-[700px]">
         {/* 이미지 영역 */}
         <div className="md:w-3/5 flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none md:h-full h-72">
-          <img
-            src={meme.media_url || "/placeholder.svg"}
-            alt={meme.title}
-            className="w-full h-full object-contain md:rounded-l-lg md:rounded-r-none rounded-t-lg"
+          <iframe
+            src={post.media_url}
+            title={post.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full h-full rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
           />
         </div>
         <div className="md:w-2/5 flex flex-col md:h-full md:overflow-y-auto">
@@ -128,22 +130,22 @@ export function MemeDetail({ id }: MemeDetailProps) {
                 alt={"작성자"}
                 className="w-8 h-8 rounded-full mr-2"
               />
-              <span className="font-medium mr-2">작성자 {meme.user_id}</span>
+              <span className="font-medium mr-2">작성자 {post.user_id}</span>
               <span className="text-gray-400 text-xs">
-                {new Date(meme.created_at).toLocaleDateString()}
+                {new Date(post.created_at).toLocaleDateString()}
               </span>
             </div>
-            <h2 className="text-xl font-bold mb-2">{meme.title}</h2>
+            <h2 className="text-xl font-bold mb-2">{post.title}</h2>
             <div className="mb-2 text-gray-700 md:text-base whitespace-pre-line">
-              {meme.content}
+              {post.content}
             </div>
           </div>
           <div className="px-4 pb-2 flex flex-wrap gap-2 items-center">
             <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-              카테고리 {meme.category_id}
+              카테고리 {post.category_id}
             </div>
             <div className="text-xs text-gray-500 ml-auto">
-              좋아요 {meme.likes} · 댓글 {meme.comments}
+              좋아요 {post.likes} · 댓글 {post.comments}
             </div>
           </div>
           <div className="px-4 pb-2 flex-1">
@@ -172,7 +174,7 @@ export function MemeDetail({ id }: MemeDetailProps) {
           </form>
         </div>
       </div>
-      <RelatedMemes id={id} />
+      <RelatedPosts id={id} />
     </div>
   );
 }

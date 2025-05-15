@@ -1,22 +1,15 @@
 "use client";
 
-import {
-  ArrowRight,
-  TrendingUp,
-  Sparkles,
-  Zap,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
 import DynamicVideoGrid from "@/components/intro/dynamic-video-grid";
-import { motion, useScroll, useTransform } from "framer-motion";
-import dynamic from "next/dynamic";
-import Link from "next/link";
-import { JSX, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useMobile } from "@/hooks/use-mobile";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { JSX, useEffect, useRef, useState } from "react";
 // Import ThreeScene component with dynamic import to avoid SSR issues
 
 interface MemeImageProps {
@@ -84,7 +77,7 @@ export default function Home(): JSX.Element {
   const [isImageHover, setIsImageHover] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
   // Check if mobile using the hook
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useMobile();
 
   //route
   const router = useRouter();

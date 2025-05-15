@@ -1,6 +1,6 @@
 "use client";
 
-import MemesGrid from "@/components/memes/memes-grid";
+import MemesGrid from "@/components/posts/post-grid";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -52,7 +52,7 @@ export default function SearchPage() {
             검색 결과
           </div>
           {filteredMemes.length > 0 || loading ? (
-            <MemesGrid memes={filteredMemes} loading={loading} />
+            <MemesGrid posts={filteredMemes} loading={loading} />
           ) : (
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-8 text-center text-gray-500 dark:text-gray-400">
               <span className="text-lg">검색 결과가 없습니다.</span>

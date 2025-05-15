@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { MemeDetail } from "./meme-detail";
+import { PostComments } from "./post-comments";
 
-const meta: Meta<typeof MemeDetail> = {
-  title: "Memes/MemeDetail",
-  component: MemeDetail,
+const meta: Meta<typeof PostComments> = {
+  title: "Posts/PostComments",
+  component: PostComments,
   tags: ["autodocs"],
   argTypes: {
     id: { control: "text" },
@@ -11,7 +11,7 @@ const meta: Meta<typeof MemeDetail> = {
 };
 export default meta;
 
-type Story = StoryObj<typeof MemeDetail>;
+type Story = StoryObj<typeof PostComments>;
 
 export const Default: Story = {
   args: {

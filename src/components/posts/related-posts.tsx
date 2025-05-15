@@ -1,12 +1,13 @@
+import Image from "next/image";
 import Link from "next/link";
 
-interface RelatedMemesProps {
+interface RelatedPostsProps {
   id: string;
 }
 
-export function RelatedMemes({ id }: RelatedMemesProps) {
+export function RelatedPosts({ id }: RelatedPostsProps) {
   // Simulated related memes
-  const relatedMemes = Array(4)
+  const relatedPosts = Array(4)
     .fill(0)
     .map((_, i) => ({
       id: `${i + 1}`,
@@ -20,26 +21,28 @@ export function RelatedMemes({ id }: RelatedMemesProps) {
     <div className="mt-12">
       <h2 className="text-2xl font-bold mb-6">관련 밈</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {relatedMemes.map((meme) => (
-          <Link href={`/memes/${meme.id}`} key={meme.id}>
+        {relatedPosts.map((post) => (
+          <Link href={`/posts/${post.id}`} key={post.id}>
             <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
               <div className="relative pb-[100%]">
-                <img
-                  src={meme.image || "/placeholder.svg"}
-                  alt={meme.title}
+                <Image
+                  src={post.image || "/placeholder.svg"}
+                  alt={post.title}
                   className="absolute inset-0 w-full h-full object-cover"
+                  width={300}
+                  height={300}
                 />
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">{meme.title}</h3>
+                <h3 className="font-bold text-lg mb-2">{post.title}</h3>
                 <div className="flex justify-between text-sm text-gray-500">
                   <div className="flex items-center gap-1">
                     <span>👍</span>
-                    <span>{meme.likes}</span>
+                    <span>{post.likes}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <span>💬</span>
-                    <span>{meme.comments}</span>
+                    <span>{post.comments}</span>
                   </div>
                 </div>
               </div>

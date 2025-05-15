@@ -1,4 +1,4 @@
-export function MemeDetailLoading() {
+export function PostDetailLoading() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -32,7 +32,10 @@ export function MemeDetailLoading() {
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="bg-gray-50 p-3 rounded-lg text-center">
+                  <div
+                    key={i}
+                    className="bg-gray-50 p-3 rounded-lg text-center"
+                  >
                     <div className="bg-gray-200 animate-pulse h-6 w-16 mx-auto rounded mb-1"></div>
                     <div className="bg-gray-200 animate-pulse h-4 w-12 mx-auto rounded"></div>
                   </div>
@@ -53,7 +56,10 @@ export function MemeDetailLoading() {
         <div className="bg-gray-200 animate-pulse h-8 w-48 rounded mb-4"></div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gray-200 animate-pulse h-24 w-full rounded-lg"></div>
+            <div
+              key={i}
+              className="bg-gray-200 animate-pulse h-24 w-full rounded-lg"
+            ></div>
           ))}
         </div>
       </div>
@@ -62,10 +68,13 @@ export function MemeDetailLoading() {
         <div className="bg-gray-200 animate-pulse h-8 w-48 rounded mb-4"></div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-gray-200 animate-pulse h-48 rounded-lg"></div>
+            <div
+              key={i}
+              className="bg-gray-200 animate-pulse h-48 rounded-lg"
+            ></div>
           ))}
         </div>
       </div>
     </div>
-  )
+  );
 }

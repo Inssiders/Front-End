@@ -7,10 +7,10 @@ import { motion } from "framer-motion";
 import { Bookmark, Heart, MessageCircle, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import MemesLoading from "./memes-loading";
+import PostsLoading from "./post-loading";
 
 // 밈 데이터 (실제로는 API에서 가져올 것)
-export const memesData = [
+export const postsData = [
   {
     id: 1,
     title: "아무말 대잔치 밈 시리즈",
@@ -133,7 +133,7 @@ export const memesData = [
   },
 ];
 
-interface Meme {
+interface Post {
   id: number;
   title: string;
   category: string;
@@ -146,13 +146,13 @@ interface Meme {
   isBookmarked: boolean;
 }
 
-interface MemesGridProps {
-  memes?: Meme[];
+interface PostsGridProps {
+  posts?: Post[];
   loading?: boolean;
 }
 
-export default function MemesGrid({ memes, loading }: MemesGridProps) {
-  const [internalMemes, setInternalMemes] = useState(memes ?? memesData);
+export default function PostsGrid({ posts, loading }: PostsGridProps) {
+  const [internalPosts, setInternalPosts] = useState(posts ?? postsData);
   const [internalLoading, setInternalLoading] = useState(loading ?? true);
 
   useEffect(() => {
@@ -169,34 +169,34 @@ export default function MemesGrid({ memes, loading }: MemesGridProps) {
   }, [loading]);
 
   useEffect(() => {
-    if (memes) setInternalMemes(memes);
-  }, [memes]);
+    if (posts) setInternalPosts(posts);
+  }, [posts]);
 
   const toggleLike = (id: number) => {
-    setInternalMemes((prevMemes) =>
-      prevMemes.map((meme) => {
-        if (meme.id === id) {
+    setInternalPosts((prevPosts: Post[]) =>
+      prevPosts.map((post: Post) => {
+        if (post.id === id) {
           return {
-            ...meme,
-            isLiked: !meme.isLiked,
-            likes: meme.isLiked ? meme.likes - 1 : meme.likes + 1,
+            ...post,
+            isLiked: !post.isLiked,
+            likes: post.isLiked ? post.likes - 1 : post.likes + 1,
           };
         }
-        return meme;
+        return post;
       })
     );
   };
 
   const toggleBookmark = (id: number) => {
-    setInternalMemes((prevMemes) =>
-      prevMemes.map((meme) => {
-        if (meme.id === id) {
+    setInternalPosts((prevPosts: Post[]) =>
+      prevPosts.map((post: Post) => {
+        if (post.id === id) {
           return {
-            ...meme,
-            isBookmarked: !meme.isBookmarked,
+            ...post,
+            isBookmarked: !post.isBookmarked,
           };
         }
-        return meme;
+        return post;
       })
     );
   };
@@ -217,7 +217,7 @@ export default function MemesGrid({ memes, loading }: MemesGridProps) {
   };
 
   if (internalLoading) {
-    return <MemesLoading />;
+    return <PostsLoading />;
   }
 
   return (
@@ -228,37 +228,37 @@ export default function MemesGrid({ memes, loading }: MemesGridProps) {
         animate="show"
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
       >
-        {internalMemes.map((meme) => (
-          <motion.div key={meme.id} variants={item}>
+        {internalPosts.map((post: Post) => (
+          <motion.div key={post.id} variants={item}>
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900 h-full">
               <div className="relative">
                 <img
-                  src={meme.image || "/placeholder.svg"}
-                  alt={meme.title}
+                  src={post.image || "/placeholder.svg"}
+                  alt={post.title}
                   className="w-full aspect-square object-cover"
                 />
                 <div className="absolute top-3 left-3">
                   <Badge className="bg-purple-600 hover:bg-purple-700">
-                    {meme.category}
+                    {post.category}
                   </Badge>
                 </div>
                 <button
                   className="absolute top-3 right-3 bg-black/30 hover:bg-black/50 text-white p-1.5 rounded-full transition-colors"
-                  onClick={() => toggleBookmark(meme.id)}
+                  onClick={() => toggleBookmark(post.id)}
                   aria-label="북마크"
                 >
                   <Bookmark
                     className={`h-4 w-4 ${
-                      meme.isBookmarked ? "fill-current text-yellow-400" : ""
+                      post.isBookmarked ? "fill-current text-yellow-400" : ""
                     }`}
                   />
                 </button>
               </div>
 
               <CardContent className="p-4">
-                <Link href={`/memes/${meme.id}`}>
+                <Link href={`/posts/${post.id}`}>
                   <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                    {meme.title}
+                    {post.title}
                   </h3>
                 </Link>
 
@@ -266,15 +266,15 @@ export default function MemesGrid({ memes, loading }: MemesGridProps) {
                   <div className="flex items-center">
                     <Avatar className="h-6 w-6 mr-2">
                       <AvatarImage
-                        src={meme.author.avatar || "/placeholder.svg"}
-                        alt={meme.author.name}
+                        src={post.author.avatar || "/placeholder.svg"}
+                        alt={post.author.name}
                       />
                       <AvatarFallback>
-                        {meme.author.name.substring(0, 2)}
+                        {post.author.name.substring(0, 2)}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-xs text-gray-700 dark:text-gray-300">
-                      {meme.author.name}
+                      {post.author.name}
                     </span>
                   </div>
                 </div>
@@ -282,24 +282,24 @@ export default function MemesGrid({ memes, loading }: MemesGridProps) {
                 <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs">
                   <button
                     className={`flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors ${
-                      meme.isLiked ? "text-purple-600 dark:text-purple-400" : ""
+                      post.isLiked ? "text-purple-600 dark:text-purple-400" : ""
                     }`}
-                    onClick={() => toggleLike(meme.id)}
+                    onClick={() => toggleLike(post.id)}
                   >
                     <Heart
                       className={`h-3 w-3 mr-1 ${
-                        meme.isLiked ? "fill-current" : ""
+                        post.isLiked ? "fill-current" : ""
                       }`}
                     />
-                    {meme.likes.toLocaleString()}
+                    {post.likes.toLocaleString()}
                   </button>
                   <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                     <MessageCircle className="h-3 w-3 mr-1" />
-                    {meme.comments.toLocaleString()}
+                    {post.comments.toLocaleString()}
                   </button>
                   <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                     <Share2 className="h-3 w-3 mr-1" />
-                    {meme.shares.toLocaleString()}
+                    {post.shares.toLocaleString()}
                   </button>
                 </div>
               </CardContent>

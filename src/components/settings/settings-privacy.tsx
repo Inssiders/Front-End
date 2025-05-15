@@ -1,23 +1,31 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Lock } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { motion } from "framer-motion";
+import { Lock } from "lucide-react";
 
 export default function SettingsPrivacy() {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-      <Card>
-        <CardHeader>
-          <CardTitle>개인정보 설정</CardTitle>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Card className="mb-4 p-2 sm:p-4">
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg md:text-xl">
+            개인정보 설정
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-2 md:p-4">
           <div className="space-y-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">계정 공개 설정</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                계정 공개 설정
+              </h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="public-profile" className="flex-1">
@@ -41,7 +49,9 @@ export default function SettingsPrivacy() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">데이터 및 개인정보</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                데이터 및 개인정보
+              </h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="data-collection" className="flex-1">
@@ -68,5 +78,5 @@ export default function SettingsPrivacy() {
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }

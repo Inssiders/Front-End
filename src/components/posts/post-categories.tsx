@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 
-export default function MemesCategories() {
+export default function PostCategories() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [showSearch, setShowSearch] = useState(false);
 

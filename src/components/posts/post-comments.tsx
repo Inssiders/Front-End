@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-interface MemeCommentsProps {
+interface PostCommentsProps {
   id: string;
   likes?: number;
   commentsCount?: number;
@@ -8,13 +8,13 @@ interface MemeCommentsProps {
   saved?: number;
 }
 
-export function MemeComments({
+export function PostComments({
   id,
   likes,
   commentsCount,
   shares,
   saved,
-}: MemeCommentsProps) {
+}: PostCommentsProps) {
   // Simulated comments
   const comments = Array(5)
     .fill(0)

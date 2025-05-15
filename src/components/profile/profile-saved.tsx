@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Heart, MessageCircle, Eye, Bookmark } from "lucide-react"
-import Link from "next/link"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { Bookmark, Eye, Heart, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 // 저장된 게시물 데이터 (실제로는 API에서 가져올 것)
 const savedData = [
@@ -70,10 +70,10 @@ const savedData = [
     views: 15678,
     savedAt: "1달 전",
   },
-]
+];
 
 export default function ProfileSaved() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const container = {
     hidden: { opacity: 0 },
@@ -83,18 +83,22 @@ export default function ProfileSaved() {
         staggerChildren: 0.05,
       },
     },
-  }
+  };
 
   const item = {
     hidden: { opacity: 0, scale: 0.9 },
     show: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
-  }
+  };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">저장된 항목</h2>
-        <span className="text-sm text-gray-500 dark:text-gray-400">{savedData.length}개 항목</span>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          저장된 항목
+        </h2>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          {savedData.length}개 항목
+        </span>
       </div>
 
       <motion.div
@@ -137,7 +141,9 @@ export default function ProfileSaved() {
                 )}
 
                 <div className="absolute top-3 left-3">
-                  <Badge className="bg-purple-600 hover:bg-purple-700">{item.category}</Badge>
+                  <Badge className="bg-purple-600 hover:bg-purple-700">
+                    {item.category}
+                  </Badge>
                 </div>
 
                 <div className="absolute bottom-3 right-3 text-xs text-white bg-black/50 px-2 py-1 rounded-full">
@@ -168,7 +174,7 @@ export default function ProfileSaved() {
                     size="sm"
                     className="mt-4 bg-transparent border-white text-white hover:bg-white/20"
                     onClick={(e) => {
-                      e.preventDefault()
+                      e.preventDefault();
                       // 저장 취소 로직
                     }}
                   >
@@ -182,5 +188,5 @@ export default function ProfileSaved() {
         ))}
       </motion.div>
     </div>
-  )
+  );
 }
