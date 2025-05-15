@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Bookmark, Heart, MessageCircle, Share2 } from "lucide-react";
+import { Bookmark, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import PostsLoading from "./post-loading";
@@ -134,24 +134,48 @@ export const postsData = [
 ];
 
 interface Post {
-  id: number;
+  id: number | string;
   title: string;
   category: string;
-  image: string;
-  author: { name: string; avatar: string };
+  image?: string;
+  post_media_url?: string;
+  type?: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
   likes: number;
   comments: number;
   shares: number;
-  isLiked: boolean;
-  isBookmarked: boolean;
+  views?: number;
+  isLiked?: boolean;
+  isBookmarked?: boolean;
+  likedAt?: string;
 }
 
 interface PostsGridProps {
   posts?: Post[];
   loading?: boolean;
+  layout?: "grid" | "list" | "masonry";
+  columns?: number;
+  showAuthor?: boolean;
+  showActions?: boolean;
+  onPostClick?: (post: Post) => void;
+  className?: string;
+  ref?: React.RefObject<HTMLDivElement>;
 }
 
-export default function PostsGrid({ posts, loading }: PostsGridProps) {
+export default function PostsGrid({
+  posts,
+  loading,
+  layout = "grid",
+  columns = 4,
+  showAuthor = true,
+  showActions = true,
+  onPostClick,
+  className = "",
+  ref,
+}: PostsGridProps) {
   const [internalPosts, setInternalPosts] = useState(posts ?? postsData);
   const [internalLoading, setInternalLoading] = useState(loading ?? true);
 
@@ -221,38 +245,67 @@ export default function PostsGrid({ posts, loading }: PostsGridProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className={`container mx-auto px-4 py-8 ${className}`} ref={ref}>
       <motion.div
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        className={`grid grid-cols-1 ${
+          layout === "grid"
+            ? `sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-${columns}`
+            : layout === "list"
+            ? "grid-cols-1"
+            : "sm:grid-cols-2 md:grid-cols-3"
+        } gap-6`}
       >
         {internalPosts.map((post: Post) => (
-          <motion.div key={post.id} variants={item}>
+          <motion.div
+            key={post.id}
+            variants={item}
+            onClick={() => onPostClick?.(post)}
+          >
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900 h-full">
               <div className="relative">
-                <img
-                  src={post.image || "/placeholder.svg"}
-                  alt={post.title}
-                  className="w-full aspect-square object-cover"
-                />
+                {post.post_media_url ? (
+                  <iframe
+                    src={post.post_media_url}
+                    title={post.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full aspect-square object-cover"
+                  />
+                ) : (
+                  <img
+                    src={post.image || "/placeholder.svg"}
+                    alt={post.title}
+                    className="w-full aspect-square object-cover"
+                  />
+                )}
                 <div className="absolute top-3 left-3">
                   <Badge className="bg-purple-600 hover:bg-purple-700">
                     {post.category}
                   </Badge>
                 </div>
-                <button
-                  className="absolute top-3 right-3 bg-black/30 hover:bg-black/50 text-white p-1.5 rounded-full transition-colors"
-                  onClick={() => toggleBookmark(post.id)}
-                  aria-label="북마크"
-                >
-                  <Bookmark
-                    className={`h-4 w-4 ${
-                      post.isBookmarked ? "fill-current text-yellow-400" : ""
-                    }`}
-                  />
-                </button>
+                {showActions && (
+                  <button
+                    className="absolute top-3 right-3 bg-black/30 hover:bg-black/50 text-white p-1.5 rounded-full transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleBookmark(
+                        typeof post.id === "string"
+                          ? parseInt(post.id)
+                          : post.id
+                      );
+                    }}
+                    aria-label="북마크"
+                  >
+                    <Bookmark
+                      className={`h-4 w-4 ${
+                        post.isBookmarked ? "fill-current text-yellow-400" : ""
+                      }`}
+                    />
+                  </button>
+                )}
               </div>
 
               <CardContent className="p-4">
@@ -262,46 +315,70 @@ export default function PostsGrid({ posts, loading }: PostsGridProps) {
                   </h3>
                 </Link>
 
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center">
-                    <Avatar className="h-6 w-6 mr-2">
-                      <AvatarImage
-                        src={post.author.avatar || "/placeholder.svg"}
-                        alt={post.author.name}
-                      />
-                      <AvatarFallback>
-                        {post.author.name.substring(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-xs text-gray-700 dark:text-gray-300">
-                      {post.author.name}
-                    </span>
+                {showAuthor && (
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center">
+                      <Avatar className="h-6 w-6 mr-2">
+                        <AvatarImage
+                          src={post.author.avatar || "/placeholder.svg"}
+                          alt={post.author.name}
+                        />
+                        <AvatarFallback>
+                          {post.author.name.substring(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-xs text-gray-700 dark:text-gray-300">
+                        {post.author.name}
+                      </span>
+                      {post.likedAt && (
+                        <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">
+                          {post.likedAt}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs">
-                  <button
-                    className={`flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors ${
-                      post.isLiked ? "text-purple-600 dark:text-purple-400" : ""
-                    }`}
-                    onClick={() => toggleLike(post.id)}
-                  >
-                    <Heart
-                      className={`h-3 w-3 mr-1 ${
-                        post.isLiked ? "fill-current" : ""
+                {showActions && (
+                  <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs">
+                    <button
+                      className={`flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors ${
+                        post.isLiked
+                          ? "text-purple-600 dark:text-purple-400"
+                          : ""
                       }`}
-                    />
-                    {post.likes.toLocaleString()}
-                  </button>
-                  <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                    <MessageCircle className="h-3 w-3 mr-1" />
-                    {post.comments.toLocaleString()}
-                  </button>
-                  <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                    <Share2 className="h-3 w-3 mr-1" />
-                    {post.shares.toLocaleString()}
-                  </button>
-                </div>
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike(
+                          typeof post.id === "string"
+                            ? parseInt(post.id)
+                            : post.id
+                        );
+                      }}
+                    >
+                      <Heart
+                        className={`h-3 w-3 mr-1 ${
+                          post.isLiked ? "fill-current" : ""
+                        }`}
+                      />
+                      {post.likes.toLocaleString()}
+                    </button>
+                    <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                      <MessageCircle className="h-3 w-3 mr-1" />
+                      {post.comments.toLocaleString()}
+                    </button>
+                    <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                      <Share2 className="h-3 w-3 mr-1" />
+                      {post.shares.toLocaleString()}
+                    </button>
+                    {post.views !== undefined && (
+                      <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                        <Eye className="h-3 w-3 mr-1" />
+                        {post.views.toLocaleString()}
+                      </button>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
