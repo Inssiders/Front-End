@@ -152,7 +152,7 @@ export default function Header() {
     <TooltipProvider>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b bg-white",
           isScrolled
             ? "bg-white/90 dark:bg-gray-900/90 border-gray-200 dark:border-gray-800 backdrop-blur-md shadow-sm"
             : "bg-white/70 dark:bg-gray-900/70 border-transparent",

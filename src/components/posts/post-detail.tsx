@@ -73,11 +73,13 @@ export function PostDetail({ post }: PostDetailProps) {
     <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">
       <Card className="w-full mx-auto md:flex md:flex-row md:h-[700px] overflow-hidden">
         {/* 비디오 컨테이너 */}
-        <div className="md:w-3/5 relative bg-gray-50 md:rounded-l-lg md:rounded-r-none">
-          <div
-            ref={videoContainerRef}
-            className="absolute inset-0 w-full h-full"
-            style={{ aspectRatio: "16/9" }}
+        <div className="md:w-3/5 flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none md:h-full h-72">
+          <iframe
+            src={post.post_media_url}
+            title={post.post_title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full h-full rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
           />
         </div>
         <div className="md:w-2/5 flex flex-col md:h-full md:overflow-y-auto">
