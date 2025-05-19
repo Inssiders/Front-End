@@ -7,9 +7,7 @@ interface FrameComponentProps {
   width: number | string;
   height: number | string;
   className?: string;
-  corner: string;
-  edgeHorizontal: string;
-  edgeVertical: string;
+
   mediaSize: number;
   borderThickness: number;
   borderSize: number;
@@ -28,9 +26,6 @@ export function FrameComponent({
   width,
   height,
   className = "",
-  corner,
-  edgeHorizontal,
-  edgeVertical,
   mediaSize,
   borderThickness,
   borderSize,
@@ -88,98 +83,43 @@ export function FrameComponent({
               transition: "transform 0.3s ease-in-out",
             }}
           >
-            <video
-              className="w-full h-full object-cover"
-              src={video}
-              loop
-              muted
-              playsInline
-              autoPlay={
-                autoplayMode === "all" ||
-                (autoplayMode === "hover" && isHovered)
-              }
-              ref={videoRef}
-              onMouseEnter={(e) => {
-                if (autoplayMode === "hover") {
-                  e.currentTarget.play();
+            {video.includes("youtube.com") ? (
+              <iframe
+                className="w-full h-full"
+                src={video}
+                title="YouTube video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <video
+                className="w-full h-full object-cover"
+                src={video}
+                loop
+                muted
+                playsInline
+                autoPlay={
+                  autoplayMode === "all" ||
+                  (autoplayMode === "hover" && isHovered)
                 }
-              }}
-              onMouseLeave={(e) => {
-                if (autoplayMode === "hover") {
-                  e.currentTarget.pause();
-                }
-              }}
-            />
+                ref={videoRef}
+                onMouseEnter={(e) => {
+                  if (autoplayMode === "hover") {
+                    e.currentTarget.play();
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (autoplayMode === "hover") {
+                    e.currentTarget.pause();
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
 
         {/* Frame Elements (Higher z-index) */}
-        {showFrame && (
-          <div className="absolute inset-0" style={{ zIndex: 2 }}>
-            {/* Corners */}
-            <div
-              className="absolute top-0 left-0 w-16 h-16 bg-contain bg-no-repeat"
-              style={{ backgroundImage: `url(${corner})` }}
-            />
-            <div
-              className="absolute top-0 right-0 w-16 h-16 bg-contain bg-no-repeat"
-              style={{
-                backgroundImage: `url(${corner})`,
-                transform: "scaleX(-1)",
-              }}
-            />
-            <div
-              className="absolute bottom-0 left-0 w-16 h-16 bg-contain bg-no-repeat"
-              style={{
-                backgroundImage: `url(${corner})`,
-                transform: "scaleY(-1)",
-              }}
-            />
-            <div
-              className="absolute bottom-0 right-0 w-16 h-16 bg-contain bg-no-repeat"
-              style={{
-                backgroundImage: `url(${corner})`,
-                transform: "scale(-1, -1)",
-              }}
-            />
-
-            {/* Edges */}
-            <div
-              className="absolute top-0 left-16 right-16 h-16"
-              style={{
-                backgroundImage: `url(${edgeHorizontal})`,
-                backgroundSize: "auto 64px",
-                backgroundRepeat: "repeat-x",
-              }}
-            />
-            <div
-              className="absolute bottom-0 left-16 right-16 h-16"
-              style={{
-                backgroundImage: `url(${edgeHorizontal})`,
-                backgroundSize: "auto 64px",
-                backgroundRepeat: "repeat-x",
-                transform: "rotate(180deg)",
-              }}
-            />
-            <div
-              className="absolute left-0 top-16 bottom-16 w-16"
-              style={{
-                backgroundImage: `url(${edgeVertical})`,
-                backgroundSize: "64px auto",
-                backgroundRepeat: "repeat-y",
-              }}
-            />
-            <div
-              className="absolute right-0 top-16 bottom-16 w-16"
-              style={{
-                backgroundImage: `url(${edgeVertical})`,
-                backgroundSize: "64px auto",
-                backgroundRepeat: "repeat-y",
-                transform: "scaleX(-1)",
-              }}
-            />
-          </div>
-        )}
       </div>
 
       {/* Controls */}
