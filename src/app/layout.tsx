@@ -1,11 +1,8 @@
 import { NextLayout, NextProvider } from "@/components/provider";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+
 import type React from "react";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const pretendard = Inter({ subsets: ["latin"], variable: "--font-pretendard" });
 
 export const metadata: Metadata = {
   title: "인싸이더 - 트렌드의 모든 것",
