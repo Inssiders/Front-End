@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 interface RelatedPostsProps {
@@ -6,22 +5,24 @@ interface RelatedPostsProps {
 }
 
 export function RelatedPosts({ post }: RelatedPostsProps) {
-  // Simulated related memes
-
+  console.log(post);
   return (
     <div className="mt-12">
       <h2 className="text-2xl font-bold mb-6">관련 밈</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {Array(4).map((temp: any) => (
-          <Link href={`/posts/${post.post_id}`} key={post.post_id}>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Link
+            href={`/posts/${post.post_id}`}
+            key={`${post.post_id}-${index}`}
+          >
             <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
-              <div className="relative pb-[100%]">
-                <Image
-                  src={post.post_media_url || "/placeholder.svg"}
-                  alt={post.post_title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  width={300}
-                  height={300}
+              <div className="md:w-3/5 flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none md:h-full h-72">
+                <iframe
+                  src={post.post_media_url}
+                  title={post.post_title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
                 />
               </div>
               <div className="p-4">
