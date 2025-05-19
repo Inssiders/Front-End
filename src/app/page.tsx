@@ -371,12 +371,12 @@ export default function Home(): JSX.Element {
 
             {/* Centered START button with left-to-right lightening effect */}
             <div className="flex justify-center mt-4 sm:mt-6 mb-8 sm:mb-12">
-              <Link href="/memes">
+              <Link href="/posts">
                 <button
                   className="group relative overflow-hidden bg-[#FF8C38] text-white px-8 sm:px-12 py-3 sm:py-4 text-lg sm:text-xl font-bold rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105"
                   onMouseEnter={() => setIsButtonHover(true)}
                   onMouseLeave={() => setIsButtonHover(false)}
-                  onClick={() => router.push("/memes")}
+                  onClick={() => router.push("/posts")}
                 >
                   {/* Progressive lightening effect overlay */}
                   <div

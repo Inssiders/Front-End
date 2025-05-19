@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Grid3X3, Bookmark, Award, Heart, Clock } from "lucide-react"
-import ProfilePosts from "@/components/profile/profile-posts"
-import ProfileSaved from "@/components/profile/profile-saved"
-import ProfileChallenges from "@/components/profile/profile-challenges"
-import ProfileLikes from "@/components/profile/profile-likes"
-import ProfileActivity from "@/components/profile/profile-activity"
+import ProfileActivity from "@/app/profile/_components/profile-activity";
+import ProfileChallenges from "@/app/profile/_components/profile-challenges";
+import ProfileLikes from "@/app/profile/_components/profile-likes";
+import ProfilePosts from "@/app/profile/_components/profile-posts";
+import ProfileSaved from "@/app/profile/_components/profile-saved";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion } from "framer-motion";
+import { Award, Bookmark, Clock, Grid3X3, Heart } from "lucide-react";
+import { useState } from "react";
 
 export function ProfileTabs() {
-  const [activeTab, setActiveTab] = useState("posts")
+  const [activeTab, setActiveTab] = useState("posts");
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -83,5 +83,5 @@ export function ProfileTabs() {
         </motion.div>
       </Tabs>
     </div>
-  )
+  );
 }

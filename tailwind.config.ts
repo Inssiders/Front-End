@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
 const config = {
   darkMode: ["class"],
@@ -22,15 +22,15 @@ const config = {
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
+        ring: "hsl(210, 100%, 92%)",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "hsl(30, 100%, 85%)",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: "hsl(210, 100%, 92%)",
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
@@ -53,32 +53,31 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // 커스텀 색상
-        purple: {
-          50: "#f5f3ff",
-          100: "#ede9fe",
-          200: "#ddd6fe",
-          300: "#c4b5fd",
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
-          700: "#6d28d9",
-          800: "#5b21b6",
-          900: "#4c1d95",
-          950: "#2e1065",
+        main: {
+          50: "#fff8f1",
+          100: "#feecd6",
+          200: "#fdd8ae",
+          300: "#fdc47e",
+          400: "#fbb757",
+          500: "#f9a825",
+          600: "#f59e1b",
+          700: "#e68913",
+          800: "#c7770e",
+          900: "#a6630a",
+          950: "#7a4706",
         },
-        pink: {
-          50: "#fdf2f8",
-          100: "#fce7f3",
-          200: "#fbcfe8",
-          300: "#f9a8d4",
-          400: "#f472b6",
-          500: "#ec4899",
-          600: "#db2777",
-          700: "#be185d",
-          800: "#9d174d",
-          900: "#831843",
-          950: "#500724",
+        sub: {
+          50: "#f3f8ff",
+          100: "#e0f0ff",
+          200: "#b8e1ff",
+          300: "#8fd1ff",
+          400: "#5bbcff",
+          500: "#2ea7ff",
+          600: "#1b8ee6",
+          700: "#176fb3",
+          800: "#155a8c",
+          900: "#13496e",
+          950: "#0d2d44",
         },
       },
       borderRadius: {
@@ -103,6 +102,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+} satisfies Config;
 
-export default config
+export default config;

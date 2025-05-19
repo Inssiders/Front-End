@@ -1,26 +1,99 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { Menu, Search, Sparkles, X } from "lucide-react";
+import { Menu, Search, Sparkles } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./ui/command";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "./ui/navigation-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
+import { TooltipProvider } from "./ui/tooltip";
 
 const navItems = [
-  { name: "밈", href: "/posts", icon: <Sparkles className="h-4 w-4 mr-2" /> },
+  {
+    category: "트렌드",
+    items: [
+      {
+        name: "밈",
+        href: "/posts",
+        icon: <Sparkles className="h-4 w-4" />,
+        description: "최신 트렌드와 밈을 발견하세요",
+      },
+      {
+        name: "공감밈",
+        href: "/empathy-meme",
+        icon: <Sparkles className="h-4 w-4" />,
+        description: "공감할 수 있는 밈들을 찾아보세요",
+      },
+    ],
+  },
 ];
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <span className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </span>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = "ListItem";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [showHeader, setShowHeader] = useState(true);
+  const [open, setOpen] = useState(false);
   const lastScrollY = useRef(0);
   const { status, data: session } = useSession();
   const pathname = usePathname();
@@ -28,10 +101,7 @@ export default function Header() {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [mounted, setMounted] = useState(false);
-
-  const handleProfileMenu = () => setIsProfileMenuOpen((v) => !v);
-  const handleMenuToggle = () => setIsMenuOpen((v) => !v);
-  const handleMenuClose = () => setIsMenuOpen(false);
+  const [openMobileMenu, setOpenMobileMenu] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,288 +123,254 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    if (!isMenuOpen) return;
-    function handleClick(e: MouseEvent) {
-      const dropdown = document.getElementById("mobile-menu-dropdown");
-      if (dropdown && !dropdown.contains(e.target as Node)) {
-        setIsMenuOpen(false);
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
       }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [isMenuOpen]);
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   useEffect(() => setMounted(true), []);
 
   if (!mounted) return null;
 
-  function handleSearchSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function handleSearchSubmit(e?: React.FormEvent) {
+    if (e) {
+      e.preventDefault();
+    }
     if (search.trim()) {
       router.push(`/search?q=${encodeURIComponent(search.trim())}`);
-      setIsMenuOpen(false);
+      setOpen(false);
+      setSearch("");
     }
   }
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b shadow-sm backdrop-blur-md",
-        isScrolled
-          ? "bg-white/90 dark:bg-gray-900/90"
-          : "bg-white/70 dark:bg-gray-900/70",
-        showHeader ? "translate-y-0" : "-translate-y-full"
-      )}
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between gap-2 w-full">
-          {/* Logo */}
-          <Link href="/" className="flex items-center min-w-[100px]">
-            <Image src="/logo.png" alt="인싸이더" width={48} height={48} />
-          </Link>
+    <TooltipProvider>
+      <header
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b bg-white",
+          isScrolled
+            ? "bg-white/90 dark:bg-gray-900/90 border-gray-200 dark:border-gray-800 backdrop-blur-md shadow-sm"
+            : "bg-white/70 dark:bg-gray-900/70 border-transparent",
+          showHeader ? "translate-y-0" : "-translate-y-full"
+        )}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex h-16 items-center justify-between gap-4 w-full">
+            {/* Logo */}
+            <Link
+              href="/"
+              className="flex items-center min-w-[100px] hover:opacity-80 transition-opacity"
+            >
+              <Image
+                src="/logo.png"
+                alt="인싸이더"
+                width={40}
+                height={40}
+                className="rounded-xl"
+              />
+            </Link>
 
-          {/* Mobile Search (centered) */}
-          <div className="flex-1 flex justify-center items-center md:hidden">
-            <form onSubmit={handleSearchSubmit} className="w-full max-w-xs">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                  type="search"
-                  placeholder="트렌드 검색..."
-                  className="pl-10 pr-3 py-2 rounded-full bg-gray-100 border-0 focus-visible:ring-2 focus-visible:ring-purple-400 dark:bg-gray-800 text-base transition-all"
-                  aria-label="트렌드 검색"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-            </form>
-          </div>
-
-          {/* Desktop Nav */}
-          {!isMobile && (
-            <nav className="flex-1 flex justify-center items-center gap-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "px-4 py-2 rounded-full text-sm font-semibold flex items-center transition-all duration-150",
-                    pathname === item.href
-                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-200 shadow"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/60"
-                  )}
-                >
-                  {item.icon}
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
-          )}
-
-          {/* Desktop Search */}
-          <div className="hidden md:flex items-center w-64 max-w-xs relative">
-            <form onSubmit={handleSearchSubmit} className="w-full">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  type="search"
-                  placeholder="트렌드 검색..."
-                  className="pl-10 pr-3 py-2 rounded-full bg-gray-100 border-0 focus-visible:ring-2 focus-visible:ring-purple-400 dark:bg-gray-800 text-sm"
-                  aria-label="트렌드 검색"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-            </form>
-          </div>
-
-          {/* Desktop Profile/Login - 항상 button만 렌더링 */}
-          <div className="hidden md:flex items-center ml-2">
-            <div className="relative">
-              <button
-                onClick={handleProfileMenu}
-                className="focus:outline-none flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all min-w-[80px]"
-                aria-label="프로필 메뉴 열기"
-                disabled={status === "loading"}
-              >
-                {status === "authenticated" ? (
-                  <>
-                    <Avatar className="h-9 w-9 border-2 border-purple-200 hover:border-purple-400 transition-all">
-                      <AvatarImage
-                        src="/placeholder.svg?height=36&width=36"
-                        alt="프로필"
-                      />
-                      <AvatarFallback>MZ</AvatarFallback>
-                    </Avatar>
-                    <span className="font-semibold text-gray-800 dark:text-gray-100 text-base">
-                      {session?.user?.name || "사용자"}
-                    </span>
-                  </>
-                ) : (
-                  <Link
-                    href="/signin"
-                    className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
-                  >
-                    로그인
-                  </Link>
+            {/* Search Command Center */}
+            <div className="flex-1 max-w-2xl mx-auto">
+              <Button
+                variant="outline"
+                className={cn(
+                  "relative w-full justify-start text-sm text-muted-foreground h-10",
+                  "md:px-4",
+                  "px-3 rounded-xl border-gray-200 dark:border-gray-800 hover:bg-accent"
                 )}
-              </button>
-              {status === "authenticated" && isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-900 rounded-xl shadow-lg py-2 z-50 border border-gray-100 dark:border-gray-800">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    onClick={() => setIsProfileMenuOpen(false)}
-                  >
-                    프로필
-                  </Link>
-                  <Link
-                    href="/settings"
-                    className="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    onClick={() => setIsProfileMenuOpen(false)}
-                  >
-                    계정설정
-                  </Link>
-                  <button
-                    className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    onClick={() => {
-                      signOut({ callbackUrl: "/" });
-                      setIsProfileMenuOpen(false);
-                    }}
-                  >
-                    로그아웃
-                  </button>
-                </div>
+                onClick={() => setOpen(true)}
+              >
+                <Search className="mr-2 h-4 w-4" />
+                <span className="hidden md:inline">트렌드 검색...</span>
+                <span className="inline md:hidden">검색...</span>
+                <kbd className="pointer-events-none absolute right-2 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium opacity-100 md:flex">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
+              </Button>
+            </div>
+
+            {/* Desktop Nav & Actions */}
+            <div className="flex items-center gap-2">
+              {!isMobile && (
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    {navItems.map((category) => (
+                      <NavigationMenuItem key={category.category}>
+                        <NavigationMenuTrigger className="h-9">
+                          {category.category}
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent className="w-full flex flex-col items-start">
+                          <ul className="grid w-[400px] gap-3 grid-1 p-4 md:w-[300px]">
+                            {category.items.map((item) => (
+                              <ListItem
+                                key={item.name}
+                                title={item.name}
+                                href={item.href}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {item.icon}
+                                  <span>{item.description}</span>
+                                </div>
+                              </ListItem>
+                            ))}
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    ))}
+                  </NavigationMenuList>
+                </NavigationMenu>
+              )}
+
+              {/* Profile Menu */}
+              {status === "authenticated" ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-10 w-10 rounded-full"
+                    >
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          src={session.user?.image || "/placeholder.svg"}
+                          alt={session.user?.name || "프로필"}
+                        />
+                        <AvatarFallback>
+                          {session.user?.name?.substring(0, 2) || "사용자"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {session.user?.name}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {session.user?.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile">프로필</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings">설정</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-red-500 focus:text-red-500"
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                    >
+                      로그아웃
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button asChild variant="default">
+                  <Link href="/signin">로그인</Link>
+                </Button>
+              )}
+
+              {/* Mobile Menu */}
+              {isMobile && (
+                <Sheet open={openMobileMenu} onOpenChange={setOpenMobileMenu}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-80">
+                    <SheetHeader>
+                      <SheetTitle>메뉴</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-4">
+                      {navItems.map((category) => (
+                        <div key={category.category} className="mb-4">
+                          <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                            {category.category}
+                          </h3>
+                          <div className="space-y-1">
+                            {category.items.map((item) => (
+                              <Link
+                                key={item.name}
+                                href={item.href}
+                                className={cn(
+                                  "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                                  pathname === item.href
+                                    ? "bg-primary text-primary-foreground"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                                )}
+                                onClick={() => setOpenMobileMenu(false)}
+                              >
+                                {item.icon}
+                                <div>
+                                  <p>{item.name}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {item.description}
+                                  </p>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </SheetContent>
+                </Sheet>
               )}
             </div>
           </div>
-
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden ml-2"
-            onClick={handleMenuToggle}
-            aria-label={isMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </Button>
         </div>
-      </div>
+      </header>
 
-      {/* Mobile Menu Dropdown */}
-      {isMenuOpen && (
-        <div
-          className="absolute left-1/2 top-16 z-50 w-full flex justify-center md:hidden"
-          style={{ transform: "translateX(-50%)" }}
-        >
-          <div
-            className="bg-white dark:bg-gray-900 shadow-xl rounded-2xl mt-2 px-6 py-6 flex flex-col gap-4 items-center w-11/12 max-w-sm border border-gray-100 dark:border-gray-800 transition-all duration-300 animate-dropdown"
-            id="mobile-menu-dropdown"
-          >
-            {/* Close Button */}
-            <button
-              className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors"
-              onClick={handleMenuClose}
-              aria-label="메뉴 닫기"
+      {/* Command Menu */}
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <form onSubmit={handleSearchSubmit}>
+          <CommandInput
+            placeholder="트렌드 검색..."
+            value={search}
+            onValueChange={setSearch}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSearchSubmit();
+              }
+            }}
+            className="border-none focus:ring-0 md:rounded-none rounded-xl px-4"
+          />
+        </form>
+        <CommandList className="md:rounded-none rounded-xl">
+          <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
+          <CommandGroup heading="추천 검색어">
+            <CommandItem
+              onSelect={() => {
+                setSearch("최신 트렌드");
+                handleSearchSubmit();
+              }}
             >
-              <X className="h-6 w-6" />
-            </button>
-            {/* Main Actions: 밈, 로그인/프로필/설정 */}
-            <Link
-              href="/memes"
-              className="w-full px-6 py-4 rounded-full text-lg font-bold flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow hover:scale-105 active:scale-95 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-purple-400"
-              onClick={handleMenuClose}
-              aria-label="밈 페이지로 이동"
+              <Search className="mr-2 h-4 w-4" />
+              <span>최신 트렌드</span>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setSearch("인기 밈");
+                handleSearchSubmit();
+              }}
             >
-              <Sparkles className="h-6 w-6 mr-2" />밈
-            </Link>
-            <button
-              onClick={handleProfileMenu}
-              className="w-full px-6 py-4 rounded-full text-lg font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-purple-400"
-              aria-label="프로필/로그인 메뉴 열기"
-              disabled={status === "loading"}
-            >
-              {status === "authenticated" ? (
-                <>
-                  <Avatar className="h-7 w-7 border border-purple-200 mr-2">
-                    <AvatarImage
-                      src="/placeholder.svg?height=28&width=28"
-                      alt="프로필"
-                    />
-                    <AvatarFallback>MZ</AvatarFallback>
-                  </Avatar>
-                  <span className="font-semibold text-gray-800 dark:text-gray-100 text-base">
-                    {session?.user?.name || "사용자"}
-                  </span>
-                </>
-              ) : (
-                <span>로그인</span>
-              )}
-            </button>
-            {status === "authenticated" && isProfileMenuOpen && (
-              <div className="w-full flex flex-col gap-2 mt-2">
-                <Link
-                  href="/profile"
-                  className="w-full px-6 py-4 rounded-full text-lg font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-purple-400"
-                  onClick={() => {
-                    setIsProfileMenuOpen(false);
-                    handleMenuClose();
-                  }}
-                  aria-label="프로필 페이지로 이동"
-                >
-                  <Avatar className="h-7 w-7 border border-purple-200 mr-2">
-                    <AvatarImage
-                      src="/placeholder.svg?height=28&width=28"
-                      alt="프로필"
-                    />
-                    <AvatarFallback>MZ</AvatarFallback>
-                  </Avatar>
-                  <span className="font-semibold text-gray-800 dark:text-gray-100 text-base">
-                    {session?.user?.name || "사용자"}
-                  </span>
-                  프로필
-                </Link>
-                <Link
-                  href="/settings"
-                  className="w-full px-6 py-4 rounded-full text-lg font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-purple-400"
-                  onClick={() => {
-                    setIsProfileMenuOpen(false);
-                    handleMenuClose();
-                  }}
-                  aria-label="계정설정 페이지로 이동"
-                >
-                  <Avatar className="h-7 w-7 border border-purple-200 mr-2">
-                    <AvatarImage
-                      src="/placeholder.svg?height=28&width=28"
-                      alt="프로필"
-                    />
-                    <AvatarFallback>MZ</AvatarFallback>
-                  </Avatar>
-                  <span className="font-semibold text-gray-800 dark:text-gray-100 text-base">
-                    {session?.user?.name || "사용자"}
-                  </span>
-                  계정설정
-                </Link>
-                <button
-                  className="w-full px-6 py-4 rounded-full text-lg font-bold flex items-center justify-center text-red-500 bg-gray-100 dark:bg-gray-800 shadow hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-purple-400"
-                  onClick={() => {
-                    signOut({ callbackUrl: "/" });
-                    setIsProfileMenuOpen(false);
-                    handleMenuClose();
-                  }}
-                >
-                  로그아웃
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </header>
+              <Sparkles className="mr-2 h-4 w-4" />
+              <span>인기 밈</span>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </TooltipProvider>
   );
 }
