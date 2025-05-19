@@ -7,7 +7,6 @@ interface FrameComponentProps {
   width: number | string;
   height: number | string;
   className?: string;
-
   mediaSize: number;
   borderThickness: number;
   borderSize: number;

@@ -11,8 +11,8 @@ const GRID_SIZE = 12;
 const CELL_SIZE = 60; // pixels per grid cell
 
 interface Frame {
-  id: number;
-  media_url: string;
+  post_id: number;
+  post_media_url: string;
   defaultPos: { x: number; y: number; w: number; h: number };
   mediaSize: number;
   borderThickness: number;
@@ -22,8 +22,8 @@ interface Frame {
 }
 
 interface RawVideoData {
-  id: number;
-  media_url: string;
+  post_id: number;
+  post_media_url: string;
   // 다른 외부에서 올 수 있는 데이터 필드들
 }
 interface DynamicVideoGridProps {
@@ -154,7 +154,7 @@ export default function DynamicFrameLayout(props: DynamicVideoGridProps) {
   const [showFrames, setShowFrames] = useState(false); // Update: showFrames starts as false
   const [autoplayMode, setAutoplayMode] = useState<"all" | "hover">("hover");
 
-  const toFrame = (media_url: RawVideoData, index: number): Frame => {
+  const toFrame = (post_media_url: RawVideoData, index: number): Frame => {
     const positions = [
       { x: 0, y: 0, w: 4, h: 4 },
       { x: 4, y: 0, w: 4, h: 4 },
@@ -168,8 +168,8 @@ export default function DynamicFrameLayout(props: DynamicVideoGridProps) {
     ];
 
     return {
-      ...media_url,
-      defaultPos: positions[index] || { x: 0, y: 0, w: 4, h: 4 },
+      ...post_media_url,
+      defaultPos: positions[index],
       borderThickness: 0,
       borderSize: 80,
       mediaSize: 1,
@@ -178,16 +178,16 @@ export default function DynamicFrameLayout(props: DynamicVideoGridProps) {
     };
   };
   useEffect(() => {
-    fetch("/mock-data/posts-data.json")
+    fetch("/mock-data/all-mock-data.json")
       .then((res) => res.json())
       .then((rawData: RawVideoData[]) => {
         // id가 1부터 6까지만 필터링
         const filteredData = rawData.filter(
-          (item) => item.id >= 1 && item.id <= 9
+          (item) => item.post_id >= 1 && item.post_id <= 9
         );
 
-        const framed = filteredData.map((media_url, i) =>
-          toFrame(media_url, i)
+        const framed = filteredData.map((post_media_url, i) =>
+          toFrame(post_media_url, i)
         );
         setFrames(framed);
         console.log(framed);
@@ -228,7 +228,7 @@ export default function DynamicFrameLayout(props: DynamicVideoGridProps) {
   ) => {
     setFrames(
       frames.map((frame) =>
-        frame.id === id ? { ...frame, [property]: value } : frame
+        frame.post_id === id ? { ...frame, [property]: value } : frame
       )
     );
   };
@@ -344,7 +344,7 @@ export default function DynamicFrameLayout(props: DynamicVideoGridProps) {
 
           return (
             <motion.div
-              key={frame.id}
+              key={frame.post_id}
               className="relative"
               style={{
                 transformOrigin,
@@ -354,7 +354,7 @@ export default function DynamicFrameLayout(props: DynamicVideoGridProps) {
               onMouseLeave={() => setHovered(null)}
             >
               <FrameComponent
-                video={frame.media_url}
+                video={frame.post_media_url}
                 width="100%"
                 height="100%"
                 className="absolute inset-0"
@@ -362,16 +362,16 @@ export default function DynamicFrameLayout(props: DynamicVideoGridProps) {
                 borderThickness={frame.borderThickness}
                 borderSize={frame.borderSize}
                 onMediaSizeChange={(value) =>
-                  updateFrameProperty(frame.id, "mediaSize", value)
+                  updateFrameProperty(frame.post_id, "mediaSize", value)
                 }
                 onBorderThicknessChange={(value) =>
-                  updateFrameProperty(frame.id, "borderThickness", value)
+                  updateFrameProperty(frame.post_id, "borderThickness", value)
                 }
                 onBorderSizeChange={(value) =>
-                  updateFrameProperty(frame.id, "borderSize", value)
+                  updateFrameProperty(frame.post_id, "borderSize", value)
                 }
                 showControls={showControls && !cleanInterface}
-                label={`Frame ${frame.id}`}
+                label={`Frame ${frame.post_id}`}
                 showFrame={showFrames}
                 autoplayMode={autoplayMode}
                 isHovered={

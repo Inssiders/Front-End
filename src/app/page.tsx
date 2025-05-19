@@ -266,7 +266,7 @@ export default function Home(): JSX.Element {
                 </div>
 
                 {/* Right content with flexible image container - mobile optimized */}
-                <div className="relative">
+                <div className="relative max-w-60 md:max-w-md">
                   <div className="absolute inset-0 bg-[#FF8C38]/20 rounded-3xl transform rotate-3"></div>
 
                   <div className="relative bg-[#FFF5E9] p-3 sm:p-4 rounded-2xl shadow-lg transform -rotate-2">
@@ -357,13 +357,9 @@ export default function Home(): JSX.Element {
                       ></div>
                     </div>
 
-                    <div className="absolute -left-3 sm:-left-4 bottom-10 z-30 bg-[#333] text-white px-2 sm:px-3 py-1 text-xs sm:text-sm font-bold transform -rotate-90">
+                    <div className="absolute -left-3 sm:-left-4 bottom-10 z-30 hidden md:block bg-[#333] text-white px-2 sm:px-3 py-1 text-xs sm:text-sm font-bold transform -rotate-90">
                       VIRAL
                     </div>
-                  </div>
-
-                  <div className="absolute -bottom-3 sm:-bottom-4 -right-3 sm:-right-4 w-20 sm:w-24 h-6 sm:h-8 bg-[#333] text-white flex items-center justify-center text-xs font-bold transform rotate-3">
-                    #SHARKMEME
                   </div>
                 </div>
               </div>
@@ -671,7 +667,7 @@ export default function Home(): JSX.Element {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="flex items-start"
+              className="flex items-start hidden md:block"
             >
               <div className="space-y-4 max-w-lg w-full">
                 <motion.div
@@ -869,12 +865,10 @@ export default function Home(): JSX.Element {
         }`}
       >
         <div className="w-full max-w-7xl mx-auto flex flex-col gap-8 ">
-          <div className="w-full  mb-8">
-            <h2 className="text-3xl md:text-5xl font-bold text-center text-mocha-900 mb-4">
-              요즘 가장 핫한 <span className="text-orange-500">인싸 밈</span>{" "}
-              모음
+          <div className="w-full  ">
+            <h2 className="text-3xl md:text-5xl font-bold text-center text-mocha-900 ">
+              요즘 가장 핫한 <span className="text-orange-500">밈</span> 모음
             </h2>
-            <p className="text-lg mb-6"></p>
           </div>
 
           <div className="w-full max-w-6xl mx-auto min-h-[600px]">
