@@ -33,9 +33,9 @@ export const NextProvider = ({ children }: Props) => {
 
 export const NextLayout = ({ children }: Props) => {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex relative flex-col min-h-screen w-full bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
       <Header />
-      <main className="flex-1 mt-16">{children}</main>
+      <main className="flex-1 pt-16 flex flex-col">{children}</main>
       <ToasterContext />
       <Footer />
       <Analytics />

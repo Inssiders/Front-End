@@ -2,14 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { useMobile } from "@/hooks/use-mobile";
+import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { Menu, Search, Sparkles } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   CommandDialog,
@@ -91,10 +93,7 @@ const ListItem = React.forwardRef<
 ListItem.displayName = "ListItem";
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [showHeader, setShowHeader] = useState(true);
   const [open, setOpen] = useState(false);
-  const lastScrollY = useRef(0);
   const { status, data: session } = useSession();
   const pathname = usePathname();
   const isMobile = useMobile();
@@ -102,25 +101,7 @@ export default function Header() {
   const [search, setSearch] = useState("");
   const [mounted, setMounted] = useState(false);
   const [openMobileMenu, setOpenMobileMenu] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-      if (window.scrollY < 10) {
-        setShowHeader(true);
-        lastScrollY.current = window.scrollY;
-        return;
-      }
-      if (window.scrollY > lastScrollY.current) {
-        setShowHeader(false);
-      } else {
-        setShowHeader(true);
-      }
-      lastScrollY.current = window.scrollY;
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const isScrollingUp = useScrollDirection();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -150,13 +131,12 @@ export default function Header() {
 
   return (
     <TooltipProvider>
-      <header
+      <motion.header
+        initial={{ y: 0 }}
+        animate={{ y: isScrollingUp ? 0 : "-100%" }}
+        transition={{ duration: 0.3 }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b bg-white",
-          isScrolled
-            ? "bg-white/90 dark:bg-gray-900/90 border-gray-200 dark:border-gray-800 backdrop-blur-md shadow-sm"
-            : "bg-white/70 dark:bg-gray-900/70 border-transparent",
-          showHeader ? "translate-y-0" : "-translate-y-full"
+          "fixed top-0 left-0 right-0 z-50 border-b rounded-b-xl bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950"
         )}
       >
         <div className="container mx-auto px-4">
@@ -237,11 +217,11 @@ export default function Header() {
                     >
                       <Avatar className="h-10 w-10">
                         <AvatarImage
-                          src={session.user?.image || "/placeholder.svg"}
-                          alt={session.user?.name || "프로필"}
+                          src={session.user?.profileImage || "/placeholder.svg"}
+                          alt={session.user?.nickname || "프로필"}
                         />
                         <AvatarFallback>
-                          {session.user?.name?.substring(0, 2) || "사용자"}
+                          {session.user?.nickname?.substring(0, 2) || "사용자"}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -250,7 +230,7 @@ export default function Header() {
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
-                          {session.user?.name}
+                          {session.user?.nickname}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground">
                           {session.user?.email}
@@ -275,7 +255,7 @@ export default function Header() {
                 </DropdownMenu>
               ) : (
                 <Button asChild variant="default">
-                  <Link href="/signin">로그인</Link>
+                  <Link href="/auth/signin">로그인</Link>
                 </Button>
               )}
 
@@ -329,7 +309,7 @@ export default function Header() {
             </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Command Menu */}
       <CommandDialog open={open} onOpenChange={setOpen}>
