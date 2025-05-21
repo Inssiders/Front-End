@@ -1,6 +1,6 @@
 "use client";
 
-import DynamicVideoGrid from "@/components/intro/dynamic-video-grid";
+import DynamicVideoGrid from "@/components/intro/video-grid";
 import { motion, MotionValue } from "framer-motion";
 import { useState } from "react";
 
