@@ -19,14 +19,6 @@ export const metadata: Metadata = {
     description: "지금 가장 인기있는 밈을 확인하세요!",
     type: "website",
     locale: "ko_KR",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "inSSider Preview",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
