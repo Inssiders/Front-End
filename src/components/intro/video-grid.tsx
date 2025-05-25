@@ -1,163 +1,194 @@
 "use client";
 
-import { Pause, Play } from "lucide-react";
-import { JSX, useState } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { memo, useCallback, useEffect, useState } from "react";
 
-interface VideoItem {
-  id: number;
-  title: string;
-  src: string;
-  thumbnail: string;
+interface Frame {
+  post_id: number;
+  gif_url: string;
+  defaultPos: { x: number; y: number; w: number; h: number };
 }
 
-const videoData: VideoItem[] = [
-  {
-    id: 1,
-    title: "Funny Cat",
-    src: "/videos/placeholder.mp4",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 2,
-    title: "Dancing Dog",
-    src: "/videos/placeholder.mp4",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 3,
-    title: "Epic Fail",
-    src: "/videos/placeholder.mp4",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 4,
-    title: "Cute Baby",
-    src: "/videos/placeholder.mp4",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 5,
-    title: "Prank Time",
-    src: "/videos/placeholder.mp4",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 6,
-    title: "Sports Blooper",
-    src: "/videos/placeholder.mp4",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 7,
-    title: "Reaction Meme",
-    src: "/videos/placeholder.mp4",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 8,
-    title: "Gaming Moment",
-    src: "/videos/placeholder.mp4",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 9,
-    title: "Unexpected Turn",
-    src: "/videos/placeholder.mp4",
-    thumbnail: "/placeholder.svg?height=200&width=200",
-  },
+interface VideoGridProps {
+  showFrames: boolean;
+  onToggleShowFrames: React.Dispatch<React.SetStateAction<boolean>>;
+  className?: string;
+  gridSize?: number;
+  cellSize?: number;
+  gapSize?: number;
+  gifUrls?: string[];
+}
+
+const defaultGifUrls = [
+  "gif/meme1.gif",
+  "gif/meme2.gif",
+  "gif/meme3.gif",
+  "gif/meme4.gif",
+  "gif/meme5.gif",
+  "gif/meme6.gif",
+  "gif/meme7.gif",
+  "gif/meme8.gif",
+  "gif/meme9.gif",
 ];
 
-export default function VideoGrid(): JSX.Element {
-  const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
-  const [playingVideos, setPlayingVideos] = useState<Set<number>>(new Set());
+const GridCell = memo(function GridCell({
+  frame,
+  row,
+  col,
+  transformOrigin,
+  onHover,
+  onLeave,
+  isHovered,
+}: {
+  frame: Frame;
+  row: number;
+  col: number;
+  transformOrigin: string;
+  onHover: (row: number, col: number) => void;
+  onLeave: () => void;
+  isHovered: boolean;
+}) {
+  return (
+    <motion.div
+      key={frame.post_id}
+      className="relative overflow-hidden rounded-lg"
+      style={{
+        transformOrigin,
+        transition: "transform 0.4s ease",
+      }}
+      onMouseEnter={() => onHover(row, col)}
+      onMouseLeave={onLeave}
+    >
+      <Image
+        src={frame.gif_url}
+        alt={`Meme ${frame.post_id}`}
+        fill
+        className="object-cover"
+        priority
+        unoptimized
+      />
+    </motion.div>
+  );
+});
 
-  const handleMouseEnter = (id: number) => {
-    setHoveredVideo(id);
-    const videoElement = document.getElementById(
-      `video-${id}`
-    ) as HTMLVideoElement;
-    if (videoElement && !playingVideos.has(id)) {
-      videoElement
-        .play()
-        .catch((error) => console.error("Error playing video:", error));
+function VideoGrid({
+  showFrames,
+  onToggleShowFrames,
+  className = "",
+  gridSize = 12,
+  cellSize = 60,
+  gapSize = 4,
+  gifUrls = defaultGifUrls,
+}: VideoGridProps) {
+  const [frames, setFrames] = useState<Frame[]>([]);
+  const [hovered, setHovered] = useState<{ row: number; col: number } | null>(
+    null
+  );
+  const [hoverSize, setHoverSize] = useState(6);
+
+  const toFrame = useCallback(
+    (gif_url: string, index: number): Frame => {
+      const gridDimension = Math.sqrt(gifUrls.length);
+      const cellWidth = gridSize / gridDimension;
+      const row = Math.floor(index / gridDimension);
+      const col = index % gridDimension;
+
+      return {
+        post_id: index + 1,
+        gif_url,
+        defaultPos: {
+          x: col * cellWidth,
+          y: row * cellWidth,
+          w: cellWidth,
+          h: cellWidth,
+        },
+      };
+    },
+    [gifUrls.length, gridSize]
+  );
+
+  useEffect(() => {
+    const framed = gifUrls.map((gif_url, i) => toFrame(gif_url, i));
+    setFrames(framed);
+  }, [gifUrls, toFrame]);
+
+  const getRowSizes = useCallback(() => {
+    if (hovered === null) {
+      return Array(Math.sqrt(gifUrls.length)).fill("1fr").join(" ");
     }
-  };
+    const { row } = hovered;
+    const nonHoveredSize = (gridSize - hoverSize) / 2;
+    return Array(Math.sqrt(gifUrls.length))
+      .fill(0)
+      .map((_, r) => (r === row ? `${hoverSize}fr` : `${nonHoveredSize}fr`))
+      .join(" ");
+  }, [hovered, hoverSize, gridSize, gifUrls.length]);
 
-  const handleMouseLeave = (id: number) => {
-    setHoveredVideo(null);
-    const videoElement = document.getElementById(
-      `video-${id}`
-    ) as HTMLVideoElement;
-    if (videoElement && !playingVideos.has(id)) {
-      videoElement.pause();
-      videoElement.currentTime = 0;
+  const getColSizes = useCallback(() => {
+    if (hovered === null) {
+      return Array(Math.sqrt(gifUrls.length)).fill("1fr").join(" ");
     }
-  };
+    const { col } = hovered;
+    const nonHoveredSize = (gridSize - hoverSize) / 2;
+    return Array(Math.sqrt(gifUrls.length))
+      .fill(0)
+      .map((_, c) => (c === col ? `${hoverSize}fr` : `${nonHoveredSize}fr`))
+      .join(" ");
+  }, [hovered, hoverSize, gridSize, gifUrls.length]);
 
-  const toggleVideoPlay = (id: number) => {
-    const newPlayingVideos = new Set(playingVideos);
-    const videoElement = document.getElementById(
-      `video-${id}`
-    ) as HTMLVideoElement;
-
-    if (playingVideos.has(id)) {
-      newPlayingVideos.delete(id);
-      if (videoElement) {
-        videoElement.pause();
-      }
-    } else {
-      newPlayingVideos.add(id);
-      if (videoElement) {
-        videoElement
-          .play()
-          .catch((error) => console.error("Error playing video:", error));
-      }
-    }
-
-    setPlayingVideos(newPlayingVideos);
-  };
+  const getTransformOrigin = useCallback(
+    (x: number, y: number) => {
+      const vertical =
+        y === 0 ? "top" : y === gridSize / 2 ? "center" : "bottom";
+      const horizontal =
+        x === 0 ? "left" : x === gridSize / 2 ? "center" : "right";
+      return `${vertical} ${horizontal}`;
+    },
+    [gridSize]
+  );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {videoData.map((video) => (
-        <div
-          key={video.id}
-          className="relative rounded-lg overflow-hidden bg-mocha-700"
-          onMouseEnter={() => handleMouseEnter(video.id)}
-          onMouseLeave={() => handleMouseLeave(video.id)}
-          style={{
-            transform: hoveredVideo === video.id ? "scale(1.1)" : "scale(1)",
-            transition: "transform 0.3s ease",
-            zIndex: hoveredVideo === video.id ? 10 : 1,
-          }}
-        >
-          <video
-            id={`video-${video.id}`}
-            className="w-full aspect-video object-cover"
-            src={video.src}
-            poster={video.thumbnail}
-            loop
-            muted
-            playsInline
-          />
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-            <h3 className="text-cream-100 font-medium">{video.title}</h3>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleVideoPlay(video.id);
-              }}
-              className="absolute top-2 right-2 bg-cream-100/30 hover:bg-cream-100/50 rounded-full p-1.5 backdrop-blur-sm transition-colors"
-            >
-              {playingVideos.has(video.id) ? (
-                <Pause className="w-4 h-4 text-cream-100" />
-              ) : (
-                <Play className="w-4 h-4 text-cream-100" />
-              )}
-            </button>
-          </div>
-        </div>
-      ))}
+    <div className={`space-y-4 w-full h-full ${className}`}>
+      <div
+        className="relative w-full h-full min-h-[480px]"
+        style={{
+          display: "grid",
+          gridTemplateRows: getRowSizes(),
+          gridTemplateColumns: getColSizes(),
+          gap: `${gapSize}px`,
+          transition:
+            "grid-template-rows 0.4s ease, grid-template-columns 0.4s ease",
+        }}
+      >
+        {frames.map((frame, index) => {
+          const row = Math.floor(
+            frame.defaultPos.y / (gridSize / Math.sqrt(gifUrls.length))
+          );
+          const col = Math.floor(
+            frame.defaultPos.x / (gridSize / Math.sqrt(gifUrls.length))
+          );
+          const transformOrigin = getTransformOrigin(
+            frame.defaultPos.x,
+            frame.defaultPos.y
+          );
+
+          return (
+            <GridCell
+              key={frame.post_id}
+              frame={frame}
+              row={row}
+              col={col}
+              transformOrigin={transformOrigin}
+              onHover={(r, c) => setHovered({ row: r, col: c })}
+              onLeave={() => setHovered(null)}
+              isHovered={hovered?.row === row && hovered?.col === col}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
+
+export default memo(VideoGrid);
