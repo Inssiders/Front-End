@@ -14,6 +14,23 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#000000",
     categories: ["social", "entertainment"],
     prefer_related_applications: false,
+    screenshots: [
+      // 데스크톱 스크린샷
+      {
+        src: "/screenshots/desktop-home.png",
+        sizes: "1919x955",
+        type: "image/png",
+        form_factor: "wide",
+        label: "홈 화면",
+      },
+      // 모바일 스크린샷
+      {
+        src: "/screenshots/mobile-home.png",
+        sizes: "387x841",
+        type: "image/png",
+        label: "모바일 홈 화면",
+      },
+    ],
     icons: [
       {
         src: "/icons/icon-192x192.png",
