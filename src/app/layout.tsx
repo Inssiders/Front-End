@@ -1,15 +1,33 @@
 import { NextLayout, NextProvider } from "@/components/provider";
-import type { Metadata } from "next";
-
+import type { Metadata, Viewport } from "next";
 import type React from "react";
 import "./globals.css";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
-  title: "인싸이더 - 트렌드의 모든 것",
-  description:
-    "인싸 문화, 밈, 인플루언서, 연예인을 중심으로 한 트렌디한 플랫폼",
-  manifest: "/manifest.json",
-  generator: "v0.dev",
+  title: "Inssider",
+  description: "Inssider - 밈 콘텐츠 공유 플랫폼",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Inssider",
+  },
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    apple: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512" },
+    ],
+  },
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
@@ -19,6 +37,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        <meta name="application-name" content="Inssider" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Inssider" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+      </head>
       <body>
         <NextProvider>
           <NextLayout>{children}</NextLayout>
