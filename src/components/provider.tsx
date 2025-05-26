@@ -1,5 +1,6 @@
 "use client";
 
+import { MSWProvider } from "@/contexts/msw-context";
 import ToasterContext from "@/contexts/toaster-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/react";
@@ -23,11 +24,13 @@ const queryClient = new QueryClient({
 
 export const NextProvider = ({ children }: Props) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <Suspense fallback={<Web3CubeLoader />}>{children}</Suspense>
-      </SessionProvider>
-    </QueryClientProvider>
+    <MSWProvider>
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider>
+          <Suspense fallback={<Web3CubeLoader />}>{children}</Suspense>
+        </SessionProvider>
+      </QueryClientProvider>
+    </MSWProvider>
   );
 };
 
