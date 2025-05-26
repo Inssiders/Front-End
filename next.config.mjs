@@ -5,7 +5,7 @@ const withPWA = nextPWA({
   dest: "public",
 
   // PWA 비활성화 여부 (development 환경에서는 true로 설정하는 것이 좋습니다)
-  // disable: process.env.NODE_ENV === "development",
+  disable: process.env.NODE_ENV === "development",
 
   // 서비스 워커를 자동으로 등록
   register: true,
