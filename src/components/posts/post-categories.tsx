@@ -5,11 +5,23 @@ import { Input } from "@/components/ui/input";
 import { MEME_CATEGORIES } from "@/utils/constant";
 import { motion } from "framer-motion";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PostCategories() {
-  const [activeCategory, setActiveCategory] = useState("all");
+  const router = useRouter(); //  라우터 인스턴스
+  const searchParams = useSearchParams(); //  쿼리스트링 읽기용
+  const currentCategory = searchParams.get("category") || "all"; //  현재 쿼리값 사용
+
   const [showSearch, setShowSearch] = useState(false);
+
+  const handleCategoryClick = (categoryId: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.set("category", categoryId);
+
+    router.push(`?${params.toString()}`); //  쿼리스트링 업데이트
+  };
 
   return (
     <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
@@ -23,13 +35,15 @@ export default function PostCategories() {
                 whileTap={{ scale: 0.95 }}
               >
                 <Button
-                  variant={activeCategory === category.id ? "default" : "ghost"}
+                  variant={
+                    currentCategory === category.id ? "default" : "ghost"
+                  }
                   className={`rounded-full mr-2 ${
-                    activeCategory === category.id
-                      ? "bg-purple-600 hover:bg-purple-700 text-white"
+                    currentCategory === category.id
+                      ? "bg-main-700 hover:bg-main-700 text-white font-bold"
                       : "text-gray-700 dark:text-gray-300"
                   }`}
-                  onClick={() => setActiveCategory(category.id)}
+                  onClick={() => handleCategoryClick(category.id)}
                 >
                   {category.name}
                 </Button>

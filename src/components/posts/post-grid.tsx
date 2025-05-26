@@ -6,9 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Bookmark, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import PostsLoading from "./post-loading";
-
+import { useSearchParams } from "next/navigation";
+import { useInfiniteEmpathyMemes } from "@/hooks/use-infinite-user-posts";
+// import { useInView } from "react-intersection-observer";
 // 밈 데이터 (실제로는 API에서 가져올 것)
 export const postsData = [
   {
@@ -178,6 +180,14 @@ export default function PostsGrid({
 }: PostsGridProps) {
   const [internalPosts, setInternalPosts] = useState(posts ?? postsData);
   const [internalLoading, setInternalLoading] = useState(loading ?? true);
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category");
+  const filteredContents = useMemo(() => {
+    if (!category || category === "all") return internalPosts;
+    return internalPosts.filter(
+      (content) => content.category.toLowerCase() === category.toLowerCase()
+    );
+  }, [category, internalPosts]);
 
   useEffect(() => {
     if (typeof loading === "boolean") {
@@ -185,6 +195,7 @@ export default function PostsGrid({
     } else {
       // 데이터 로딩 시뮬레이션
       setInternalLoading(true);
+
       const timer = setTimeout(() => {
         setInternalLoading(false);
       }, 1000);
@@ -204,20 +215,6 @@ export default function PostsGrid({
             ...post,
             isLiked: !post.isLiked,
             likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-          };
-        }
-        return post;
-      })
-    );
-  };
-
-  const toggleBookmark = (id: number) => {
-    setInternalPosts((prevPosts: Post[]) =>
-      prevPosts.map((post: Post) => {
-        if (post.id === id) {
-          return {
-            ...post,
-            isBookmarked: !post.isBookmarked,
           };
         }
         return post;
@@ -258,7 +255,7 @@ export default function PostsGrid({
             : "sm:grid-cols-2 md:grid-cols-3"
         } gap-6`}
       >
-        {internalPosts.map((post: Post) => (
+        {filteredContents.map((post: Post) => (
           <motion.div
             key={post.id}
             variants={item}
@@ -282,35 +279,15 @@ export default function PostsGrid({
                   />
                 )}
                 <div className="absolute top-3 left-3">
-                  <Badge className="bg-purple-600 hover:bg-purple-700">
+                  <Badge className="bg-main-700 hover:bg-main-800 text-white font-normal">
                     {post.category}
                   </Badge>
                 </div>
-                {showActions && (
-                  <button
-                    className="absolute top-3 right-3 bg-black/30 hover:bg-black/50 text-white p-1.5 rounded-full transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleBookmark(
-                        typeof post.id === "string"
-                          ? parseInt(post.id)
-                          : post.id
-                      );
-                    }}
-                    aria-label="북마크"
-                  >
-                    <Bookmark
-                      className={`h-4 w-4 ${
-                        post.isBookmarked ? "fill-current text-yellow-400" : ""
-                      }`}
-                    />
-                  </button>
-                )}
               </div>
 
               <CardContent className="p-4">
                 <Link href={`/posts/${post.id}`}>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                  <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white hover:text-main-600 dark:hover:text-purple-400 transition-colors">
                     {post.title}
                   </h3>
                 </Link>
@@ -342,10 +319,8 @@ export default function PostsGrid({
                 {showActions && (
                   <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs">
                     <button
-                      className={`flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors ${
-                        post.isLiked
-                          ? "text-purple-600 dark:text-purple-400"
-                          : ""
+                      className={`flex items-center hover:text-red-600 dark:hover:text-red-400 transition-colors ${
+                        post.isLiked ? "text-red-600 dark:text-red-400" : ""
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -363,16 +338,13 @@ export default function PostsGrid({
                       />
                       {post.likes.toLocaleString()}
                     </button>
-                    <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                    <button className="flex items-center hover:text-main-600 dark:hover:text-main-400 transition-colors">
                       <MessageCircle className="h-3 w-3 mr-1" />
                       {post.comments.toLocaleString()}
                     </button>
-                    <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                      <Share2 className="h-3 w-3 mr-1" />
-                      {post.shares.toLocaleString()}
-                    </button>
+
                     {post.views !== undefined && (
-                      <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                      <button className="flex items-center hover:text-main-600 dark:hover:text-main-400 transition-colors">
                         <Eye className="h-3 w-3 mr-1" />
                         {post.views.toLocaleString()}
                       </button>
