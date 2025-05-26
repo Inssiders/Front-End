@@ -36,15 +36,23 @@ export default function SignInForm({ onLoginFail }: SignInFormProps) {
 
   const handleSubmit = async (values: SignInFields) => {
     setError("");
-    const res = await signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
-    if (res?.ok) {
-      router.push("/");
-    } else {
-      setError("로그인 실패! 아이디/비밀번호를 확인하세요.");
+    try {
+      const res = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        grant_type: "password",
+        redirect: false,
+        callbackUrl: "/",
+      });
+
+      if (!res?.error) {
+        router.push("/");
+      } else {
+        setError("로그인 실패! 아이디/비밀번호를 확인하세요.");
+        onLoginFail?.();
+      }
+    } catch (error) {
+      setError("로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
       onLoginFail?.();
     }
   };

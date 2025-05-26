@@ -1,4 +1,4 @@
-import { Post } from "./types";
+import { Post } from "@/utils/type/feed";
 
 export const seedPosts: Post[] = [
   {
@@ -89,77 +89,3 @@ export const seedPosts: Post[] = [
     is_deleted: false,
   },
 ];
-
-export const mockUsers = [
-  {
-    id: "1",
-    email: "test@example.com",
-    password: "password123",
-    nickname: "TestUser",
-    profileUrl: "https://picsum.photos/200",
-    bio: "Hello, I'm a test user!",
-    follower_count: 10,
-    post_count: 5,
-    accountVisible: true,
-    followerVisible: true,
-    deleted_at: null,
-  },
-  {
-    id: "2",
-    email: "deleted@example.com",
-    password: "password123",
-    nickname: "DeletedUser",
-    profileUrl: "https://picsum.photos/200",
-    bio: "I'm a deleted user",
-    follower_count: 0,
-    post_count: 0,
-    accountVisible: false,
-    followerVisible: false,
-    deleted_at: "2024-03-21T10:00:00Z",
-  },
-];
-
-export const mockTokens = {
-  access_token: "mock_access_token",
-  refresh_token: "mock_refresh_token",
-  expires_in: 3600,
-};
-
-// Error responses
-export const mockErrors = {
-  unauthorized: {
-    type: "https://api.inssider.com/problems/invalid-requests",
-    title: "유효하지 않은 인증 정보",
-    status: 401,
-    detail: "인증 정보가 누락되었거나 유효하지 않습니다.",
-    instance: "/api/auth/token",
-  },
-  forbidden: {
-    type: "https://api.inssider.com/problems/not-permitted",
-    title: "권한 제한",
-    status: 403,
-    detail: "해당 요청을 수행할 권한이 없습니다.",
-    instance: "/api/accounts/me",
-  },
-  emailConflict: {
-    type: "https://api.inssider.com/problems/email-already-exists",
-    title: "이메일 중복",
-    status: 409,
-    detail: "해당 이메일은 이미 사용 중입니다.",
-    instance: "/api/accounts",
-  },
-  invalidRequest: {
-    type: "https://api.inssider.com/problems/invalid-email-password",
-    title: "유효하지 않은 요청입니다",
-    status: 422,
-    detail: "검증 규칙을 만족하지 않습니다.",
-    instance: "/api/accounts",
-    errors: [
-      {
-        field: "email",
-        code: "REGEX_FAILED",
-        message: "이메일 표현식 검증에 실패했습니다.",
-      },
-    ],
-  },
-};

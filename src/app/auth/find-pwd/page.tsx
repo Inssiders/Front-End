@@ -6,10 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { requestEmailVerification, resetPassword } from "@/utils/fetch";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function FindPwdPage() {
+  const router = useRouter();
   const [step, setStep] = useState<"email" | "code" | "reset" | "done">(
     "email"
   );
@@ -23,33 +27,60 @@ export default function FindPwdPage() {
 
   async function handleSendCode(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    // 실제 이메일 인증번호 발송 로직은 여기에 (API 호출 등)
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      await requestEmailVerification(form.email);
       setSentCode(true);
       setStep("code");
+      toast.success("인증번호가 발송되었습니다. 이메일을 확인해주세요.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "알 수 없는 오류가 발생했습니다."
+      );
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   }
 
   async function handleVerifyCode(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    // 실제 인증번호 검증 로직은 여기에 (API 호출 등)
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      // TODO: 실제 인증번호 확인 API 구현 필요
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setStep("reset");
+      toast.success("인증이 완료되었습니다");
+    } catch (error) {
+      toast.error("인증번호를 다시 확인해주세요.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   }
 
   async function handleResetPwd(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    // 실제 비밀번호 재설정 로직은 여기에 (API 호출 등)
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      await resetPassword({
+        email: form.email,
+        password: form.password,
+      });
       setStep("done");
+      toast.success("비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.");
+      setTimeout(() => {
+        router.push("/auth/signin");
+      }, 2000);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "알 수 없는 오류가 발생했습니다."
+      );
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   }
 
   return (

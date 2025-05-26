@@ -1,12 +1,14 @@
-import "next-auth";
+import { DefaultSession } from "next-auth";
+import "next-auth/jwt";
 
 declare module "next-auth" {
-  interface Session {
+  interface Session extends DefaultSession {
     user: {
       id: string;
+      email: string;
+      grantType: "authorization_code" | "password" | "refresh_token";
       accessToken: string;
       refreshToken: string;
-      email?: string;
       exp: number;
       iat: number;
       jti: string;
@@ -15,14 +17,21 @@ declare module "next-auth" {
       aud: string | string[];
       nickname: string;
       profileImage: string;
-      grantType?: "email" | "password" | "refresh_token";
-    };
+      bio?: string;
+      followerCount?: number;
+      postCount?: number;
+      accountVisible?: boolean;
+      followerVisible?: boolean;
+      deletedAt?: string;
+    } & DefaultSession["user"];
   }
+
   interface User {
     id: string;
+    email: string;
+    grantType: "authorization_code" | "password" | "refresh_token";
     accessToken: string;
     refreshToken: string;
-    email?: string;
     exp: number;
     iat: number;
     jti: string;
@@ -31,17 +40,22 @@ declare module "next-auth" {
     aud: string | string[];
     nickname: string;
     profileImage: string;
-    grantType?: "email" | "password" | "refresh_token";
+    bio?: string;
+    followerCount?: number;
+    postCount?: number;
+    accountVisible?: boolean;
+    followerVisible?: boolean;
+    deletedAt?: string;
   }
 }
 
 declare module "next-auth/jwt" {
-  /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
   interface JWT {
     id: string;
+    email: string;
+    grantType: "authorization_code" | "password" | "refresh_token";
     accessToken: string;
     refreshToken: string;
-    email?: string;
     exp: number;
     iat: number;
     jti: string;
@@ -50,6 +64,11 @@ declare module "next-auth/jwt" {
     aud: string | string[];
     nickname: string;
     profileImage: string;
-    grantType?: "email" | "password" | "refresh_token";
+    bio?: string;
+    followerCount?: number;
+    postCount?: number;
+    accountVisible?: boolean;
+    followerVisible?: boolean;
+    deletedAt?: string;
   }
 }

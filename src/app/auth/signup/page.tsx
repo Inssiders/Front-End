@@ -18,11 +18,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { register, requestEmailVerification } from "@/utils/fetch";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Info, KeyRound, Loader2, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
@@ -38,36 +42,60 @@ export default function RegisterPage() {
     e.preventDefault();
     if (!form.email) return;
 
-    setLoading(true);
-    // TODO: 실제 이메일 발송 API 호출
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      await requestEmailVerification(form.email);
       setVerificationSent(true);
+      toast.success("인증번호가 발송되었습니다. 이메일을 확인해주세요.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "알 수 없는 오류가 발생했습니다."
+      );
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   }
 
   async function handleVerifyCode(e: React.FormEvent) {
     e.preventDefault();
     if (verificationCode.length !== 6) return;
 
-    setLoading(true);
-    // TODO: 실제 인증번호 확인 API 호출
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      // TODO: 실제 인증번호 확인 API 구현 필요
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setIsVerified(true);
+      toast.success("인증이 완료되었습니다");
+    } catch (error) {
+      toast.error("인증번호를 다시 확인해주세요.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isVerified) return;
 
-    setLoading(true);
-    // TODO: 실제 회원가입 API 호출
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      await register(form);
       setRegisterSuccess(true);
+      toast.success("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
+      setTimeout(() => {
+        router.push("/auth/signin");
+      }, 2000);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "알 수 없는 오류가 발생했습니다."
+      );
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   }
 
   return (

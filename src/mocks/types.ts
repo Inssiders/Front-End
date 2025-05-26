@@ -111,7 +111,3 @@ export interface CreateCommentBody {
   content: string;
   parent_comment_id?: number;
 }
-
-export interface ErrorResponse {
-  message: string;
-}

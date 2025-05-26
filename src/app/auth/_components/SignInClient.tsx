@@ -1,11 +1,19 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import MemeCard from "./MemeCard";
-import SignInForm from "./SignInForm";
 
 const MEMES = [
   {
@@ -56,6 +64,9 @@ const MEMES = [
 ];
 
 export default function SignInClient() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ email: "", password: "" });
   const [currentIdx, setCurrentIdx] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const meme = MEMES[currentIdx];
@@ -69,6 +80,40 @@ export default function SignInClient() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setForm({ ...form, [e.target.id]: e.target.value });
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      const result = await signIn("credentials", {
+        email: form.email,
+        password: form.password,
+        grant_type: "password",
+        redirect: false,
+        callbackUrl: "/",
+      });
+
+      if (!result?.error) {
+        toast.success("로그인 성공! 메인 페이지로 이동합니다.");
+        router.push("/");
+      } else {
+        toast.error("이메일 또는 비밀번호를 확인해주세요.");
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "이메일 또는 비밀번호를 확인해주세요."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen h-screen flex items-center justify-center relative overflow-hidden">
@@ -109,11 +154,68 @@ export default function SignInClient() {
             <h1 className="text-4xl font-extrabold mb-8 text-center text-purple-700 dark:text-purple-200 tracking-tight drop-shadow">
               Inssider Login
             </h1>
-            <SignInForm
-              onLoginFail={() =>
-                setCurrentIdx((prev) => (prev + 1) % MEMES.length)
-              }
-            />
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="w-full max-w-md"
+            >
+              <Card className="shadow-xl rounded-2xl border-0">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs px-2 py-1">
+                      INSSIDER
+                    </Badge>
+                    로그인
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                      <Label htmlFor="email">이메일</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        required
+                        placeholder="이메일"
+                        value={form.email}
+                        onChange={handleChange}
+                        className="mt-1 focus:ring-2 focus:ring-pink-400 transition"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="password">비밀번호</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        required
+                        placeholder="비밀번호"
+                        value={form.password}
+                        onChange={handleChange}
+                        className="mt-1 focus:ring-2 focus:ring-yellow-400 transition"
+                      />
+                    </div>
+                    <motion.div whileTap={{ scale: 0.97 }}>
+                      <Button
+                        type="submit"
+                        className="w-full text-base font-semibold tracking-wide bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 hover:from-purple-500 hover:to-yellow-500 transition"
+                        size="lg"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            로그인 중...
+                          </>
+                        ) : (
+                          "로그인"
+                        )}
+                      </Button>
+                    </motion.div>
+                  </form>
+                </CardContent>
+              </Card>
+            </motion.div>
             <div className="mt-8 text-center text-xs text-gray-400">
               아직 회원이 아니신가요?{" "}
               <Link
