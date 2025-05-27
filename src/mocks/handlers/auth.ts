@@ -39,7 +39,7 @@ const handlers = [
   // 토큰 발급/갱신
   http.post(
     `${
-      process.env.NEXT_PUBLIC_MOCK_SERVER_URL || process.env.MOCK_SERVER_URL
+      process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL
     }/api/auth/token`,
     async ({ request }) => {
       const body = (await request.json()) as TokenRequest;
@@ -113,7 +113,7 @@ const handlers = [
   // 프로필 조회
   http.get(
     `${
-      process.env.NEXT_PUBLIC_MOCK_SERVER_URL || process.env.MOCK_SERVER_URL
+      process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL
     }/api/profiles/:id`,
     async ({ params, request }) => {
       const { id } = params;
@@ -177,7 +177,7 @@ const handlers = [
   // 회원가입
   http.post(
     `${
-      process.env.NEXT_PUBLIC_MOCK_SERVER_URL || process.env.MOCK_SERVER_URL
+      process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL
     }/api/accounts`,
     async ({ request }) => {
       const body = (await request.json()) as RegisterRequest;
@@ -210,7 +210,7 @@ const handlers = [
   // 회원탈퇴
   http.delete(
     `${
-      process.env.NEXT_PUBLIC_MOCK_SERVER_URL || process.env.MOCK_SERVER_URL
+      process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL
     }/api/accounts/me`,
     async ({ request }) => {
       const authHeader = request.headers.get("Authorization");

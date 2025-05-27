@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { handlers as authHandlers } from "./handlers/auth";
+import { handlers as mockHandlers } from "./handlers/index";
 import { seedPosts } from "./seed-data";
 
 // 초기 더미 데이터 생성
@@ -26,4 +26,4 @@ if (typeof window !== "undefined") {
 }
 
 // 모든 핸들러를 하나로 합칩니다
-export const handlers = [...authHandlers];
+export const handlers = [...mockHandlers];

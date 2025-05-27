@@ -1,19 +1,22 @@
 import { setupServer } from "msw/node";
 import { handlers } from "./handlers";
 
-// MSW 서버 인스턴스 생성
 const server = setupServer(...handlers);
 
 // 서버 시작
-const startServer = () => {
+const startServer = async () => {
   server.listen({
     onUnhandledRequest: "warn",
   });
   console.log("[MSW] Server started");
-  console.log(
-    "[MSW] Registered handlers:",
-    handlers.map((h) => `${h.info.method} ${h.info.path}`)
-  );
+
+  // 핸들러 정보를 더 명확하게 출력
+  const registeredHandlers = handlers.map((handler) => {
+    const { method, path } = handler.info;
+    return `${method} ${path}`;
+  });
+
+  console.log("[MSW] Registered handlers:", registeredHandlers);
 };
 
 // 서버 종료
@@ -27,5 +30,9 @@ const resetHandlers = () => {
   server.resetHandlers();
   console.log("[MSW] Handlers reset");
 };
+
+if (process.env.NODE_ENV === "development") {
+  startServer();
+}
 
 export { resetHandlers, server, startServer, stopServer };
