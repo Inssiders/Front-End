@@ -209,24 +209,30 @@ export default function Header() {
 
               {/* Profile Menu */}
               {status === "authenticated" ? (
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="relative h-10 w-10 rounded-full"
+                      className="relative h-10 w-10 rounded-full p-0 overflow-hidden"
                     >
-                      <Avatar className="h-10 w-10">
+                      <Avatar className="h-10 w-10 block">
                         <AvatarImage
                           src={session.user?.profileImage || "/placeholder.svg"}
                           alt={session.user?.nickname || "프로필"}
+                          className="object-cover"
                         />
-                        <AvatarFallback>
+                        <AvatarFallback className="text-xs">
                           {session.user?.nickname?.substring(0, 2) || "사용자"}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuContent
+                    className="w-56"
+                    align="end"
+                    sideOffset={5}
+                    alignOffset={0}
+                  >
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
@@ -239,7 +245,7 @@ export default function Header() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/profile">프로필</Link>
+                      <Link href={`/profile/${session.user?.id}`}>프로필</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/settings">설정</Link>

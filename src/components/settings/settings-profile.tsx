@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
-import { Camera, Save } from "lucide-react";
+import { Camera, KeyRound, Save } from "lucide-react";
 
 export default function SettingsProfile() {
   return (
@@ -15,8 +15,9 @@ export default function SettingsProfile() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className="space-y-4"
     >
-      <Card className="mb-4 p-2 sm:p-4">
+      <Card className="p-2 sm:p-4">
         <CardHeader className="pb-2 sm:pb-4">
           <CardTitle className="text-base sm:text-lg md:text-xl">
             프로필 정보
@@ -44,14 +45,8 @@ export default function SettingsProfile() {
               <div className="flex-1 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name" className="mb-1 block">
-                      이름
-                    </Label>
-                    <Input id="name" defaultValue="김민서" />
-                  </div>
-                  <div>
                     <Label htmlFor="username" className="mb-1 block">
-                      사용자 이름
+                      닉네임
                     </Label>
                     <Input id="username" defaultValue="@minseo_style" />
                   </div>
@@ -80,32 +75,48 @@ export default function SettingsProfile() {
                 </div>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="instagram" className="mb-1 block">
-                  인스타그램
-                </Label>
-                <Input id="instagram" defaultValue="minseo_style" />
-              </div>
-              <div>
-                <Label htmlFor="youtube" className="mb-1 block">
-                  유튜브
-                </Label>
-                <Input id="youtube" defaultValue="MinSeoStyle" />
-              </div>
-              <div>
-                <Label htmlFor="twitter" className="mb-1 block">
-                  트위터
-                </Label>
-                <Input id="twitter" defaultValue="minseo_style" />
-              </div>
-            </div>
-
             <div className="flex justify-end">
               <Button className="bg-purple-600 hover:bg-purple-700">
                 <Save className="h-4 w-4 mr-2" />
                 저장하기
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="p-2 sm:p-4">
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg md:text-xl">
+            비밀번호 변경
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0 sm:p-2 md:p-4">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="current-password" className="mb-1 block">
+                  현재 비밀번호
+                </Label>
+                <Input id="current-password" type="password" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="new-password" className="mb-1 block">
+                  새 비밀번호
+                </Label>
+                <Input id="new-password" type="password" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="confirm-password" className="mb-1 block">
+                  새 비밀번호 확인
+                </Label>
+                <Input id="confirm-password" type="password" />
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button variant="outline" className="bg-white hover:bg-gray-100">
+                <KeyRound className="h-4 w-4 mr-2" />
+                비밀번호 변경
               </Button>
             </div>
           </div>
