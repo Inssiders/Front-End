@@ -1,11 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
-// 서버 사이드 MSW 초기화
-if (process.env.NODE_ENV === "development") {
-  require("./mocks/server").startServer();
-}
-
 export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
 

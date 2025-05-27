@@ -5,21 +5,19 @@ import {
   type RegisterType,
 } from "./type/auth";
 
+const getBaseUrl = () =>
+  process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL || "";
+
 // API 호출 함수
 async function callAuthAPI(endpoint: string, data: any): Promise<AuthResponse> {
-  const response = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_MOCK_SERVER_URL || process.env.MOCK_SERVER_URL
-    }/api/auth/${endpoint}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/hal+json; q=0.9, application/json; q=0.8",
-      },
-      body: JSON.stringify(data),
-    }
-  );
+  const response = await fetch(`${getBaseUrl()}/api/auth/${endpoint}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/hal+json; q=0.9, application/json; q=0.8",
+    },
+    body: JSON.stringify(data),
+  });
 
   if (!response.ok) {
     const error = await response.json();
@@ -85,15 +83,10 @@ export const fetchProfile = async (accountId: string, accessToken: string) => {
     Authorization: `Bearer ${accessToken}`,
   };
 
-  const response = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_MOCK_SERVER_URL || process.env.MOCK_SERVER_URL
-    }/api/profiles/${accountId}`,
-    {
-      method: "GET",
-      headers,
-    }
-  );
+  const response = await fetch(`${getBaseUrl()}/api/profiles/${accountId}`, {
+    method: "GET",
+    headers,
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch profile");
@@ -112,23 +105,18 @@ export async function register({
   password: string;
   nickname: string;
 }) {
-  const response = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_MOCK_SERVER_URL || process.env.MOCK_SERVER_URL
-    }/api/accounts`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/hal+json; q=0.9, application/json; q=0.8",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-        register_type: "password" as RegisterType,
-      }),
-    }
-  );
+  const response = await fetch(`${getBaseUrl()}/api/accounts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/hal+json; q=0.9, application/json; q=0.8",
+    },
+    body: JSON.stringify({
+      email,
+      password,
+      register_type: "password" as RegisterType,
+    }),
+  });
 
   if (!response.ok) {
     const error = await response.json();
@@ -146,21 +134,16 @@ export async function resetPassword({
   email: string;
   password: string;
 }) {
-  const response = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_MOCK_SERVER_URL || process.env.MOCK_SERVER_URL
-    }/api/accounts/reset-password`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    }
-  );
+  const response = await fetch(`${getBaseUrl()}/api/accounts/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      password,
+    }),
+  });
 
   if (!response.ok) {
     throw new Error("Failed to reset password");
@@ -171,18 +154,13 @@ export async function resetPassword({
 
 // 회원탈퇴
 export async function deleteAccount(accessToken: string) {
-  const response = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_MOCK_SERVER_URL || process.env.MOCK_SERVER_URL
-    }/api/accounts/me`,
-    {
-      method: "DELETE",
-      headers: {
-        Accept: "application/hal+json; q=0.9, application/json; q=0.8",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
+  const response = await fetch(`${getBaseUrl()}/api/accounts/me`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/hal+json; q=0.9, application/json; q=0.8",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
   if (!response.ok) {
     const errorData = await response.json();
