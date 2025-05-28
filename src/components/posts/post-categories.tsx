@@ -9,9 +9,9 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PostCategories() {
-  const router = useRouter(); //  라우터 인스턴스
-  const searchParams = useSearchParams(); //  쿼리스트링 읽기용
-  const currentCategory = searchParams.get("category") || "all"; //  현재 쿼리값 사용
+  const router = useRouter(); // 라우터
+  const searchParams = useSearchParams();
+  const currentCategory = searchParams.get("category") || "all";
 
   const [showSearch, setShowSearch] = useState(false);
 
@@ -20,7 +20,7 @@ export default function PostCategories() {
 
     params.set("category", categoryId);
 
-    router.push(`?${params.toString()}`); //  쿼리스트링 업데이트
+    router.push(`?${params.toString()}`); // 쿼리스트링 업데이트
   };
 
   return (
