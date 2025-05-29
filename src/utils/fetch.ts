@@ -10,7 +10,7 @@ const getBaseUrl = () =>
 
 // API 호출 함수
 async function callAuthAPI(endpoint: string, data: any): Promise<AuthResponse> {
-  const response = await fetch(`${getBaseUrl()}/api/auth/${endpoint}`, {
+  const response = await fetch(`/server/auth/${endpoint}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -83,7 +83,7 @@ export const fetchProfile = async (accountId: string, accessToken: string) => {
     Authorization: `Bearer ${accessToken}`,
   };
 
-  const response = await fetch(`${getBaseUrl()}/api/profiles/${accountId}`, {
+  const response = await fetch(`/server/profiles/${accountId}`, {
     method: "GET",
     headers,
   });
@@ -105,7 +105,7 @@ export async function register({
   password: string;
   nickname: string;
 }) {
-  const response = await fetch(`${getBaseUrl()}/api/accounts`, {
+  const response = await fetch(`/server/accounts`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -134,7 +134,7 @@ export async function resetPassword({
   email: string;
   password: string;
 }) {
-  const response = await fetch(`${getBaseUrl()}/api/accounts/reset-password`, {
+  const response = await fetch(`/server/accounts/reset-password`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -154,7 +154,7 @@ export async function resetPassword({
 
 // 회원탈퇴
 export async function deleteAccount(accessToken: string) {
-  const response = await fetch(`${getBaseUrl()}/api/accounts/me`, {
+  const response = await fetch(`/server/accounts/me`, {
     method: "DELETE",
     headers: {
       Accept: "application/hal+json; q=0.9, application/json; q=0.8",

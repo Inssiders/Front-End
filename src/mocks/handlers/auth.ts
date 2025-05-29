@@ -51,7 +51,7 @@ const mockUsers = [
 ];
 
 // API 기본 URL 설정
-const BASE_URL = ""; // 빈 문자열로 설정하여 상대 경로로 처리
+const BASE_URL = process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL;
 
 interface TokenRequest {
   email?: string;

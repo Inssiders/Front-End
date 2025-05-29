@@ -3,72 +3,88 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface MSWContextType {
-  isMSWReady: boolean;
+  isReady: boolean;
+  error: string | null;
 }
 
-const MSWContext = createContext<MSWContextType>({ isMSWReady: false });
+const MSWContext = createContext<MSWContextType>({
+  isReady: false,
+  error: null,
+});
+
+export const useMSW = () => useContext(MSWContext);
 
 export function MSWProvider({ children }: { children: React.ReactNode }) {
-  const [isMSWReady, setIsMSWReady] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function initMSW() {
-      // 프로덕션 환경에서는 MSW를 비활성화
-      if (process.env.NODE_ENV === "production") {
-        setIsMSWReady(true);
+    const initMSW = async () => {
+      if (
+        typeof window === "undefined" ||
+        process.env.NEXT_PUBLIC_API_MOCKING !== "enabled"
+      ) {
+        console.log("[MSW Context] Skipping MSW initialization");
+        setIsReady(true);
         return;
       }
 
       try {
-        // MSW 브라우저 워커 초기화
-        const { worker } = await import("../mocks/browser");
+        console.log("[MSW Context] Starting MSW initialization...");
 
-        // 워커가 이미 시작되었는지 확인
-        if (!worker) {
-          throw new Error("MSW worker is not initialized");
+        const { startWorker } = await import("../mocks/browser");
+
+        console.log("[MSW Context] Starting worker...");
+        const workerStarted = await startWorker();
+
+        if (!workerStarted) {
+          setError("MSW is not properly intercepting network requests");
+          console.error(
+            "[MSW Context] Worker started but interception test failed"
+          );
+        } else {
+          console.log("[MSW Context] MSW initialized successfully");
+          setError(null);
         }
 
-        // 워커 시작
-        await worker.start({
-          onUnhandledRequest: "bypass", // 처리되지 않은 요청은 무시
-          serviceWorker: {
-            url: "/mockServiceWorker.js",
-            options: {
-              scope: "/",
-            },
-          },
-        });
-
-        console.log("[MSW] 초기화가 완료되었습니다");
-        setIsMSWReady(true);
-      } catch (error) {
-        console.error("[MSW] 초기화 실패:", error);
-        // 에러가 발생해도 앱이 동작할 수 있도록 합니다
-        setIsMSWReady(true);
-      }
-    }
-
-    initMSW();
-
-    // 컴포넌트 언마운트 시 클린업
-    return () => {
-      if (process.env.NODE_ENV === "development") {
-        import("../mocks/browser").then(({ worker }) => {
-          worker?.stop();
-        });
+        setIsReady(true);
+      } catch (initError) {
+        const errorMessage = `MSW initialization failed: ${
+          (initError as Error).message
+        }`;
+        console.error("[MSW Context] Failed to initialize MSW:", initError);
+        setError(errorMessage);
+        setIsReady(true); // 에러가 있어도 앱은 계속 실행
       }
     };
+
+    initMSW();
   }, []);
 
-  if (!isMSWReady) {
-    return null; // MSW가 준비되지 않았을 때는 아무것도 렌더링하지 않습니다
-  }
+  // 에러가 있으면 콘솔에 경고 표시
+  useEffect(() => {
+    if (error) {
+      console.error("[MSW Context] Error:", error);
+
+      // 브라우저 알림 (개발 환경에서만)
+      if (process.env.NODE_ENV === "development") {
+        setTimeout(() => {
+          console.warn(
+            `%c[MSW ERROR] ${error}`,
+            "color: red; font-weight: bold; font-size: 14px;"
+          );
+          console.warn(
+            "%cTry: 1. Hard refresh (Ctrl+Shift+R) 2. Clear browser cache 3. Check Application → Service Workers tab",
+            "color: orange; font-weight: bold;"
+          );
+        }, 1000);
+      }
+    }
+  }, [error]);
 
   return (
-    <MSWContext.Provider value={{ isMSWReady }}>{children}</MSWContext.Provider>
+    <MSWContext.Provider value={{ isReady, error }}>
+      {children}
+    </MSWContext.Provider>
   );
-}
-
-export function useMSW() {
-  return useContext(MSWContext);
 }
