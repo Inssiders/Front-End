@@ -1,23 +1,31 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Bell } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { motion } from "framer-motion";
+import { Bell } from "lucide-react";
 
 export default function SettingsNotifications() {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-      <Card>
-        <CardHeader>
-          <CardTitle>알림 설정</CardTitle>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Card className="mb-4 p-2 sm:p-4">
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg md:text-xl">
+            알림 설정
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-2 md:p-4">
           <div className="space-y-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">앱 알림</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                앱 알림
+              </h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="comments" className="flex-1">
@@ -47,7 +55,9 @@ export default function SettingsNotifications() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">이메일 알림</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                이메일 알림
+              </h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="email-news" className="flex-1">
@@ -80,5 +90,5 @@ export default function SettingsNotifications() {
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }

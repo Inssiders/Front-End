@@ -1,33 +1,24 @@
-import { Suspense } from "react"
-import { notFound } from "next/navigation"
-import PostDetail from "@/components/posts/post-detail"
-import PostDetailLoading from "@/components/posts/post-detail-loading"
-import CommentSection from "@/components/posts/comment-section"
-import RelatedPosts from "@/components/posts/related-posts"
+import { PostDetail } from "@/components/posts/post-detail";
 
-export const generateMetadata = async ({ params }: { params: { id: string } }) => {
-  // In a real app, fetch the post data here
-  // For now, we'll use a placeholder
-  return {
-    title: `인싸이더 - 게시글 #${params.id}`,
-    description: `인싸이더 게시글 #${params.id}의 상세 내용을 확인하세요.`,
-  }
+interface PostDetailPageProps {
+  params: {
+    id: string;
+  };
 }
 
-export default function PostPage({ params }: { params: { id: string } }) {
-  // In a real app, check if the post exists
-  // For now, we'll just check if the ID is a number
-  if (isNaN(Number(params.id))) {
-    notFound()
-  }
-
+export default async function PostDetailPage({ params }: PostDetailPageProps) {
+  const { id } = await params;
+  // 서버에서 fetch로 데이터 가져오기
+  const res = await fetch(
+    `${process.env.SERVER_URL || ""}/mock-data/all-mock-data.json`,
+    { cache: "no-store" }
+  );
+  const allData = await res.json();
+  // post_id가 일치하는 첫 번째 post만 추출
+  const post = allData.find((p: any) => String(p.post_id) === String(id));
   return (
-    <main className="container mx-auto px-4 py-8">
-      <Suspense fallback={<PostDetailLoading />}>
-        <PostDetail id={params.id} />
-      </Suspense>
-      <CommentSection postId={params.id} />
-      <RelatedPosts postId={params.id} />
+    <main className="flex flex-col min-h-screen bg-gray-50">
+      <PostDetail post={post} />
     </main>
-  )
+  );
 }

@@ -1,237 +1,362 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useMobile } from "@/hooks/use-mobile";
+import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import { cn } from "@/lib/utils";
-import {
-  Award,
-  Bell,
-  Menu,
-  Search,
-  Sparkles,
-  Star,
-  TrendingUp,
-  Users,
-  Video,
-  X,
-} from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { motion } from "framer-motion";
+import { Menu, Search, Sparkles } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import * as React from "react";
 import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./ui/command";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "./ui/navigation-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
+import { TooltipProvider } from "./ui/tooltip";
 
 const navItems = [
   {
-    name: "트렌딩",
-    href: "/trending",
-    icon: <TrendingUp className="h-4 w-4 mr-2" />,
+    category: "트렌드",
+    items: [
+      {
+        name: "밈",
+        href: "/posts",
+        icon: <Sparkles className="h-4 w-4" />,
+        description: "최신 트렌드와 밈을 발견하세요",
+      },
+      {
+        name: "공감밈",
+        href: "/empathy-meme",
+        icon: <Sparkles className="h-4 w-4" />,
+        description: "공감할 수 있는 밈들을 찾아보세요",
+      },
+    ],
   },
-  { name: "밈", href: "/memes", icon: <Sparkles className="h-4 w-4 mr-2" /> },
-  {
-    name: "인플루언서",
-    href: "/influencers",
-    icon: <Users className="h-4 w-4 mr-2" />,
-  },
-  {
-    name: "연예인",
-    href: "/celebrities",
-    icon: <Star className="h-4 w-4 mr-2" />,
-  },
-  {
-    name: "챌린지",
-    href: "/challenges",
-    icon: <Award className="h-4 w-4 mr-2" />,
-  },
-  { name: "라이브", href: "/live", icon: <Video className="h-4 w-4 mr-2" /> },
 ];
 
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <span className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </span>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = "ListItem";
+
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const { data: session } = useSession();
+  const [open, setOpen] = useState(false);
+  const { status, data: session } = useSession();
   const pathname = usePathname();
   const isMobile = useMobile();
+  const router = useRouter();
+  const [search, setSearch] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const [openMobileMenu, setOpenMobileMenu] = useState(false);
+  const isScrollingUp = useScrollDirection();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
   }, []);
 
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  function handleSearchSubmit(e?: React.FormEvent) {
+    if (e) {
+      e.preventDefault();
+    }
+    if (search.trim()) {
+      router.push(`/search?q=${encodeURIComponent(search.trim())}`);
+      setOpen(false);
+      setSearch("");
+    }
+  }
+
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled
-          ? "bg-white/80 backdrop-blur-md shadow-sm dark:bg-gray-900/80"
-          : "bg-transparent"
-      )}
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
-                인싸이더
-              </span>
+    <TooltipProvider>
+      <motion.header
+        initial={{ y: 0 }}
+        animate={{ y: isScrollingUp ? 0 : "-100%" }}
+        transition={{ duration: 0.3 }}
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 border-b rounded-b-xl bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950"
+        )}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex h-16 items-center justify-between gap-4 w-full">
+            {/* Logo */}
+            <Link
+              href="/"
+              className="flex items-center min-w-[100px] hover:opacity-80 transition-opacity"
+            >
+              <Image
+                src="/logo.png"
+                alt="인싸이더"
+                width={40}
+                height={40}
+                className="rounded-xl"
+              />
             </Link>
-          </div>
 
-          {!isMobile && (
-            <nav className="hidden md:flex items-center space-x-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "px-3 py-2 rounded-full text-sm font-medium flex items-center transition-all",
-                    pathname === item.href
-                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/50"
-                  )}
-                >
-                  {item.icon}
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
-          )}
-
-          <div className="flex items-center space-x-2">
-            <div className="relative hidden md:block w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="search"
-                placeholder="트렌드 검색..."
-                className="pl-10 rounded-full bg-gray-100 border-0 focus-visible:ring-purple-500 dark:bg-gray-800"
-              />
-            </div>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative"
-              aria-label="알림"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </Button>
-
-            {/* 프로필/로그인 드롭다운 */}
-            <div className="relative">
-              <button
-                onClick={() => setIsProfileMenuOpen((v) => !v)}
-                className="focus:outline-none"
-                aria-label="프로필 메뉴 열기"
+            {/* Search Command Center */}
+            <div className="flex-1 max-w-2xl mx-auto">
+              <Button
+                variant="outline"
+                className={cn(
+                  "relative w-full justify-start text-sm text-muted-foreground h-10",
+                  "md:px-4",
+                  "px-3 rounded-xl border-gray-200 dark:border-gray-800 hover:bg-accent"
+                )}
+                onClick={() => setOpen(true)}
               >
-                <Avatar className="h-8 w-8 border-2 border-purple-200 hover:border-purple-400 transition-all">
-                  <AvatarImage
-                    src="/placeholder.svg?height=32&width=32"
-                    alt="프로필"
-                  />
-                  <AvatarFallback>MZ</AvatarFallback>
-                </Avatar>
-              </button>
-              {isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 rounded-xl shadow-lg py-2 z-50 border border-gray-100 dark:border-gray-800">
-                  {session ? (
-                    <>
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                      >
-                        프로필
-                      </Link>
-                      <button
-                        className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={() => {
-                          signOut({ callbackUrl: "/" });
-                          setIsProfileMenuOpen(false);
-                        }}
-                      >
-                        로그아웃
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={() => {
-                          signIn();
-                          setIsProfileMenuOpen(false);
-                        }}
-                      >
-                        로그인
-                      </button>
-                      <Link
-                        href="/signup"
-                        className="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                      >
-                        회원가입
-                      </Link>
-                    </>
-                  )}
-                </div>
-              )}
+                <Search className="mr-2 h-4 w-4" />
+                <span className="hidden md:inline">트렌드 검색...</span>
+                <span className="inline md:hidden">검색...</span>
+                <kbd className="pointer-events-none absolute right-2 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium opacity-100 md:flex">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
+              </Button>
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="메뉴"
-            >
-              {isMenuOpen ? (
-                <X className="h-5 w-5" />
+            {/* Desktop Nav & Actions */}
+            <div className="flex items-center gap-2">
+              {!isMobile && (
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    {navItems.map((category) => (
+                      <NavigationMenuItem key={category.category}>
+                        <NavigationMenuTrigger className="h-9">
+                          {category.category}
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent className="w-full flex flex-col items-start">
+                          <ul className="grid w-[400px] gap-3 grid-1 p-4 md:w-[300px]">
+                            {category.items.map((item) => (
+                              <ListItem
+                                key={item.name}
+                                title={item.name}
+                                href={item.href}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {item.icon}
+                                  <span>{item.description}</span>
+                                </div>
+                              </ListItem>
+                            ))}
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    ))}
+                  </NavigationMenuList>
+                </NavigationMenu>
+              )}
+
+              {/* Profile Menu */}
+              {status === "authenticated" ? (
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-10 w-10 rounded-full p-0 overflow-hidden"
+                    >
+                      <Avatar className="h-10 w-10 block">
+                        <AvatarImage
+                          src={session.user?.profileImage || "/placeholder.svg"}
+                          alt={session.user?.nickname || "프로필"}
+                          className="object-cover"
+                        />
+                        <AvatarFallback className="text-xs">
+                          {session.user?.nickname?.substring(0, 2) || "사용자"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-56"
+                    align="end"
+                    sideOffset={5}
+                    alignOffset={0}
+                  >
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {session.user?.nickname}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {session.user?.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href={`/profile/${session.user?.id}`}>프로필</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings">설정</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-red-500 focus:text-red-500"
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                    >
+                      로그아웃
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
-                <Menu className="h-5 w-5" />
+                <Button asChild variant="default">
+                  <Link href="/auth/signin">로그인</Link>
+                </Button>
               )}
-            </Button>
-          </div>
-        </div>
-      </div>
 
-      {/* 모바일 메뉴 */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 shadow-lg">
-          <div className="container mx-auto px-4 py-3">
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="search"
-                placeholder="트렌드 검색..."
-                className="pl-10 rounded-full bg-gray-100 border-0 focus-visible:ring-purple-500 dark:bg-gray-800"
-              />
+              {/* Mobile Menu */}
+              {isMobile && (
+                <Sheet open={openMobileMenu} onOpenChange={setOpenMobileMenu}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-80">
+                    <SheetHeader>
+                      <SheetTitle>메뉴</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-4">
+                      {navItems.map((category) => (
+                        <div key={category.category} className="mb-4">
+                          <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                            {category.category}
+                          </h3>
+                          <div className="space-y-1">
+                            {category.items.map((item) => (
+                              <Link
+                                key={item.name}
+                                href={item.href}
+                                className={cn(
+                                  "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                                  pathname === item.href
+                                    ? "bg-primary text-primary-foreground"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                                )}
+                                onClick={() => setOpenMobileMenu(false)}
+                              >
+                                {item.icon}
+                                <div>
+                                  <p>{item.name}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {item.description}
+                                  </p>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              )}
             </div>
-            <nav className="flex flex-col space-y-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "px-3 py-3 rounded-lg text-sm font-medium flex items-center",
-                    pathname === item.href
-                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/50"
-                  )}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.icon}
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
           </div>
         </div>
-      )}
-    </header>
+      </motion.header>
+
+      {/* Command Menu */}
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <form onSubmit={handleSearchSubmit}>
+          <CommandInput
+            placeholder="트렌드 검색..."
+            value={search}
+            onValueChange={setSearch}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSearchSubmit();
+              }
+            }}
+            className="border-none focus:ring-0 md:rounded-none rounded-xl px-4"
+          />
+        </form>
+        <CommandList className="md:rounded-none rounded-xl">
+          <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
+          <CommandGroup heading="추천 검색어">
+            <CommandItem
+              onSelect={() => {
+                setSearch("최신 트렌드");
+                handleSearchSubmit();
+              }}
+            >
+              <Search className="mr-2 h-4 w-4" />
+              <span>최신 트렌드</span>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setSearch("인기 밈");
+                handleSearchSubmit();
+              }}
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              <span>인기 밈</span>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </TooltipProvider>
   );
 }

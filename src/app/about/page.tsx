@@ -1,8 +1,7 @@
-import AboutHeader from "@/components/about/about-header"
-import AboutMission from "@/components/about/about-mission"
-import AboutTeam from "@/components/about/about-team"
-import AboutFeatures from "@/components/about/about-features"
-import AboutCTA from "@/components/about/about-cta"
+import AboutFeatures from "@/components/about/about-features";
+import AboutHeader from "@/components/about/about-header";
+import AboutMission from "@/components/about/about-mission";
+import AboutTeam from "@/components/about/about-team";
 
 export default function AboutPage() {
   return (
@@ -11,7 +10,7 @@ export default function AboutPage() {
       <AboutMission />
       <AboutFeatures />
       <AboutTeam />
-      <AboutCTA />
+      {/* <AboutCTA /> */}
     </div>
-  )
+  );
 }
