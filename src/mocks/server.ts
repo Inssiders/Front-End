@@ -1,10 +1,6 @@
 import { setupServer } from "msw/node";
 import { handlers } from "./handlers";
 
-// 환경변수에서 baseUrl 가져오기
-const baseUrl =
-  process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL || "";
-
 // MSW 서버 설정
 const server = setupServer(...handlers);
 
@@ -21,13 +17,18 @@ const startServer = async () => {
     server.listen({
       onUnhandledRequest: (req) => {
         // baseUrl로 시작하는 요청만 처리하고 나머지는 무시
-        if (baseUrl && req.url.toString().startsWith(baseUrl)) {
-          console.warn(`[MSW] Unhandled: ${req.method} ${req.url}`);
-        }
+        console.warn(`[MSW] Unhandled: ${req.method} ${req.url}`);
       },
     });
     isServerStarted = true;
     console.log("[MSW] Server started");
+
+    // 등록된 핸들러 리스트 출력
+    const registeredHandlers = handlers.map((handler) => {
+      const { method, path } = handler.info;
+      return `${method} ${path}`;
+    });
+    console.log("[MSW] Registered handlers:", registeredHandlers);
   } catch (error) {
     console.error("[MSW] Failed to start server:", error);
     throw error;

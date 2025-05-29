@@ -1,6 +1,7 @@
 import type { AuthResponse, DeleteAccountResponse } from "@/utils/type/auth";
 import { http, HttpResponse } from "msw";
 import { db } from "../db";
+import { mockErrors, mockUsers } from "../seed-data";
 import {
   AccountCreateRequest,
   AccountCreateResponse,
@@ -16,39 +17,6 @@ const mockTokens = {
   refresh_token: "mock-refresh-token",
   expires_in: 3600,
 };
-
-const mockErrors = {
-  unauthorized: {
-    type: "https://api.inssider.com/problems/unauthorized",
-    title: "인증되지 않은 요청",
-    status: 401,
-    detail: "유효하지 않은 인증 정보입니다.",
-    instance: "/api/auth/token",
-  },
-  forbidden: {
-    type: "https://api.inssider.com/problems/forbidden",
-    title: "접근 권한 없음",
-    status: 403,
-    detail: "해당 리소스에 대한 접근 권한이 없습니다.",
-    instance: "/api/auth/token",
-  },
-};
-
-const mockUsers = [
-  {
-    id: "1",
-    email: "test@example.com",
-    password: "Test1234!",
-    nickname: "테스트 사용자",
-    profileUrl: "https://example.com/profile.jpg",
-    bio: "테스트 사용자입니다.",
-    follower_count: 0,
-    post_count: 0,
-    accountVisible: true,
-    followerVisible: true,
-    deleted_at: null,
-  },
-];
 
 // API 기본 URL 설정
 const BASE_URL = process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL;
