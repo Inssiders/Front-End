@@ -28,3 +28,6 @@ next-env.d.ts
 *storybook.log
 
 .cursor
+
+/public/fallback-*.js
+/public/worker-*.js

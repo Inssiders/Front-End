@@ -1,10 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { memesData } from "../seed-data/memes";
 
-const getBaseUrl = () =>
-  process.env.NEXT_PUBLIC_SERVER_URL ||
-  process.env.SERVER_URL ||
-  "http://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL;
 
 // Helper function to generate pagination links
 const generateLinks = (
@@ -97,7 +94,9 @@ const filterMemes = (searchParams: URLSearchParams, data = memesData) => {
 
 export const handlers = [
   // GET - 게시물 목록 조회
-  http.get(`${getBaseUrl()}/api/posts`, ({ request }) => {
+  http.get(`${BASE_URL}/api/posts`, ({ request }) => {
+    console.log("[MSW] Intercepted GET request to (BASE_URL):", request.url);
+
     const url = new URL(request.url);
     const searchParams = url.searchParams;
 
@@ -108,7 +107,6 @@ export const handlers = [
 
     const filteredData = filterMemes(searchParams);
 
-    // Handle cursor-based pagination for profile views
     if (profileFilter) {
       const startIndex = cursor
         ? filteredData.findIndex((item) => btoa(item.created_at) === cursor) + 1
@@ -139,7 +137,6 @@ export const handlers = [
       });
     }
 
-    // Handle offset-based pagination for general views
     const startIndex = (page - 1) * size;
     const items = filteredData.slice(startIndex, startIndex + size);
 
@@ -154,12 +151,14 @@ export const handlers = [
           totalPages: Math.ceil(filteredData.length / size),
         },
       },
-      _links: generateLinks(`${getBaseUrl()}/api/posts`, searchParams, page),
+      _links: generateLinks(`${BASE_URL}/api/posts`, searchParams, page),
     });
   }),
 
   // POST - 새 게시물 작성
-  http.post(`${getBaseUrl()}/api/posts`, async ({ request }) => {
+  http.post(`${BASE_URL}/api/posts`, async ({ request }) => {
+    console.log("[MSW] Intercepted POST request to (BASE_URL):", request.url);
+
     const authHeader = request.headers.get("Authorization");
 
     if (!authHeader?.includes("Bearer")) {
@@ -185,9 +184,10 @@ export const handlers = [
   }),
 
   // GET - 단일 게시물 조회
-  http.get(`${getBaseUrl()}/api/posts/:id`, ({ params }) => {
+  http.get(`${BASE_URL}/api/posts/:id`, ({ params, request }) => {
+    console.log("[MSW] Intercepted GET request to (BASE_URL):", request.url);
+
     const { id } = params;
-    // memesData 배열의 인덱스를 id로 사용
     const post = memesData[Number(id) - 1];
 
     if (!post) {
@@ -210,7 +210,9 @@ export const handlers = [
   }),
 
   // DELETE - 게시물 삭제
-  http.delete(`${getBaseUrl()}/api/posts/:id`, ({ params, request }) => {
+  http.delete(`${BASE_URL}/api/posts/:id`, ({ params, request }) => {
+    console.log("[MSW] Intercepted DELETE request to (BASE_URL):", request.url);
+
     const { id } = params;
     const authHeader = request.headers.get("Authorization");
 

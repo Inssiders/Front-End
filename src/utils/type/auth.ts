@@ -44,3 +44,53 @@ export interface RegisterError {
     message: string;
   }>;
 }
+
+export interface ProfileResponse {
+  message: string;
+  data: {
+    nickname: string;
+    profileUrl: string;
+    bio?: string;
+    follower_count?: number;
+    post_count?: number;
+    accountVisible?: boolean;
+    followerVisible?: boolean;
+  };
+}
+
+export interface ProfilePostsResponse {
+  message: string;
+  data: {
+    memes: Array<{
+      id: number;
+      title: string;
+      content: string;
+      image_url?: string;
+      created_at: string;
+      updated_at: string;
+      user_id: number;
+      category_id: number;
+      like_count: number;
+      comment_count: number;
+      is_liked: boolean;
+      user: {
+        id: number;
+        nickname: string;
+        profileUrl: string;
+      };
+    }>;
+    pageInfo: {
+      page?: number;
+      limit: number;
+      totalElements?: number;
+      totalPages?: number;
+      next?: boolean;
+      nextCursor?: string;
+    };
+  };
+  _links: {
+    self: { href: string };
+    prev?: { href: string };
+    next?: { href: string };
+  };
+}

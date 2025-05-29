@@ -31,10 +31,12 @@ export async function canFetch(url: string): Promise<boolean> {
   }
 }
 
-/**
- * Check if the API server is reachable
- * @returns Promise resolving to boolean indicating if the API is reachable
- */
 export async function isApiReachable(): Promise<boolean> {
-  return canFetch("/api/health");
+  // 클라이언트사이드와 서버사이드 환경 구분
+  const baseUrl =
+    typeof window === "undefined"
+      ? process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL
+      : "";
+
+  return canFetch(`${baseUrl}/server/health`);
 }
