@@ -1,4 +1,4 @@
-import { Post } from "./types";
+import { Post } from "@/utils/type/feed";
 
 export const seedPosts: Post[] = [
   {
@@ -11,7 +11,7 @@ export const seedPosts: Post[] = [
     media_upload_time: "2025-05-20T16:58:59Z",
     account_id: 1,
     category_id: 1,
-    category: "drama",
+
     created_at: "2025-05-20T17:39:10.251Z",
     updated_at: "2025-05-20T17:39:10.251Z",
     deleted_at: null,
@@ -27,7 +27,7 @@ export const seedPosts: Post[] = [
     media_upload_time: "2025-05-20T16:59:08Z",
     account_id: 1,
     category_id: 1,
-    category: "k-pop",
+
     created_at: "2025-05-20T17:39:10.251Z",
     updated_at: "2025-05-20T17:39:10.251Z",
     deleted_at: null,
@@ -41,7 +41,7 @@ export const seedPosts: Post[] = [
     media_upload_time: "2025-05-20T16:59:11Z",
     account_id: 1,
     category_id: 1,
-    category: "k-pop",
+
     created_at: "2025-05-20T17:39:10.251Z",
     updated_at: "2025-05-20T17:39:10.251Z",
     deleted_at: null,
@@ -57,7 +57,7 @@ export const seedPosts: Post[] = [
     media_upload_time: "2025-05-20T16:59:19Z",
     account_id: 1,
     category_id: 1,
-    category: "variety",
+
     created_at: "2025-05-20T17:39:10.251Z",
     updated_at: "2025-05-20T17:39:10.251Z",
     deleted_at: null,
@@ -73,7 +73,7 @@ export const seedPosts: Post[] = [
     media_upload_time: "2025-05-20T16:59:24Z",
     account_id: 1,
     category_id: 1,
-    category: "drama",
+
     created_at: "2025-05-20T17:39:10.251Z",
     updated_at: "2025-05-20T17:39:10.251Z",
     deleted_at: null,
@@ -88,7 +88,7 @@ export const seedPosts: Post[] = [
     media_upload_time: "2025-05-20T16:59:24Z",
     account_id: 1,
     category_id: 1,
-    category: "movie",
+
     created_at: "2025-05-20T17:39:10.251Z",
     updated_at: "2025-05-20T17:39:10.251Z",
     deleted_at: null,

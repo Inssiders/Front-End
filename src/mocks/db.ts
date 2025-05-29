@@ -1,5 +1,8 @@
 import { factory, primaryKey } from "@mswjs/data";
 
+// ID 자동 생성을 위한 카운터
+let userIdCounter = 1;
+
 // 데이터베이스 스키마 정의
 export const db = factory({
   account: {
@@ -25,6 +28,7 @@ export const db = factory({
     is_deleted: Boolean,
   },
   follow: {
+    id: primaryKey(Number),
     from_account_id: Number,
     to_account_id: Number,
     created_at: () => new Date().toISOString(),
@@ -68,19 +72,30 @@ export const db = factory({
     created_at: () => new Date().toISOString(),
   },
   post_tag: {
+    id: primaryKey(Number),
     post_id: Number,
     tag_id: Number,
   },
   email_verification_code: {
+    id: primaryKey(Number),
     email: String,
     code: String,
     created_at: () => new Date().toISOString(),
     expired_at: String,
   },
   authorization_code: {
+    id: primaryKey(Number),
     code: String,
     created_at: () => new Date().toISOString(),
     expired_at: String,
+  },
+  user: {
+    id: primaryKey(() => userIdCounter++),
+    email: String,
+    password: String,
+    registerType: String,
+    createdAt: () => new Date().toISOString(),
+    updatedAt: () => new Date().toISOString(),
   },
 });
 

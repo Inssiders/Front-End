@@ -33,43 +33,11 @@ export default function SettingsPrivacy() {
                   </Label>
                   <Switch id="public-profile" defaultChecked />
                 </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="show-activity" className="flex-1">
-                    활동 내역 공개
-                  </Label>
-                  <Switch id="show-activity" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="show-followers" className="flex-1">
-                    팔로워 목록 공개
-                  </Label>
-                  <Switch id="show-followers" defaultChecked />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                데이터 및 개인정보
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="data-collection" className="flex-1">
-                    데이터 수집 허용
-                  </Label>
-                  <Switch id="data-collection" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="personalized-ads" className="flex-1">
-                    맞춤형 광고
-                  </Label>
-                  <Switch id="personalized-ads" />
-                </div>
               </div>
             </div>
 
             <div className="flex justify-end">
-              <Button className="bg-purple-600 hover:bg-purple-700">
+              <Button>
                 <Lock className="h-4 w-4 mr-2" />
                 개인정보 설정 저장
               </Button>
