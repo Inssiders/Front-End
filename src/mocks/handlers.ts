@@ -96,40 +96,41 @@ export const handlers = [
     return HttpResponse.json(profile, { status: 201 });
   }),
 
-  // 게시물 목록 조회 (검색/필터링 지원)
+  // 게시물 목록 조회 (검색/필터링 지원) + 무한스크롤
   http.get("/mock-api/posts", async ({ request }) => {
     const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "0");
+    const pageSize = parseInt(url.searchParams.get("pageSize") || "8");
+    const category = url.searchParams.get("category") || "";
     const searchQuery = url.searchParams.get("search") || "";
-    const categoryId = url.searchParams.get("category") || "";
 
-    const cacheKey = `posts-${searchQuery}-${categoryId}`;
+    const allPosts = await db.post.findMany({
+      where: {
+        ...(category && { category: { equals: category.toLowerCase() } }),
+        ...(searchQuery && { title: { contains: searchQuery } }),
+        is_deleted: { equals: false },
+      },
+    });
 
-    if (!isOnline()) {
-      const cachedData = getFromCache(cacheKey);
-      if (cachedData) {
-        return HttpResponse.json(cachedData);
-      }
-    }
-
-    try {
-      const posts = await db.post.findMany({
-        where: {
-          ...(searchQuery && { title: { contains: searchQuery } }),
-          ...(categoryId && { category_id: { equals: Number(categoryId) } }),
-          is_deleted: { equals: false },
-        },
-      });
-
-      await saveToCache(cacheKey, posts);
-      return HttpResponse.json(posts);
-    } catch (error) {
-      console.error("[MSW] Error handling request:", error);
-      const cachedData = getFromCache(cacheKey);
-      if (cachedData) {
-        return HttpResponse.json(cachedData);
-      }
-      return new HttpResponse(null, { status: 500 });
-    }
+    const start = page * pageSize;
+    const paginated = allPosts.slice(start, start + pageSize);
+    const items = paginated.map((post) => ({
+      ...post,
+      author: {
+        name: `User${post.account_id}`, // 임시 이름
+        avatar: "/placeholder.svg", // 임시 아바타
+      },
+      likes: 0,
+      comments: 0,
+      views: 0,
+      youtubeUrl: post.media_url,
+      description: post.content,
+    }));
+    return HttpResponse.json({
+      items,
+      total: allPosts.length,
+      hasNextPage: start + pageSize < allPosts.length,
+    });
   }),
 
   // 단일 게시물 조회
