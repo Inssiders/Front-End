@@ -1,4 +1,4 @@
-import { Post } from "./types";
+import { Post } from "@/utils/type/feed";
 
 export const seedPosts: Post[] = [
   {

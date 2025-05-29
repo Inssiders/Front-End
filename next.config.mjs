@@ -73,15 +73,16 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    instrumentationHook: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
   images: {
     unoptimized: true,
     domains: ["localhost", "inssider.com"],
+  },
+  env: {
+    NEXT_PUBLIC_API_MOCKING:
+      process.env.NODE_ENV === "development" ? "enabled" : "",
   },
   // async rewrites() {
   //   return [

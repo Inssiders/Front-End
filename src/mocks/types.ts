@@ -112,6 +112,40 @@ export interface CreateCommentBody {
   parent_comment_id?: number;
 }
 
-export interface ErrorResponse {
+export interface EmailChallengeRequest {
+  email: string;
+}
+
+export interface EmailChallengeResponse {
   message: string;
+  data: {
+    email: string;
+    expires_in: number;
+  };
+}
+
+export interface EmailVerifyRequest {
+  email: string;
+  otp: string;
+}
+
+export interface EmailVerifyResponse {
+  message: string;
+  data: {
+    authorization_code: string;
+    expires_in: number;
+  };
+}
+
+export interface AccountCreateRequest {
+  register_type: string;
+  email: string;
+  password: string;
+}
+
+export interface AccountCreateResponse {
+  message: string;
+  data: {
+    email: string;
+  };
 }
