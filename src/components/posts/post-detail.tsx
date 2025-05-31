@@ -23,6 +23,7 @@ interface PostDetailProps {
 }
 
 export function PostDetail({ post }: PostDetailProps) {
+  console.log('post', post);
   const [isLiked, setIsLiked] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
