@@ -2,6 +2,7 @@
 import { http, HttpResponse } from 'msw'
 import { mockPosts } from '../seed-data/detail-seed-data'
 const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL;
+
 export const handlers = [
   // 개별 게시물 조회
   http.get(`${BASE_URL}/api/posts/:id/detail`, ({ params }) => {
@@ -18,6 +19,11 @@ export const handlers = [
     return HttpResponse.json(post)
   }),
 
+  http.get(`${BASE_URL}/api/posts/:id/comments`, ({ params }) => {
+    const { id } = params;
+    const post = mockPosts.find(p => p.post_id === id);
+    return HttpResponse.json({ comments: post?.comments_list ?? [] });
+  }),
   
   // 관련 게시물 조회 (RelatedPosts 컴포넌트용)
   http.get(`${BASE_URL}/api/posts/:id/related`, ({ params }) => {
