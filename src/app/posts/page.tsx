@@ -6,7 +6,7 @@ import { Suspense } from "react";
 
 export default function PostsPage() {
   return (
-    <div className="pt-20 pb-16">
+    <div>
       <PostsHeader />
       <PostCategories />
       <Suspense fallback={<PostsLoading />}>

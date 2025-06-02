@@ -1,15 +1,15 @@
-import { Suspense } from "react"
-import SettingsHeader from "@/components/settings/settings-header"
-import SettingsTabs from "@/components/settings/settings-tabs"
-import SettingsLoading from "@/components/settings/settings-loading"
+import SettingsHeader from "@/components/settings/settings-header";
+import SettingsLoading from "@/components/settings/settings-loading";
+import SettingsTabs from "@/components/settings/settings-tabs";
+import { Suspense } from "react";
 
 export default function SettingsPage() {
   return (
-    <div className="pt-20 pb-16">
+    <div>
       <SettingsHeader />
       <Suspense fallback={<SettingsLoading />}>
         <SettingsTabs />
       </Suspense>
     </div>
-  )
+  );
 }

@@ -4,48 +4,42 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 30 100% 85%;
-    --primary-foreground: 240 10% 3.9%;
-    --secondary: 210 100% 92%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 30 100% 85%;
-    --radius: 0.5rem;
-  }
+    /* Gen-Z 네온/파스텔 색상 팔레트 */
+    --neon-cyan: #00f5ff;
+    --neon-pink: #ff6b9d;
+    --neon-purple: #c471f5;
+    --neon-green: #39ff14;
+    --neon-orange: #ff8c00;
+    --neon-blue: #12d8fa;
 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 30 100% 85%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 210 100% 92%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
+    --pastel-pink: #f093fb;
+    --pastel-purple: #a8edea;
+    --pastel-blue: #667eea;
+    --pastel-green: #4facfe;
+    --pastel-yellow: #ffeaa7;
+    --pastel-orange: #fab1a0;
+
+    /* 통일된 Gen-Z 테마 색상 */
+    --background: 219 14% 6%;
+    --foreground: 240 10% 85%;
+    --card: 219 14% 8%;
+    --card-foreground: 240 10% 85%;
+    --popover: 219 14% 8%;
+    --popover-foreground: 240 10% 85%;
+    --primary: 191 100% 50%;
+    --primary-foreground: 219 14% 6%;
+    --secondary: 219 14% 12%;
+    --secondary-foreground: 240 10% 80%;
+    --muted: 219 14% 15%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 219 14% 15%;
+    --accent-foreground: 240 10% 85%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 30 100% 85%;
+    --destructive-foreground: 240 10% 85%;
+    --border: 219 14% 15%;
+    --input: 219 14% 15%;
+    --ring: 191 100% 50%;
+    --radius: 0.75rem;
   }
 }
 
@@ -56,69 +50,99 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    /* 기본 텍스트 색상을 연한 회색으로 설정 */
+    color: rgba(240, 240, 240, 0.85);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* 제목과 중요한 텍스트는 더 밝게 */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  /* 일반 텍스트 요소들 */
+  p,
+  span,
+  div {
+    color: rgba(240, 240, 240, 0.85);
+  }
+
+  /* 링크는 약간 더 밝게 */
+  a {
+    color: rgba(255, 255, 255, 0.9);
   }
 }
 
-/* 스크롤바 스타일링 */
+/* Gen-Z 네온 스크롤바 */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 4px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #4b5563;
+  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9333ea;
+  background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+  box-shadow: 0 0 15px rgba(255, 107, 157, 0.7);
 }
 
-/* 애니메이션 */
-@keyframes float {
-  0% {
-    transform: translateY(0px);
+/* Gen-Z 애니메이션 모음 */
+@keyframes neonGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
   }
   50% {
-    transform: translateY(-10px);
+    box-shadow: 0 0 30px rgba(255, 107, 157, 0.7);
   }
+}
+
+@keyframes floatGentle {
+  0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-15px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(-1deg);
   }
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* 폰트 설정 */
-.font-pretendard {
-  font-family: var(--font-pretendard), -apple-system, BlinkMacSystemFont,
-    system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
-    "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", sans-serif;
-}
-
-body {
-  scroll-behavior: smooth;
-}
-
-@layer utilities {
-  .animate-gradient-xy {
-    animation: gradient-xy 3s ease infinite;
-    background-size: 400% 400%;
+@keyframes slideInNeon {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0px);
   }
 }
 
-@keyframes gradient-xy {
+@keyframes gradientFlow {
   0% {
     background-position: 0% 50%;
   }
@@ -127,5 +151,260 @@ body {
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmerWave {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes bounceNeon {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 5px var(--neon-cyan));
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+    filter: drop-shadow(0 0 15px var(--neon-pink));
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* 유틸리티 클래스 */
+@layer utilities {
+  /* 개선된 텍스트 가독성 */
+  .text-readable {
+    color: rgba(240, 240, 240, 0.9);
+  }
+
+  .text-readable-bright {
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .text-readable-muted {
+    color: rgba(240, 240, 240, 0.7);
+  }
+
+  .text-readable-faded {
+    color: rgba(240, 240, 240, 0.5);
+  }
+
+  /* 네온 글로우 효과 - 가독성 개선 */
+  .neon-glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+  }
+
+  .neon-glow-pink {
+    box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+  }
+
+  .neon-glow-purple {
+    box-shadow: 0 0 20px rgba(196, 113, 245, 0.5);
+  }
+
+  /* 네온 텍스트 색상 - 가독성 개선 */
+  .text-neon-cyan {
+    color: #00f5ff;
+    text-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+  }
+
+  .text-neon-pink {
+    color: #ff6b9d;
+    text-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
+  }
+
+  .text-neon-purple {
+    color: #c471f5;
+    text-shadow: 0 0 10px rgba(196, 113, 245, 0.3);
+  }
+
+  .text-neon-green {
+    color: #39ff14;
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+  }
+
+  .text-neon-orange {
+    color: #ff8c00;
+    text-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
+  }
+
+  .text-neon-blue {
+    color: #12d8fa;
+    text-shadow: 0 0 10px rgba(18, 216, 250, 0.3);
+  }
+
+  /* 글래스모피즘 */
+  .glass {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-dark {
+    backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* 그라데이션 텍스트 */
+  .text-gradient-neon {
+    background: linear-gradient(
+      45deg,
+      var(--neon-cyan),
+      var(--neon-pink),
+      var(--neon-purple)
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-size: 300% 300%;
+    animation: gradientFlow 3s ease infinite;
+  }
+
+  .text-gradient-pastel {
+    background: linear-gradient(
+      45deg,
+      var(--pastel-blue),
+      var(--pastel-pink),
+      var(--pastel-purple)
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /* 배경 그라데이션 */
+  .bg-gradient-neon {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 245, 255, 0.1) 0%,
+      rgba(255, 107, 157, 0.1) 35%,
+      rgba(196, 113, 245, 0.1) 70%,
+      rgba(18, 216, 250, 0.1) 100%
+    );
+  }
+
+  .bg-gradient-genz {
+    background: linear-gradient(
+      135deg,
+      #667eea 0%,
+      #764ba2 25%,
+      #f093fb 50%,
+      #f5576c 75%,
+      #4facfe 100%
+    );
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+  }
+
+  /* 애니메이션 클래스 */
+  .animate-neon-glow {
+    animation: neonGlow 2s ease-in-out infinite;
+  }
+
+  .animate-float-gentle {
+    animation: floatGentle 6s ease-in-out infinite;
+  }
+
+  .animate-slide-in-neon {
+    animation: slideInNeon 0.6s ease-out;
+  }
+
+  .animate-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animate-shimmer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    animation: shimmerWave 2s infinite;
+  }
+
+  .animate-bounce-neon {
+    animation: bounceNeon 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  /* 호버 효과 */
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-5px);
+  }
+
+  .hover-glow {
+    transition: all 0.3s ease;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.6);
+    transform: scale(1.02);
+  }
+
+  /* 반응형 텍스트 크기 */
+  .text-responsive-xs {
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+  }
+
+  .text-responsive-sm {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+
+  .text-responsive-base {
+    font-size: clamp(1rem, 3vw, 1.125rem);
+  }
+
+  .text-responsive-lg {
+    font-size: clamp(1.125rem, 4vw, 1.5rem);
+  }
+
+  .text-responsive-xl {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  .text-responsive-2xl {
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+
+  .text-responsive-3xl {
+    font-size: clamp(2.5rem, 8vw, 4rem);
   }
 }

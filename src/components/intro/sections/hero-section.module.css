@@ -1,0 +1,450 @@
+/* 히어로 섹션 컨테이너 */
+.heroContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #f5576c 75%,
+    #4facfe 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientFlow 15s ease infinite;
+  overflow: hidden;
+}
+
+.heroContent {
+  width: 100%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .heroContent {
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+}
+
+/* 왼쪽 콘텐츠 */
+.leftContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+}
+
+.trendingBadge {
+  position: absolute;
+  top: -2rem;
+  left: -1rem;
+  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  transform: rotate(-15deg);
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+  animation: bounceNeon 3s ease-in-out infinite;
+}
+
+.trendingLine {
+  position: absolute;
+  left: -1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 6rem;
+  background: linear-gradient(180deg, var(--neon-cyan), var(--neon-pink));
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.7);
+}
+
+.sectionTitle {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-weight: 700;
+  color: var(--neon-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+}
+
+.mainTitle {
+  font-size: clamp(2rem, 8vw, 4rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(
+    45deg,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(0, 245, 255, 0.8) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+}
+
+.quoteSymbol {
+  font-size: 5rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: -1rem;
+  display: block;
+  text-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+}
+
+.brandName {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  margin: 1rem 0;
+  margin-left: 2rem;
+}
+
+.brandLetter {
+  display: inline-block;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+}
+
+.brandLetter:hover {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 30px rgba(0, 245, 255, 0.8);
+  transform: scale(1.1);
+}
+
+.brandLetterSpecial {
+  color: var(--neon-orange);
+  text-shadow: 0 0 20px rgba(255, 140, 0, 0.8);
+}
+
+.brandLetterSpecial:hover {
+  color: var(--neon-pink);
+  text-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+}
+
+.description {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1.5rem;
+  margin-left: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.tag {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tag::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 245, 255, 0.1),
+    rgba(255, 107, 157, 0.1)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tag:hover::before {
+  opacity: 1;
+}
+
+.tagPrimary {
+  background: rgba(0, 245, 255, 0.2);
+  color: var(--neon-cyan);
+  border-color: rgba(0, 245, 255, 0.3);
+}
+
+.tagSecondary {
+  background: rgba(255, 107, 157, 0.2);
+  color: var(--neon-pink);
+  border-color: rgba(255, 107, 157, 0.3);
+}
+
+.tagTertiary {
+  background: rgba(196, 113, 245, 0.2);
+  color: var(--neon-purple);
+  border-color: rgba(196, 113, 245, 0.3);
+}
+
+/* 오른쪽 콘텐츠 - 피처드 밈 */
+.rightContent {
+  position: relative;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.memeCardWrapper {
+  position: relative;
+  transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+  transition: all 0.5s ease;
+}
+
+.memeCardWrapper:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.05);
+}
+
+.memeCardBackground {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 245, 255, 0.3),
+    rgba(255, 107, 157, 0.3)
+  );
+  border-radius: 1.5rem;
+  transform: rotate(3deg);
+  filter: blur(20px);
+}
+
+.memeCard {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: rotate(-2deg);
+  transition: all 0.3s ease;
+}
+
+.memeCard:hover {
+  transform: rotate(0deg);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 0 40px rgba(0, 245, 255, 0.3);
+}
+
+.bestMemeBadge {
+  position: absolute;
+  top: 2.5rem;
+  right: -0.75rem;
+  background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+  color: white;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transform: rotate(90deg);
+  border-radius: 0.5rem;
+  z-index: 30;
+  box-shadow: 0 0 15px rgba(255, 107, 157, 0.5);
+}
+
+.popularBadge {
+  position: absolute;
+  top: 60%;
+  left: -1rem;
+  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-blue));
+  color: white;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transform: rotate(-5deg);
+  border-radius: 0.5rem;
+  z-index: 30;
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+}
+
+.memeImageContainer {
+  position: relative;
+  aspect-ratio: 1;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 245, 255, 0.1),
+    rgba(255, 107, 157, 0.1)
+  );
+}
+
+.memeOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 20;
+  backdrop-filter: blur(5px);
+}
+
+.memeImageContainer:hover .memeOverlay {
+  opacity: 1;
+}
+
+.overlayTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.overlayDescription {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.overlayButton {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.overlayButton:hover {
+  background: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.6);
+  transform: scale(1.1);
+}
+
+.memeImage {
+  position: relative;
+  z-index: 10;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.memeImageContainer:hover .memeImage {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* 시작 버튼 */
+.startButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+  z-index: 10;
+  position: relative;
+}
+
+.startButton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 245, 255, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.startButton:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 20px 40px rgba(0, 245, 255, 0.4),
+    0 0 40px rgba(255, 107, 157, 0.3);
+}
+
+.startButton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.1),
+    transparent,
+    rgba(255, 255, 255, 0.1)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.startButton:hover::before {
+  opacity: 1;
+}
+
+.buttonContent {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.buttonIcon {
+  transition: all 0.3s ease;
+}
+
+.startButton:hover .buttonIcon {
+  transform: translateX(0.25rem);
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+  .heroContainer {
+    padding: 1rem;
+  }
+
+  .heroContent {
+    gap: 2rem;
+  }
+
+  .trendingBadge,
+  .bestMemeBadge,
+  .popularBadge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+  }
+
+  .overlayButton {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}

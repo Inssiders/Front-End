@@ -12,6 +12,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
 import { useEffect, useState } from "react";
+import styles from "./header.module.css";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   CommandDialog,
@@ -73,16 +74,11 @@ const ListItem = React.forwardRef<
   return (
     <li>
       <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <span className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+        <a ref={ref} className={cn(styles.listItem, className)} {...props}>
+          <div className="text-sm font-medium leading-none text-readable-bright">
+            {title}
+          </div>
+          <span className="line-clamp-2 text-sm leading-snug text-readable-muted">
             {children}
           </span>
         </a>
@@ -135,17 +131,12 @@ export default function Header() {
         initial={{ y: 0 }}
         animate={{ y: isScrollingUp ? 0 : "-100%" }}
         transition={{ duration: 0.3 }}
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 border-b rounded-b-xl bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950"
-        )}
+        className={cn("fixed top-0 left-0 right-0 z-50", styles.header)}
       >
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between gap-4 w-full">
             {/* Logo */}
-            <Link
-              href="/"
-              className="flex items-center min-w-[100px] hover:opacity-80 transition-opacity"
-            >
+            <Link href="/" className={styles.logoContainer}>
               <Image
                 src="/logo.png"
                 alt="인싸이더"
@@ -158,18 +149,22 @@ export default function Header() {
             {/* Search Command Center */}
             <div className="flex-1 max-w-2xl mx-auto">
               <Button
-                variant="outline"
+                variant="ghost"
                 className={cn(
-                  "relative w-full justify-start text-sm text-muted-foreground h-10",
-                  "md:px-4",
-                  "px-3 rounded-xl border-gray-200 dark:border-gray-800 hover:bg-accent"
+                  "relative w-full justify-start text-sm h-10 rounded-xl",
+                  styles.searchButton
                 )}
                 onClick={() => setOpen(true)}
               >
                 <Search className="mr-2 h-4 w-4" />
                 <span className="hidden md:inline">트렌드 검색...</span>
                 <span className="inline md:hidden">검색...</span>
-                <kbd className="pointer-events-none absolute right-2 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium opacity-100 md:flex">
+                <kbd
+                  className={cn(
+                    "pointer-events-none absolute right-2 hidden h-6 select-none items-center gap-1 md:flex",
+                    styles.kbd
+                  )}
+                >
                   <span className="text-xs">⌘</span>K
                 </kbd>
               </Button>
@@ -182,10 +177,12 @@ export default function Header() {
                   <NavigationMenuList>
                     {navItems.map((category) => (
                       <NavigationMenuItem key={category.category}>
-                        <NavigationMenuTrigger className="h-9">
+                        <NavigationMenuTrigger
+                          className={cn("h-9", styles.navTrigger)}
+                        >
                           {category.category}
                         </NavigationMenuTrigger>
-                        <NavigationMenuContent className="w-full flex flex-col items-start">
+                        <NavigationMenuContent className={styles.navContent}>
                           <ul className="grid w-[400px] gap-3 grid-1 p-4 md:w-[300px]">
                             {category.items.map((item) => (
                               <ListItem
@@ -207,107 +204,124 @@ export default function Header() {
                 </NavigationMenu>
               )}
 
-              {/* Profile Menu */}
-              {status === "authenticated" ? (
-                <DropdownMenu modal={false}>
+              {/* User Menu */}
+              {status === "authenticated" && session?.user ? (
+                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="relative h-10 w-10 rounded-full p-0 overflow-hidden"
+                      className={cn("p-0", styles.avatarContainer)}
                     >
-                      <Avatar className="h-10 w-10 block">
+                      <Avatar className={cn("h-8 w-8", styles.avatar)}>
                         <AvatarImage
-                          src={session.user?.profileImage || "/placeholder.svg"}
-                          alt={session.user?.nickname || "프로필"}
-                          className="object-cover"
+                          src={session.user.image || ""}
+                          alt={session.user.name || "User"}
                         />
-                        <AvatarFallback className="text-xs">
-                          {session.user?.nickname?.substring(0, 2) || "사용자"}
+                        <AvatarFallback className="bg-gradient-to-br from-[var(--neon-purple)] to-[var(--neon-pink)] text-white">
+                          {session.user.name?.[0] || "U"}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
-                    className="w-56"
                     align="end"
-                    sideOffset={5}
-                    alignOffset={0}
+                    className={styles.dropdownContent}
                   >
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {session.user?.nickname}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {session.user?.email}
-                        </p>
-                      </div>
+                    <DropdownMenuLabel className="text-neon-cyan">
+                      내 계정
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href={`/profile/${session.user?.id}`}>프로필</Link>
+                      <Link href="/profile" className={styles.dropdownItem}>
+                        프로필
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/settings">설정</Link>
+                      <Link href="/settings" className={styles.dropdownItem}>
+                        설정
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="text-red-500 focus:text-red-500"
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={() => signOut()}
+                      className={styles.dropdownItem}
                     >
                       로그아웃
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button asChild variant="default">
-                  <Link href="/auth/signin">로그인</Link>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    asChild
+                    className={cn(
+                      "transition-all duration-300 ease-out",
+                      "hover:bg-white/10 hover:text-neon-cyan hover:shadow-lg",
+                      "hover:shadow-cyan-500/20 hover:border-cyan-500/30",
+                      "border border-transparent rounded-lg px-4 py-2",
+                      "backdrop-filter backdrop-blur-sm"
+                    )}
+                  >
+                    <Link href="/auth/signin">로그인</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className={cn(
+                      "bg-gradient-to-r from-[var(--neon-cyan)] to-[var(--neon-pink)]",
+                      "hover:from-[var(--neon-pink)] hover:to-[var(--neon-purple)]",
+                      "hover:shadow-lg hover:shadow-pink-500/30",
+                      "transition-all duration-300 ease-out",
+                      "border-0 text-white font-medium"
+                    )}
+                  >
+                    <Link href="/auth/signup">회원가입</Link>
+                  </Button>
+                </div>
               )}
 
               {/* Mobile Menu */}
               {isMobile && (
                 <Sheet open={openMobileMenu} onOpenChange={setOpenMobileMenu}>
                   <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={styles.mobileMenuButton}
+                    >
                       <Menu className="h-5 w-5" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-80">
-                    <SheetHeader>
-                      <SheetTitle>메뉴</SheetTitle>
+                  <SheetContent side="right" className={styles.mobileSheet}>
+                    <SheetHeader className={styles.mobileSheetHeader}>
+                      <SheetTitle className="text-gradient-neon">
+                        인싸이더
+                      </SheetTitle>
                     </SheetHeader>
-                    <div className="mt-4">
-                      {navItems.map((category) => (
-                        <div key={category.category} className="mb-4">
-                          <h3 className="text-sm font-medium text-muted-foreground mb-2">
-                            {category.category}
-                          </h3>
-                          <div className="space-y-1">
-                            {category.items.map((item) => (
-                              <Link
-                                key={item.name}
-                                href={item.href}
-                                className={cn(
-                                  "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors",
-                                  pathname === item.href
-                                    ? "bg-primary text-primary-foreground"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                                )}
-                                onClick={() => setOpenMobileMenu(false)}
-                              >
-                                {item.icon}
-                                <div>
-                                  <p>{item.name}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {item.description}
-                                  </p>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                    <div className="flex flex-col gap-4 mt-6">
+                      {navItems.map((category) =>
+                        category.items.map((item) => (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className={cn(
+                              "flex items-center gap-3 p-3 rounded-lg transition-all",
+                              styles.dropdownItem
+                            )}
+                            onClick={() => setOpenMobileMenu(false)}
+                          >
+                            {item.icon}
+                            <div className="flex flex-col">
+                              <span className="font-medium text-readable-bright">
+                                {item.name}
+                              </span>
+                              <span className="text-sm text-readable-muted">
+                                {item.description}
+                              </span>
+                            </div>
+                          </Link>
+                        ))
+                      )}
                     </div>
                   </SheetContent>
                 </Sheet>
@@ -317,45 +331,46 @@ export default function Header() {
         </div>
       </motion.header>
 
-      {/* Command Menu */}
+      {/* Search Command Dialog */}
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <form onSubmit={handleSearchSubmit}>
+        <div className={styles.commandContent}>
           <CommandInput
-            placeholder="트렌드 검색..."
+            placeholder="트렌드, 밈, 사용자 검색..."
             value={search}
             onValueChange={setSearch}
+            className={styles.commandInput}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                e.preventDefault();
                 handleSearchSubmit();
               }
             }}
-            className="border-none focus:ring-0 md:rounded-none rounded-xl px-4"
           />
-        </form>
-        <CommandList className="md:rounded-none rounded-xl">
-          <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
-          <CommandGroup heading="추천 검색어">
-            <CommandItem
-              onSelect={() => {
-                setSearch("최신 트렌드");
-                handleSearchSubmit();
-              }}
-            >
-              <Search className="mr-2 h-4 w-4" />
-              <span>최신 트렌드</span>
-            </CommandItem>
-            <CommandItem
-              onSelect={() => {
-                setSearch("인기 밈");
-                handleSearchSubmit();
-              }}
-            >
-              <Sparkles className="mr-2 h-4 w-4" />
-              <span>인기 밈</span>
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
+          <CommandList>
+            <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
+            <CommandGroup heading="빠른 탐색">
+              <CommandItem
+                onSelect={() => {
+                  router.push("/posts");
+                  setOpen(false);
+                }}
+                className={styles.commandItem}
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                <span>인기 밈</span>
+              </CommandItem>
+              <CommandItem
+                onSelect={() => {
+                  router.push("/empathy-meme");
+                  setOpen(false);
+                }}
+                className={styles.commandItem}
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                <span>공감밈</span>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </div>
       </CommandDialog>
     </TooltipProvider>
   );
