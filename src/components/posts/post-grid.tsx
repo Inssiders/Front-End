@@ -16,6 +16,7 @@ interface Post {
   title: string;
   description?: string;
   category: string; //  카테고리 이름 (예: "K-POP", "드라마")
+  category_id: Number;
   youtubeUrl?: string;
   image?: string;
   author: {
@@ -35,22 +36,17 @@ export default function PostsGrid() {
   const searchParams = useSearchParams();
   const selectedCategory = searchParams.get("category"); // category
 
-  const {
-    data,
-    isLoading,
-    isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-    target,
-  } = useInfiniteMemes({
-    category: selectedCategory || undefined,
-    pageSize: 8,
-  });
+  const { data, isLoading, isFetchingNextPage, hasNextPage, target } =
+    useInfiniteMemes({
+      category: selectedCategory || undefined,
+      size: 8,
+    });
 
-  const allPosts = useMemo(
-    () => data?.pages.flatMap((page) => page.items) ?? [],
-    [data]
-  );
+  const allPosts = useMemo(() => {
+    console.log("data 확인:", data);
+
+    return data?.pages.flatMap((page) => page.items) ?? [];
+  }, [data]);
 
   const toggleLike = (id: number | string) => {
     console.log("좋아요 클릭:", id);
@@ -79,88 +75,93 @@ export default function PostsGrid() {
         animate="show"
         className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6`}
       >
-        {allPosts.map((post: Post) => (
-          <motion.div key={post.id} variants={item}>
-            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900 h-full">
-              <div className="relative">
-                {post.youtubeUrl ? (
-                  <iframe
-                    src={post.youtubeUrl.replace("watch?v=", "embed/")}
-                    title={post.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full aspect-square object-cover"
-                  />
-                ) : (
-                  <img
-                    src={post.image || "/placeholder.svg"}
-                    alt={post.title}
-                    className="w-full aspect-square object-cover"
-                  />
-                )}
-                <div className="absolute top-3 left-3">
-                  <Badge className="bg-main-700 hover:bg-main-800 text-white font-normal">
-                    {post.category}
-                  </Badge>
-                </div>
-              </div>
-
-              <CardContent className="p-4">
-                <Link href={`/posts/${post.id}`}>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white hover:text-main-600 dark:hover:text-purple-400 transition-colors">
-                    {post.title}
-                  </h3>
-                </Link>
-
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center">
-                    <Avatar className="h-6 w-6 mr-2">
-                      <AvatarImage
-                        src={post.author.avatar || "/placeholder.svg"}
-                        alt={post.author.name}
-                      />
-                      <AvatarFallback>
-                        {post.author.name.substring(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-xs text-gray-700 dark:text-gray-300">
-                      {post.author.name}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs">
-                  <button
-                    className={`flex items-center hover:text-red-600 dark:hover:text-red-400 transition-colors ${
-                      post.isLiked ? "text-red-600 dark:text-red-400" : ""
-                    }`}
-                    onClick={() => toggleLike(post.id)}
-                  >
-                    <Heart
-                      className={`h-3 w-3 mr-1 ${
-                        post.isLiked ? "fill-current" : ""
-                      }`}
+        {allPosts.length === 0 ? (
+          <p className="col-span-full text-center text-gray-500 dark:text-gray-400">
+            결과가 없습니다
+          </p>
+        ) : (
+          allPosts.map((post: Post) => (
+            <motion.div key={post.id} variants={item}>
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900 h-full">
+                <div className="relative">
+                  {post.youtubeUrl ? (
+                    <iframe
+                      src={post.youtubeUrl.replace("watch?v=", "embed/")}
+                      title={post.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full aspect-square object-cover"
                     />
-                    {post.likes.toLocaleString()}
-                  </button>
-                  <div className="flex items-center hover:text-main-600 dark:hover:text-main-400 transition-colors">
-                    <MessageCircle className="h-3 w-3 mr-1" />
-                    {post.comments.toLocaleString()}
-                  </div>
-                  {post.views !== undefined && (
-                    <div className="flex items-center hover:text-main-600 dark:hover:text-main-400 transition-colors">
-                      <Eye className="h-3 w-3 mr-1" />
-                      {post.views.toLocaleString()}
-                    </div>
+                  ) : (
+                    <img
+                      src={post.image || "/placeholder.svg"}
+                      alt={post.title}
+                      className="w-full aspect-square object-cover"
+                    />
                   )}
+                  <div className="absolute top-3 left-3">
+                    <Badge className="bg-main-700 hover:bg-main-800 text-white font-normal">
+                      {post.category}
+                    </Badge>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+
+                <CardContent className="p-4">
+                  <Link href={`/posts/${post.id}`}>
+                    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white hover:text-main-600 dark:hover:text-purple-400 transition-colors">
+                      {post.title}
+                    </h3>
+                  </Link>
+
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center">
+                      <Avatar className="h-6 w-6 mr-2">
+                        <AvatarImage
+                          src={post.author.avatar || "/placeholder.svg"}
+                          alt={post.author.name}
+                        />
+                        <AvatarFallback>
+                          {post.author.name.substring(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-xs text-gray-700 dark:text-gray-300">
+                        {post.author.name}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs">
+                    <button
+                      className={`flex items-center hover:text-red-600 dark:hover:text-red-400 transition-colors ${
+                        post.isLiked ? "text-red-600 dark:text-red-400" : ""
+                      }`}
+                      onClick={() => toggleLike(post.id)}
+                    >
+                      <Heart
+                        className={`h-3 w-3 mr-1 ${
+                          post.isLiked ? "fill-current" : ""
+                        }`}
+                      />
+                      {post.likes.toLocaleString()}
+                    </button>
+                    <div className="flex items-center hover:text-main-600 dark:hover:text-main-400 transition-colors">
+                      <MessageCircle className="h-3 w-3 mr-1" />
+                      {post.comments.toLocaleString()}
+                    </div>
+                    {post.views !== undefined && (
+                      <div className="flex items-center hover:text-main-600 dark:hover:text-main-400 transition-colors">
+                        <Eye className="h-3 w-3 mr-1" />
+                        {post.views.toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))
+        )}
       </motion.div>
 
-      {/*  트리거 */}
       {hasNextPage && (
         <div
           ref={target}

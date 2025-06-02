@@ -7,51 +7,64 @@ const PAGE_SIZE_DEFAULT = 12;
 
 export function useInfiniteMemes({
   category,
-  pageSize = PAGE_SIZE_DEFAULT,
+  size = PAGE_SIZE_DEFAULT,
 }: {
   category?: string;
-  pageSize?: number;
+  size?: number;
 }) {
   const queryResult = useInfiniteQuery({
     queryKey: ["memes", category],
-    queryFn: async ({ pageParam = 0 }) => {
-      const url = new URL("/mock-api/posts", window.location.origin);
+    queryFn: async ({ pageParam = 1 }) => {
+      const url = new URL("/api/posts", window.location.origin);
+
       url.searchParams.set("page", String(pageParam));
-      url.searchParams.set("pageSize", String(pageSize));
+      url.searchParams.set("size", String(size));
+
       if (category) {
         url.searchParams.set("category", category);
       }
 
       const res = await fetch(url.toString());
       if (!res.ok) throw new Error("Failed to fetch posts");
-      const data = await res.json();
+      const json = await res.json();
 
-      const items = data.items.map((row: any) => ({
+      console.log("서버 응답 JSON:", json); // <- 이 부분에서 서버가 뭘 보내주는지 찍어보기
+
+      // 정상적으로 json.data.memes 형태인지도 체크 가능
+      console.log("json.data.memes:", json.data?.memes);
+
+      const items = json.data.memes.map((row: any) => ({
         id: row.id,
         title: row.title,
         description: row.content,
         youtubeUrl: row.media_url,
         author: {
-          name: `User${row.account_id}`,
+          name: `User #${row.user_id}`,
           avatar: "/placeholder.svg",
         },
-        category: row.category,
+        category_id: row.category_id,
+        category: `#${row.category}`,
         likes: 0,
         comments: 0,
         views: 0,
+        isLiked: false,
+        isBookmarked: false,
+        likedAt: null,
       }));
 
       return {
         items,
-        nextPage: data.hasNextPage ? pageParam + 1 : undefined,
-        total: data.total,
+        nextPage:
+          json.data.pageInfo.page < json.data.pageInfo.totalPages
+            ? json.data.pageInfo.page + 1
+            : undefined,
+        total: json.data.pageInfo.totalElements,
       };
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: 0,
+    initialPageParam: 1,
   });
 
-  // 무한스크롤 target
   const target = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -68,7 +81,9 @@ export function useInfiniteMemes({
       },
       { threshold: 0.5 }
     );
+
     observer.observe(target.current);
+
     return () => {
       if (target.current) observer.unobserve(target.current);
       observer.disconnect();

@@ -9,7 +9,7 @@ export const MEME_CATEGORIES = [
   { id: "movie", name: "영화" },
   { id: "animation", name: "애니메이션" },
   { id: "dance", name: "댄스 챌린지" },
-  { id: "nword", name: "신조어&유행어" },
+  { id: "zword", name: "신조어&유행어" },
   { id: "community", name: "공감 밈" },
   { id: "etc", name: "기타" },
 ];

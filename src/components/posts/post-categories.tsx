@@ -15,12 +15,21 @@ export default function PostCategories() {
 
   const [showSearch, setShowSearch] = useState(false);
 
-  const handleCategoryClick = (categoryId: string) => {
+  const handleCategoryClick = (category: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    params.set("category", categoryId);
+    // category 쿼리만 쓰기로 했으면 category_id는 삭제
+    params.delete("category_id");
 
-    router.push(`?${params.toString()}`); // 쿼리스트링 업데이트
+    if (category === "all") {
+      // 'all' 이면 category 쿼리 제거
+      params.delete("category");
+    } else {
+      params.set("category", String(category));
+    }
+
+    const queryString = params.toString();
+    router.push(queryString ? `?${queryString}` : "/posts");
   };
 
   return (
