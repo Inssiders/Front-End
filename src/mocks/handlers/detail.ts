@@ -68,7 +68,25 @@ export const handlers = [
     
     return HttpResponse.json(newComment, { status: 201 })
   }),
-  
+  http.post('/api/posts/:postId/comments/:commentId/replies', async ({ params, request }) => {
+    const { postId, commentId } = params;
+    const { reply } = await request.json() as { reply: string };
+    const post = mockPosts.find(p => p.post_id === postId);
+    const comment = post?.comments_list.find(c => c.comment_id === commentId);
+    const newReply = {
+      reply_id: `r${Date.now()}`,
+      reply_content: reply,
+      reply_created_at: new Date().toISOString(),
+      reply_user_id: "current_user",
+      user_username: "현재사용자",
+      user_profile_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+    };
+    if (comment) {
+      comment.replies = comment.replies || [];
+      comment.replies.unshift(newReply);
+    }
+    return HttpResponse.json(newReply, { status: 201 });
+  }),
   // 좋아요 토글 (POST)
   http.post(`${BASE_URL}/api/posts/:id/like`, ({ params }) => {
     const { id } = params
@@ -85,5 +103,48 @@ export const handlers = [
       liked: true, 
       likes: post.post_likes 
     })
+  }),
+  // 댓글 삭제
+  http.delete('/api/posts/:postId/comments/:commentId', ({ params }) => {
+    const { postId, commentId } = params;
+    const post = mockPosts.find(p => p.post_id === postId);
+    if (post && Array.isArray(post.comments_list)) {
+      post.comments_list = post.comments_list.filter(c => c.comment_id !== commentId);
+      post.post_comments = post.comments_list.length;
+    }
+    return HttpResponse.json({ success: true });
+  }),
+  // 대댓글(답글) 삭제
+  http.delete('/api/posts/:postId/comments/:commentId/replies/:replyId', ({ params }) => {
+    const { postId, commentId, replyId } = params;
+    const post = mockPosts.find(p => p.post_id === postId);
+    const comment = post?.comments_list.find(c => c.comment_id === commentId);
+    if (comment && Array.isArray(comment.replies)) {
+      comment.replies = comment.replies.filter((r: any) => r.reply_id !== replyId);
+    }
+    return HttpResponse.json({ success: true });
+  }),
+  // 댓글 수정
+  http.patch('/api/posts/:postId/comments/:commentId', async ({ params, request }) => {
+    const { postId, commentId } = params;
+    const { comment_content } = await request.json() as { comment_content: string };
+    const post = mockPosts.find(p => p.post_id === postId);
+    const comment = post?.comments_list.find(c => c.comment_id === commentId);
+    if (comment) {
+      comment.comment_content = comment_content;
+    }
+    return HttpResponse.json({ success: true, comment });
+  }),
+  // 대댓글(답글) 수정
+  http.patch('/api/posts/:postId/comments/:commentId/replies/:replyId', async ({ params, request }) => {
+    const { postId, commentId, replyId } = params;
+    const { reply_content } = await request.json() as { reply_content: string };
+    const post = mockPosts.find(p => p.post_id === postId);
+    const comment = post?.comments_list.find(c => c.comment_id === commentId);
+    const reply = comment?.replies?.find((r: any) => r.reply_id === replyId);
+    if (reply) {
+      reply.reply_content = reply_content;
+    }
+    return HttpResponse.json({ success: true, reply });
   })
 ]

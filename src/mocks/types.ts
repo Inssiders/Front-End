@@ -161,6 +161,7 @@ export interface DetailComment {
   comment_user_id: string;
   user_username: string;
   user_profile_url: string;
+  replies: DetailComment[];
 }
 
 // 게시물 타입
@@ -186,6 +187,7 @@ export interface DetailPost {
 
   // 댓글 목록
   comments_list: DetailComment[];
+  
 }
 export interface DetailResponse {
   message: string;

@@ -1,60 +1,74 @@
-// src/components/posts/post-detail/CommentSection.tsx
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-
-interface Comment {
-  comment_id: string;
-  user_profile_url: string;
-  user_username: string;
-  comment_user_id: string;
-  comment_created_at: string;
-  comment_content: string;
-}
+// src/components/posts/components/comment-section.tsx
+import { useState } from "react";
+import { ReplyForm } from "./reply-form";
+import { DetailComment } from "@/mocks/types";
+import { X } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 interface CommentSectionProps {
-  comments: Comment[];
+  postId: string;
+  comments: DetailComment[];
+  onRefresh: () => void;
+  onReply: (commentId: string, username: string) => void;
+  onDeleteComment: (commentId: string) => void;
+  onDeleteReply: (commentId: string, replyId: string) => void;
 }
 
-export function CommentSection({ comments }: CommentSectionProps) {
+export function CommentSection({
+  postId,
+  comments,
+  onRefresh,
+  onReply,
+  onDeleteComment,
+  onDeleteReply,
+}: CommentSectionProps) {
   return (
-    <div className="flex-1 overflow-y-auto border-t border-b border-gray-100 dark:border-gray-800 py-2 mb-4 min-h-[120px]">
-      {comments.length > 0 ? (
-        <div className="space-y-4">
-          {comments.map((comment, idx) => (
-            <Card key={comment.comment_id || idx} className="bg-gray-50">
-              <CardContent className="flex items-start gap-3 p-3">
-                <Avatar>
-                  <AvatarImage
-                    src={comment.user_profile_url || "/placeholder.svg?height=40&width=40"}
-                    alt={comment.user_username || "익명"}
-                  />
-                  <AvatarFallback>
-                    {(comment.user_username || "").slice(0, 2) || "익명"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-sm">
-                      {comment.user_username || `유저${comment.comment_user_id}`}
-                    </span>
-                    <Badge variant="outline" className="ml-1">
-                      {new Date(comment.comment_created_at).toLocaleDateString("ko-KR")}
-                    </Badge>
+    <div className="overflow-y-auto max-h-80 pr-2">
+      {comments.slice().reverse().map((comment) => (
+        <div key={comment.comment_id} className="mb-4 relative">
+          {/* 댓글 삭제 버튼 */}
+          <button
+            className="absolute top-0 right-0 p-1 text-gray-400 hover:text-red-500"
+            onClick={() => onDeleteComment(comment.comment_id)}
+            aria-label="댓글 삭제"
+          >
+            <X size={16} />
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="font-bold">{comment.user_username}</span>
+            <span className="text-xs text-gray-400">{new Date(comment.comment_created_at).toLocaleString()}</span>
+          </div>
+          <div className="ml-2">{comment.comment_content}</div>
+          <button
+            className="text-xs text-blue-500 ml-2"
+            onClick={() => onReply(comment.comment_id, comment.user_username)}
+          >
+            답글
+          </button>
+          {/* 대댓글 리스트 */}
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="ml-6 mt-2 space-y-2">
+              {comment.replies.slice().reverse().map((reply: any) => (
+                <div key={reply.reply_id} className="flex flex-col items-center gap-2 relative">
+                  <div className="flex items-center gap-2 w-full" >
+                    <div className="font-bold">{reply.user_username}</div>
+                    <div className="text-xs text-gray-400">{new Date(reply.reply_created_at).toLocaleString()}</div>
+                    {/* 대댓글 삭제 버튼 */}
+                    <button
+                      className="ml-auto p-1 text-gray-400 hover:text-red-500"
+                      onClick={() => onDeleteReply(comment.comment_id, reply.reply_id)}
+                      aria-label="대댓글 삭제"
+                    >
+                      <X size={14} />
+                    </button>
                   </div>
-                  <div className="text-gray-700 text-sm whitespace-pre-line">
-                    {comment.comment_content}
-                  </div>
+                  <span className="ml-2">{reply.reply_content}</span>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              ))}
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="flex items-center justify-center h-full min-h-[120px] text-gray-400 text-sm text-center py-8">
-          댓글이 없습니다.
-        </div>
-      )}
+      ))}
     </div>
   );
 }
