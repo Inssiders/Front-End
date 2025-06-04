@@ -26,7 +26,11 @@ export const NextProvider = ({ children }: Props) => {
   return (
     <MSWProvider>
       <QueryClientProvider client={queryClient}>
-        <SessionProvider>
+        <SessionProvider
+          refetchInterval={5 * 60} // 5분마다 세션 체크
+          refetchOnWindowFocus={true} // 윈도우 포커스 시 세션 갱신
+          refetchWhenOffline={false} // 오프라인 상태에서 세션 갱신 방지
+        >
           <Suspense fallback={<Web3CubeLoader />}>{children}</Suspense>
         </SessionProvider>
       </QueryClientProvider>
