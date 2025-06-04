@@ -95,6 +95,23 @@ const nextConfig = {
             key: "Access-Control-Allow-Headers",
             value: "Content-Type, Authorization, X-Requested-With",
           },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.youtube.com https://youtube.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https://*.youtube.com https://*.ytimg.com https://img.youtube.com https://*.vimeocdn.com",
+              "media-src 'self' https://*.youtube.com https://*.googlevideo.com https://vimeo.com https://*.vimeo.com",
+              "frame-src 'self' https://www.youtube.com https://youtube.com https://player.vimeo.com https://*.dailymotion.com https://player.twitch.tv",
+              "connect-src 'self' https://www.youtube.com https://youtube.com https://vimeo.com",
+              "font-src 'self' data:",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+            ].join("; "),
+          },
         ],
       },
     ];
@@ -116,7 +133,42 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-    domains: ["localhost", "inssider.com"],
+    domains: [
+      "localhost",
+      "inssider.com",
+      // YouTube 도메인들
+      "img.youtube.com",
+      "i.ytimg.com",
+      "yt3.ggpht.com",
+      // Vimeo 도메인들
+      "i.vimeocdn.com",
+      "f.vimeocdn.com",
+      // 기타 비디오 플랫폼들
+      "s1.dmcdn.net", // Dailymotion
+      "static-cdn.jtvnw.net", // Twitch
+    ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.youtube.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.ytimg.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.vimeocdn.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.dmcdn.net",
+      },
+      {
+        protocol: "https",
+        hostname: "*.jtvnw.net",
+      },
+    ],
   },
   env: {
     NEXT_PUBLIC_API_MOCKING:
