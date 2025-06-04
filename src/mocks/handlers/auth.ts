@@ -1,4 +1,4 @@
-import type { AuthResponse, DeleteAccountResponse } from "@/utils/type/auth";
+import type { AuthResponse, DeleteAccountResponse } from "@/utils/types/auth";
 import { http, HttpResponse } from "msw";
 import { db } from "../db";
 import { mockErrors, mockUsers } from "../seed-data";
@@ -73,7 +73,7 @@ const handlers = [
         data: {
           grant_type: "authorization_code",
           token: {
-            access_token: "",
+            access_token: "ba6c81d0-6f98-4707-b2c0-f83585527026",
             token_type: "Bearer",
             expires_in: 300, // 5분
           },
