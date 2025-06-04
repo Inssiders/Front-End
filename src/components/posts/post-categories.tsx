@@ -13,16 +13,12 @@ export default function PostCategories() {
   const searchParams = useSearchParams();
   const currentCategory = searchParams.get("category") || "all";
 
-  const [showSearch, setShowSearch] = useState(false);
-
   const handleCategoryClick = (category: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    // category 쿼리만 쓰기로 했으면 category_id는 삭제
     params.delete("category_id");
 
     if (category === "all") {
-      // 'all' 이면 category 쿼리 제거
       params.delete("category");
     } else {
       params.set("category", String(category));
@@ -58,43 +54,6 @@ export default function PostCategories() {
                 </Button>
               </motion.div>
             ))}
-          </div>
-
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            {showSearch ? (
-              <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: "100%", opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="relative flex-1"
-              >
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  type="search"
-                  placeholder="밈 검색..."
-                  className="pl-10 rounded-full bg-gray-100 border-0 focus-visible:ring-purple-500 dark:bg-gray-800"
-                  autoFocus
-                />
-              </motion.div>
-            ) : (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full"
-                onClick={() => setShowSearch(true)}
-                aria-label="검색"
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full"
-              aria-label="필터"
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>

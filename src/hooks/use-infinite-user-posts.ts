@@ -28,11 +28,6 @@ export function useInfiniteMemes({
       if (!res.ok) throw new Error("Failed to fetch posts");
       const json = await res.json();
 
-      console.log("서버 응답 JSON:", json); // <- 이 부분에서 서버가 뭘 보내주는지 찍어보기
-
-      // 정상적으로 json.data.memes 형태인지도 체크 가능
-      console.log("json.data.memes:", json.data?.memes);
-
       const items = json.data.memes.map((row: any) => ({
         id: row.id,
         title: row.title,

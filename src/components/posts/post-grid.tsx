@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Eye, Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useInfiniteMemes } from "@/hooks/use-infinite-user-posts";
 import PostsLoading from "./post-loading";
@@ -15,7 +15,7 @@ interface Post {
   id: number | string;
   title: string;
   description?: string;
-  category: string; //  카테고리 이름 (예: "K-POP", "드라마")
+  category: string;
   category_id: Number;
   youtubeUrl?: string;
   image?: string;
@@ -32,9 +32,39 @@ interface Post {
   likedAt?: string;
 }
 
+function HoverVideo({ youtubeUrl }: { youtubeUrl: string }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const videoId = youtubeUrl.split("v=")[1];
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1`;
+
+  return (
+    <div
+      className="w-full aspect-square relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {isHovered ? (
+        <iframe
+          src={embedUrl}
+          title="YouTube video"
+          allow="autoplay; encrypted-media"
+          allowFullScreen
+          className="w-full h-full"
+        />
+      ) : (
+        <img
+          src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+          alt="Video thumbnail"
+          className="w-full h-full object-cover"
+        />
+      )}
+    </div>
+  );
+}
+
 export default function PostsGrid() {
   const searchParams = useSearchParams();
-  const selectedCategory = searchParams.get("category"); // category
+  const selectedCategory = searchParams.get("category");
 
   const { data, isLoading, isFetchingNextPage, hasNextPage, target } =
     useInfiniteMemes({
@@ -43,8 +73,6 @@ export default function PostsGrid() {
     });
 
   const allPosts = useMemo(() => {
-    console.log("data 확인:", data);
-
     return data?.pages.flatMap((page) => page.items) ?? [];
   }, [data]);
 
@@ -85,13 +113,7 @@ export default function PostsGrid() {
               <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900 h-full">
                 <div className="relative">
                   {post.youtubeUrl ? (
-                    <iframe
-                      src={post.youtubeUrl.replace("watch?v=", "embed/")}
-                      title={post.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full aspect-square object-cover"
-                    />
+                    <HoverVideo youtubeUrl={post.youtubeUrl} />
                   ) : (
                     <img
                       src={post.image || "/placeholder.svg"}
