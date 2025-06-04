@@ -1,37 +1,28 @@
 "use client";
 
-import PostsGrid from "@/components/posts/post-grid";
-import { fetchProfilePosts, triggerRevalidation } from "@/utils/fetch";
-import { ProfilePostsResponse } from "@/utils/type/profile";
+import {
+  fetchProfilePosts,
+  transformMemeToPost,
+  triggerRevalidation,
+} from "@/utils/fetch";
+import { ProfilePostsResponse } from "@/utils/types/profile";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import PostsGrid from "./post-grid";
 
 interface ProfilePostsProps {
   id: string;
   initialData?: ProfilePostsResponse;
+  enableHoverPlay?: boolean;
+  feedMode?: boolean; // 피드 모드 활성화
 }
 
-interface Post {
-  id: number | string;
-  title: string;
-  category: string;
-  image?: string;
-  post_media_url?: string;
-  type?: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  likes: number;
-  comments: number;
-  shares: number;
-  views?: number;
-  isLiked?: boolean;
-  isBookmarked?: boolean;
-  likedAt?: string;
-}
-
-export default function ProfilePosts({ id, initialData }: ProfilePostsProps) {
+export default function ProfilePosts({
+  id,
+  initialData,
+  enableHoverPlay = true,
+  feedMode = true, // 프로필에서는 기본적으로 피드 모드 활성화
+}: ProfilePostsProps) {
   const queryClient = useQueryClient();
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -108,64 +99,16 @@ export default function ProfilePosts({ id, initialData }: ProfilePostsProps) {
   const posts = useMemo(() => {
     // 초기 데이터가 있고 React Query 데이터가 없으면 초기 데이터 사용
     if (initialData && !data?.pages?.length) {
-      const transformedPosts = initialData.data.memes.map((meme) => ({
-        id: `posts-${meme.id}`,
-        title: meme.title,
-        category: `카테고리 ${meme.category_id}`,
-        image:
-          meme.media_url ||
-          "/placeholder.svg?height=400&width=400&text=" +
-            encodeURIComponent(meme.title),
-        post_media_url: meme.media_url,
-        type: "video",
-        author: {
-          name: meme.user?.nickname || "익명",
-          avatar:
-            meme.user?.profileUrl ||
-            "/placeholder.svg?height=40&width=40&text=" +
-              (meme.user?.nickname?.[0] || "U"),
-        },
-        likes: meme.like_count || 0,
-        comments: meme.comment_count || 0,
-        shares: 0,
-        views: 0,
-        isLiked: meme.is_liked || false,
-        isBookmarked: false,
-      }));
-      return transformedPosts;
+      return initialData.data.memes.map((meme) =>
+        transformMemeToPost(meme, "posts-")
+      );
     }
 
     // React Query 데이터 사용
     if (!data?.pages) return [];
 
     const allMemes = data.pages.flatMap((page) => page.data.memes);
-
-    const transformedPosts: Post[] = allMemes.map((meme) => ({
-      id: `posts-${meme.id}`,
-      title: meme.title,
-      category: `카테고리 ${meme.category_id}`,
-      image:
-        meme.media_url ||
-        "/placeholder.svg?height=400&width=400&text=" +
-          encodeURIComponent(meme.title),
-      post_media_url: meme.media_url,
-      type: "video",
-      author: {
-        name: meme.user?.nickname || "익명",
-        avatar:
-          meme.user?.profileUrl ||
-          "/placeholder.svg?height=40&width=40&text=" +
-            (meme.user?.nickname?.[0] || "U"),
-      },
-      likes: meme.like_count || 0,
-      comments: meme.comment_count || 0,
-      shares: 0,
-      views: 0,
-      isLiked: meme.is_liked || false,
-      isBookmarked: false,
-    }));
-
-    return transformedPosts;
+    return allMemes.map((meme) => transformMemeToPost(meme, "posts-"));
   }, [data, initialData, id]);
 
   // ISR 캐시 무효화 및 React Query 캐시 재검증
@@ -221,61 +164,82 @@ export default function ProfilePosts({ id, initialData }: ProfilePostsProps) {
     );
   }
 
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          내 게시물
-        </h2>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {posts.length}개 항목
-          </span>
-          <button
-            onClick={handleRefresh}
-            className="text-xs px-2 py-1 text-gray-500 hover:text-gray-700 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-            title="캐시 새로고침"
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-400 mb-4">
+          <svg
+            className="mx-auto h-12 w-12"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            새로고침
-          </button>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012 2v2M7 7h10"
+            />
+          </svg>
         </div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          아직 게시물이 없습니다
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400">
+          첫 번째 게시물을 작성해보세요!
+        </p>
+        <button
+          onClick={handleRefresh}
+          className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+        >
+          새로고침
+        </button>
       </div>
+    );
+  }
 
+  return (
+    <div className="space-y-6">
+      {/* 피드 스타일 게시물 그리드 */}
       <PostsGrid
         posts={posts}
         loading={isActuallyLoading}
-        layout="grid"
-        columns={3}
-        showActions={false}
-        showAuthor={false}
-        className="px-0"
+        layout={feedMode ? "feed" : "grid"}
+        columns={4}
+        showAuthor={true}
+        showActions={true}
+        enableHoverPlay={enableHoverPlay}
+        feedMode={feedMode}
+        className="profile-posts-grid"
       />
 
-      {/* 무한스크롤 감지 영역 */}
+      {/* 로딩 더보기 트리거 */}
       {hasNextPage && (
-        <div
-          ref={loadMoreRef}
-          className="flex justify-center items-center py-8 min-h-[100px]"
-        >
+        <div ref={loadMoreRef} className="py-8 text-center">
           {isFetchingNextPage ? (
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex flex-col items-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
-              <span>더 많은 게시물을 불러오는 중...</span>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                더 많은 게시물을 불러오는 중...
+              </p>
             </div>
           ) : (
-            <div className="text-gray-400 text-sm">
-              스크롤하여 더 많은 게시물 보기
-            </div>
+            <button
+              onClick={() => fetchNextPage()}
+              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              더 보기
+            </button>
           )}
         </div>
       )}
 
-      {/* 모든 데이터를 불러왔을 때 */}
+      {/* 모든 게시물을 로드했을 때 */}
       {!hasNextPage && posts.length > 0 && (
         <div className="text-center py-8">
-          <div className="text-gray-400 text-sm">
-            모든 게시물을 불러왔습니다.
-          </div>
+          <p className="text-gray-500 dark:text-gray-400">
+            모든 게시물을 확인했습니다 🎉
+          </p>
         </div>
       )}
     </div>

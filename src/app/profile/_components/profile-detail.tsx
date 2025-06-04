@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ProfilePostsResponse } from "@/utils/type/profile";
+import { ProfileData, ProfilePostsResponse } from "@/utils/types/profile";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import ProfileLikes from "./profile-likes";
 import ProfilePosts from "./profile-posts";
 
 interface ProfileDetailProps {
-  profile: any;
+  profile: ProfileData;
   initialTab?: string;
   initialPostsData?: ProfilePostsResponse;
   initialLikesData?: ProfilePostsResponse;
@@ -112,6 +112,28 @@ export function ProfileDetail({
                   </span>
                   <span className="text-xs text-gray-500">게시물</span>
                 </Badge>
+                {profile.followers !== undefined && (
+                  <Badge
+                    variant="secondary"
+                    className="flex flex-col items-center px-4 py-2"
+                  >
+                    <span className="font-bold">
+                      {profile.followers.toLocaleString()}
+                    </span>
+                    <span className="text-xs text-gray-500">팔로워</span>
+                  </Badge>
+                )}
+                {profile.following !== undefined && (
+                  <Badge
+                    variant="secondary"
+                    className="flex flex-col items-center px-4 py-2"
+                  >
+                    <span className="font-bold">
+                      {profile.following.toLocaleString()}
+                    </span>
+                    <span className="text-xs text-gray-500">팔로잉</span>
+                  </Badge>
+                )}
               </div>
               <Card className="bg-gray-50 p-4 rounded-lg w-full mb-6">
                 <CardHeader className="p-0 mb-2">

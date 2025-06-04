@@ -1,6 +1,7 @@
 import { ProfileDetail } from "@/app/profile/_components/profile-detail";
 import { ProfileDetailLoading } from "@/app/profile/_components/profile-detail-loading";
 import { fetchProfilePosts } from "@/utils/fetch";
+import { ProfileData } from "@/utils/types/profile";
 import { Suspense } from "react";
 
 // MSW 서버 초기화
@@ -14,6 +15,22 @@ interface ProfileDetailPageProps {
   };
   searchParams: {
     tab?: string;
+  };
+}
+
+// Meme 데이터에서 ProfileData로 변환하는 유틸리티 함수
+function transformMemeToProfileData(meme: any, userId: string): ProfileData {
+  return {
+    user_id: userId,
+    user_detail_username: meme.user?.nickname || `사용자${userId}`,
+    user_detail_profile_url:
+      meme.user?.profileUrl || "/placeholder.svg?height=150&width=150&text=U",
+    user_detail_introduction:
+      meme.user?.bio || "안녕하세요! 인싸이더에서 활동중입니다.",
+    user_created_at: meme.created_at,
+    posts: 0, // 실제 게시물 수는 별도로 계산 필요
+    followers: 0, // 실제 팔로워 수는 별도 API 필요
+    following: 0, // 실제 팔로잉 수는 별도 API 필요
   };
 }
 
@@ -40,11 +57,26 @@ export default async function ProfileDetailPage({
       }),
     ]);
 
-    const profile = postsData.data.memes[0];
+    // 첫 번째 meme에서 사용자 정보 추출 (또는 기본값 사용)
+    const firstMeme = postsData.data.memes[0];
 
-    if (!profile) {
-      throw new Error("프로필을 찾을 수 없습니다");
-    }
+    // ProfileData 형태로 변환
+    const profile: ProfileData = firstMeme
+      ? transformMemeToProfileData(firstMeme, userId)
+      : {
+          user_id: userId,
+          user_detail_username: `사용자${userId}`,
+          user_detail_profile_url:
+            "/placeholder.svg?height=150&width=150&text=U",
+          user_detail_introduction: "안녕하세요! 인싸이더에서 활동중입니다.",
+          user_created_at: new Date().toISOString(),
+          posts: postsData.data.memes.length,
+          followers: 0,
+          following: 0,
+        };
+
+    // 실제 게시물 수 업데이트
+    profile.posts = postsData.data.memes.length;
 
     return (
       <main className="flex flex-col min-h-screen bg-gray-50">
@@ -74,8 +106,10 @@ export default async function ProfileDetailPage({
 }
 
 export async function generateMetadata({ params }: ProfileDetailPageProps) {
+  const { id: userId } = await params;
+
   return {
-    title: `User Profile | 인싸이더`,
-    description: `View user profile on 인싸이더.`,
+    title: `${userId} 프로필 | 인싸이더`,
+    description: `인싸이더에서 ${userId}님의 프로필을 확인해보세요.`,
   };
 }
