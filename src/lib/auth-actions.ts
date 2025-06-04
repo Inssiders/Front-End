@@ -1,6 +1,7 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { clearAuthCookies, setAuthCookies, TokenData } from "./auth-cookies";
 
 /**
  * 비밀번호를 bcrypt로 해싱하는 Server Action
@@ -51,4 +52,18 @@ export async function createAccount(data: {
     console.error("Account creation error:", error);
     throw error;
   }
+}
+
+/**
+ * 로그인 성공 후 토큰을 쿠키에 저장하는 Server Action
+ */
+export async function saveAuthTokens(tokenData: TokenData): Promise<void> {
+  await setAuthCookies(tokenData);
+}
+
+/**
+ * 로그아웃 시 쿠키를 삭제하는 Server Action
+ */
+export async function removeAuthTokens(): Promise<void> {
+  await clearAuthCookies();
 }
