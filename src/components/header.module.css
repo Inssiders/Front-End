@@ -1,0 +1,44 @@
+/* 개선된 Gen-Z 헤더 컨테이너 */
+.header {
+  backdrop-filter: blur(20px) saturate(120%);
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+  transition: all 0.3s ease;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--neon-cyan),
+    var(--neon-pink),
+    var(--neon-purple),
+    var(--neon-cyan),
+    transparent
+  );
+  background-size: 300% 100%;
+  animation: rainbowFlow 4s ease-in-out infinite;
+}
+
+@keyframes rainbowFlow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+}
+
+/* 이하 생략: 기존 스타일 및 개선된 네비/드롭다운/검색/버튼 등 포함 */
