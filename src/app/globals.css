@@ -2,187 +2,157 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    /* Gen-Z 네온/파스텔 색상 팔레트 */
-    --neon-cyan: #00f5ff;
-    --neon-pink: #ff6b9d;
-    --neon-purple: #c471f5;
-    --neon-green: #39ff14;
-    --neon-orange: #ff8c00;
-    --neon-blue: #12d8fa;
+:root {
+  /* Gen-Z 밝은 네온/파스텔 색상 팔레트 */
+  --neon-pink: #ff4081;
+  --neon-cyan: #00e5ff;
+  --neon-purple: #9c3aff;
+  --neon-green: #4caf50;
+  --neon-yellow: #ffeb3b;
+  --neon-orange: #ff9800;
 
-    --pastel-pink: #f093fb;
-    --pastel-purple: #a8edea;
-    --pastel-blue: #667eea;
-    --pastel-green: #4facfe;
-    --pastel-yellow: #ffeaa7;
-    --pastel-orange: #fab1a0;
+  --pastel-pink: #ffb3d9;
+  --pastel-blue: #b3e5fc;
+  --pastel-purple: #d1c4e9;
+  --pastel-mint: #c8e6c9;
+  --pastel-yellow: #fff9c4;
+  --pastel-lavender: #f3e5f5;
 
-    /* 통일된 Gen-Z 테마 색상 */
-    --background: 219 14% 6%;
-    --foreground: 240 10% 85%;
-    --card: 219 14% 8%;
-    --card-foreground: 240 10% 85%;
-    --popover: 219 14% 8%;
-    --popover-foreground: 240 10% 85%;
-    --primary: 191 100% 50%;
-    --primary-foreground: 219 14% 6%;
-    --secondary: 219 14% 12%;
-    --secondary-foreground: 240 10% 80%;
-    --muted: 219 14% 15%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 219 14% 15%;
-    --accent-foreground: 240 10% 85%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 240 10% 85%;
-    --border: 219 14% 15%;
-    --input: 219 14% 15%;
-    --ring: 191 100% 50%;
-    --radius: 0.75rem;
-  }
+  /* 밝은 그라데이션 */
+  --gradient-primary: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  --gradient-secondary: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+  --gradient-tertiary: linear-gradient(135deg, var(--pastel-pink), var(--pastel-purple));
+  --gradient-bg: linear-gradient(135deg, #fafafa 0%, #f0f4f8 50%, #e8f4f8 100%);
+
+  /* Shadcn/ui 밝은 테마 변수들 */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 263.4 70% 50.4%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 98%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 98%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 98%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 263.4 70% 50.4%;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  --radius: 0.75rem;
+
+  /* Sidebar 밝은 테마 변수들 */
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 263.4 70% 50.4%;
+  --sidebar-accent: 220 14.3% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial, sans-serif;
-    /* 기본 텍스트 색상을 연한 회색으로 설정 */
-    color: rgba(240, 240, 240, 0.85);
+    background: linear-gradient(
+      135deg,
+      #fafafa 0%,
+      #f0f4f8 25%,
+      #e8f4f8 50%,
+      #f3f9ff 75%,
+      #fafafa 100%
+    );
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255, 64, 129, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0, 229, 255, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, rgba(156, 58, 255, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
   }
 
   html {
     scroll-behavior: smooth;
   }
 
-  /* 제목과 중요한 텍스트는 더 밝게 */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(30, 30, 30, 0.95);
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink), var(--neon-cyan));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-size: 200% 200%;
+    animation: gradientFlow 4s ease infinite;
   }
 
-  /* 일반 텍스트 요소들 */
   p,
   span,
   div {
-    color: rgba(240, 240, 240, 0.85);
+    color: rgba(60, 60, 60, 0.85);
   }
 
-  /* 링크는 약간 더 밝게 */
   a {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(30, 30, 30, 0.9);
+    transition: all 0.3s ease;
+  }
+
+  a:hover {
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px rgba(255, 64, 129, 0.3);
   }
 }
 
-/* Gen-Z 네온 스크롤바 */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
-  border-radius: 3px;
-  box-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
-  box-shadow: 0 0 15px rgba(255, 107, 157, 0.7);
-}
-
-/* Gen-Z 애니메이션 모음 */
-@keyframes neonGlow {
+/* Gen-Z 애니메이션 키프레임 */
+@keyframes neon-pulse {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+    text-shadow:
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor;
   }
   50% {
-    box-shadow: 0 0 30px rgba(255, 107, 157, 0.7);
+    text-shadow:
+      0 0 2px currentColor,
+      0 0 5px currentColor,
+      0 0 8px currentColor;
   }
 }
 
-@keyframes floatGentle {
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  33% {
-    transform: translateY(-15px) rotate(1deg);
-  }
-  66% {
-    transform: translateY(5px) rotate(-1deg);
-  }
-}
-
-@keyframes slideInNeon {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-    filter: blur(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-    filter: blur(0px);
-  }
-
-  /* 애니메이션 지연 클래스 */
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-
-  .animation-delay-4000 {
-    animation-delay: 4s;
-  }
-
-  /* 네온 글로우 효과 유틸리티 */
-  .neon-glow-cyan {
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-  }
-
-  .neon-glow-purple {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
-  }
-
-  .neon-glow-pink {
-    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
-  }
-
-  /* 글래스모피즘 유틸리티 */
-  .glass-effect {
-    backdrop-filter: blur(20px) saturate(180%);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-  }
-
-  /* 텍스트 네온 효과 */
-  .text-neon-cyan {
-    color: #00ffff;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
-  }
-
-  .text-neon-pink {
-    color: #ff00ff;
-    text-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
-  }
-}
-
-@keyframes gradientFlow {
+@keyframes gradient-shift {
   0% {
     background-position: 0% 50%;
   }
@@ -194,257 +164,36 @@
   }
 }
 
-@keyframes shimmerWave {
-  0% {
-    transform: translateX(-100%) skewX(-15deg);
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(200%) skewX(-15deg);
-    opacity: 0;
-  }
-}
-
-@keyframes bounceNeon {
+@keyframes float {
   0%,
   100% {
-    transform: translateY(0) scale(1);
-    filter: drop-shadow(0 0 5px var(--neon-cyan));
+    transform: translateY(0px);
   }
   50% {
-    transform: translateY(-20px) scale(1.05);
-    filter: drop-shadow(0 0 15px var(--neon-pink));
+    transform: translateY(-10px);
   }
 }
 
-@keyframes pulseGlow {
+@keyframes glow {
   0%,
   100% {
-    opacity: 0.8;
-    transform: scale(1);
+    box-shadow:
+      0 0 5px rgba(255, 0, 110, 0.5),
+      0 0 10px rgba(0, 245, 255, 0.3);
   }
   50% {
-    opacity: 1;
-    transform: scale(1.05);
+    box-shadow:
+      0 0 15px rgba(255, 0, 110, 0.8),
+      0 0 25px rgba(0, 245, 255, 0.6);
   }
 }
 
-/* 유틸리티 클래스 */
-@layer utilities {
-  /* 개선된 텍스트 가독성 */
-  .text-readable {
-    color: rgba(240, 240, 240, 0.9);
+@keyframes bounce-gentle {
+  0%,
+  100% {
+    transform: translateY(0);
   }
-
-  .text-readable-bright {
-    color: rgba(255, 255, 255, 0.95);
-  }
-
-  .text-readable-muted {
-    color: rgba(240, 240, 240, 0.7);
-  }
-
-  .text-readable-faded {
-    color: rgba(240, 240, 240, 0.5);
-  }
-
-  /* 네온 글로우 효과 - 가독성 개선 */
-  .neon-glow-cyan {
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
-  }
-
-  .neon-glow-pink {
-    box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
-  }
-
-  .neon-glow-purple {
-    box-shadow: 0 0 20px rgba(196, 113, 245, 0.5);
-  }
-
-  /* 네온 텍스트 색상 - 가독성 개선 */
-  .text-neon-cyan {
-    color: #00f5ff;
-    text-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
-  }
-
-  .text-neon-pink {
-    color: #ff6b9d;
-    text-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
-  }
-
-  .text-neon-purple {
-    color: #c471f5;
-    text-shadow: 0 0 10px rgba(196, 113, 245, 0.3);
-  }
-
-  .text-neon-green {
-    color: #39ff14;
-    text-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-  }
-
-  .text-neon-orange {
-    color: #ff8c00;
-    text-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
-  }
-
-  .text-neon-blue {
-    color: #12d8fa;
-    text-shadow: 0 0 10px rgba(18, 216, 250, 0.3);
-  }
-
-  /* 글래스모피즘 */
-  .glass {
-    backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .glass-dark {
-    backdrop-filter: blur(20px);
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  /* 그라데이션 텍스트 */
-  .text-gradient-neon {
-    background: linear-gradient(
-      45deg,
-      var(--neon-cyan),
-      var(--neon-pink),
-      var(--neon-purple)
-    );
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    background-size: 300% 300%;
-    animation: gradientFlow 3s ease infinite;
-  }
-
-  .text-gradient-pastel {
-    background: linear-gradient(
-      45deg,
-      var(--pastel-blue),
-      var(--pastel-pink),
-      var(--pastel-purple)
-    );
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-  }
-
-  /* 배경 그라데이션 */
-  .bg-gradient-neon {
-    background: linear-gradient(
-      135deg,
-      rgba(0, 245, 255, 0.1) 0%,
-      rgba(255, 107, 157, 0.1) 35%,
-      rgba(196, 113, 245, 0.1) 70%,
-      rgba(18, 216, 250, 0.1) 100%
-    );
-  }
-
-  .bg-gradient-genz {
-    background: linear-gradient(
-      135deg,
-      #667eea 0%,
-      #764ba2 25%,
-      #f093fb 50%,
-      #f5576c 75%,
-      #4facfe 100%
-    );
-    background-size: 400% 400%;
-    animation: gradientFlow 15s ease infinite;
-  }
-
-  /* 애니메이션 클래스 */
-  .animate-neon-glow {
-    animation: neonGlow 2s ease-in-out infinite;
-  }
-
-  .animate-float-gentle {
-    animation: floatGentle 6s ease-in-out infinite;
-  }
-
-  .animate-slide-in-neon {
-    animation: slideInNeon 0.6s ease-out;
-  }
-
-  .animate-shimmer {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .animate-shimmer::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
-    );
-    animation: shimmerWave 2s infinite;
-  }
-
-  .animate-bounce-neon {
-    animation: bounceNeon 3s ease-in-out infinite;
-  }
-
-  .animate-pulse-glow {
-    animation: pulseGlow 2s ease-in-out infinite;
-  }
-
-  /* 호버 효과 */
-  .hover-lift {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .hover-lift:hover {
+  50% {
     transform: translateY(-5px);
-  }
-
-  .hover-glow {
-    transition: all 0.3s ease;
-  }
-
-  .hover-glow:hover {
-    box-shadow: 0 0 30px rgba(0, 245, 255, 0.6);
-    transform: scale(1.02);
-  }
-
-  /* 반응형 텍스트 크기 */
-  .text-responsive-xs {
-    font-size: clamp(0.75rem, 2vw, 0.875rem);
-  }
-
-  .text-responsive-sm {
-    font-size: clamp(0.875rem, 2.5vw, 1rem);
-  }
-
-  .text-responsive-base {
-    font-size: clamp(1rem, 3vw, 1.125rem);
-  }
-
-  .text-responsive-lg {
-    font-size: clamp(1.125rem, 4vw, 1.5rem);
-  }
-
-  .text-responsive-xl {
-    font-size: clamp(1.5rem, 5vw, 2rem);
-  }
-
-  .text-responsive-2xl {
-    font-size: clamp(2rem, 6vw, 3rem);
-  }
-
-  .text-responsive-3xl {
-    font-size: clamp(2.5rem, 8vw, 4rem);
   }
 }

@@ -12,7 +12,7 @@ export default function Footer() {
         <div className={`${styles.decorativeParticle} ${styles.particle3}`} />
       </div>
 
-      <div className={`container mx-auto px-4 py-8 ${styles.footerContainer}`}>
+      <div className={`container mx-auto px-4 py-4 ${styles.footerContainer}`}>
         <div className={styles.footerContent}>
           {/* 로고 섹션 */}
           <div className={styles.logoSection}>
@@ -22,25 +22,14 @@ export default function Footer() {
 
           {/* 링크 섹션 */}
           <div className={styles.linksSection}>
-            <Link href="/posts" className={styles.link}>
-              밈 보기
-            </Link>
-            <Link href="/empathy-meme" className={styles.link}>
-              공감밈
-            </Link>
             <Link href="/terms" className={styles.link}>
               이용약관
-            </Link>
-            <Link href="/privacy" className={styles.link}>
-              개인정보처리방침
             </Link>
           </div>
 
           {/* 저작권 및 소셜 링크 */}
           <div className={styles.copyrightSection}>
-            <p className={styles.copyright}>
-              © 2025 inSSider. All rights reserved.
-            </p>
+            <p className={styles.copyright}>© 2025 inSSider. All rights reserved.</p>
             <div className={styles.socialLinks}>
               <a
                 href="https://github.com"
@@ -49,7 +38,7 @@ export default function Footer() {
                 className={styles.socialLink}
                 aria-label="GitHub"
               >
-                <Github size={16} />
+                <Github size={14} />
               </a>
               <a
                 href="https://instagram.com"
@@ -58,7 +47,7 @@ export default function Footer() {
                 className={styles.socialLink}
                 aria-label="Instagram"
               >
-                <Instagram size={16} />
+                <Instagram size={14} />
               </a>
               <a
                 href="https://twitter.com"
@@ -67,7 +56,7 @@ export default function Footer() {
                 className={styles.socialLink}
                 aria-label="Twitter"
               >
-                <Twitter size={16} />
+                <Twitter size={14} />
               </a>
             </div>
           </div>
