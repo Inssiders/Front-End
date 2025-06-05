@@ -1,4 +1,4 @@
-import { InfiniteScrollTriggerProps } from "../types";
+import { InfiniteScrollTriggerProps } from "@/utils/types/posts";
 
 export default function InfiniteScrollTrigger({
   hasNextPage,
@@ -11,7 +11,7 @@ export default function InfiniteScrollTrigger({
     <div ref={target} className="py-8 text-center">
       {isFetchingNextPage ? (
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+          <div className="size-6 animate-spin rounded-full border-b-2 border-purple-600"></div>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             더 많은 게시물을 불러오는 중...
           </p>

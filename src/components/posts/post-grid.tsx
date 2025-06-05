@@ -1,17 +1,13 @@
 "use client";
 
 import { useInfiniteMemes } from "@/hooks/use-infinite-user-posts";
+import { PostsGridProps } from "@/utils/types/posts";
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 import EmptyState from "./components/EmptyState";
 import InfiniteScrollTrigger from "./components/InfiniteScrollTrigger";
 import PostCard from "./components/PostCard";
-import {
-  ANIMATION_VARIANTS,
-  DEFAULT_GRID_COLS,
-  GRID_COLUMNS,
-} from "./constants";
-import { PostsGridProps } from "./types";
+import { ANIMATION_VARIANTS, DEFAULT_GRID_COLS, GRID_COLUMNS } from "./constants";
 
 export default function PostsGrid({
   posts: controlledPosts,
@@ -57,9 +53,7 @@ export default function PostsGrid({
     return infiniteData?.pages.flatMap((page) => page.items) ?? [];
   }, [isControlled, controlledPosts, infiniteData]);
 
-  const isLoading = isControlled
-    ? controlledLoading
-    : infiniteLoading && !infiniteData;
+  const isLoading = isControlled ? controlledLoading : infiniteLoading && !infiniteData;
 
   // 이벤트 핸들러
   const handleLike = (id: number | string) => {
@@ -130,10 +124,8 @@ export default function PostsGrid({
 
           {/* 모든 게시물 로드 완료 메시지 */}
           {!hasNextPage && posts.length > 0 && (
-            <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400">
-                모든 게시물을 확인했습니다 🎉
-              </p>
+            <div className="py-8 text-center">
+              <p className="text-gray-500 dark:text-gray-400">모든 게시물을 확인했습니다 🎉</p>
             </div>
           )}
         </>

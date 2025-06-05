@@ -1,11 +1,10 @@
-import { CategoriesResponse } from "@/components/posts/types";
+import { CategoriesResponse } from "@/utils/types/posts";
 
 // 카테고리 데이터 가져오기 함수
 export async function getCategories(): Promise<CategoriesResponse> {
   try {
     // SSR 환경에서는 절대 URL이 필요
-    const baseUrl =
-      process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
     const apiUrl = `${baseUrl}/server/categories`;
 
     const response = await fetch(apiUrl, {

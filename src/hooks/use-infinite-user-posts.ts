@@ -1,5 +1,6 @@
 "use client";
 
+import { Post } from "@/utils/types/posts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 
@@ -44,23 +45,27 @@ export function useInfiniteMemes({
       if (!res.ok) throw new Error("Failed to fetch posts");
       const json = await res.json();
 
-      const items = json.data.memes.map((row: any) => ({
-        id: row.id,
+      const items: Post[] = json.data.memes.map((row: any) => ({
+        id: row.id?.toString() || Date.now().toString(),
         title: row.title,
-        description: row.content,
-        youtubeUrl: row.media_url,
-        author: {
-          name: `User #${row.user_id}`,
-          avatar: "/placeholder.svg",
-        },
+        content: row.content,
         category_id: row.category_id,
-        category: `#${row.category}`,
-        likes: 0,
-        comments: 0,
-        views: 0,
-        isLiked: false,
-        isBookmarked: false,
-        likedAt: null,
+        media_url: row.media_url,
+        media_upload_time: row.media_upload_time,
+        account_id: row.user_id,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        is_deleted: false,
+
+        // UI를 위한 추가 정보
+        author: {
+          account_id: row.user_id,
+          account_name: `User ${row.user_id}`,
+          profile_image: "/placeholder.svg",
+        },
+        likes: row.like_count || 0,
+        comment_count: row.comment_count || 0,
+        is_liked: row.is_liked || false,
       }));
 
       return {

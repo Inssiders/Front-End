@@ -1,5 +1,5 @@
 // src/components/posts/post-detail/VideoSection.tsx
-import React from 'react';
+import React from "react";
 
 interface VideoSectionProps {
   mediaUrl: string;
@@ -8,13 +8,13 @@ interface VideoSectionProps {
 
 export function VideoSection({ mediaUrl, title }: VideoSectionProps) {
   return (
-    <div className="md:w-3/5 flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none md:h-full h-72">
+    <div className="flex h-72 items-center justify-center bg-gray-50 md:h-full md:w-3/5 md:rounded-l-lg md:rounded-r-none">
       <iframe
         src={mediaUrl}
         title={title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="w-full h-full rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
+        className="size-full rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
       />
     </div>
   );

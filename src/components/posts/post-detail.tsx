@@ -43,7 +43,7 @@ export function PostDetail({ post }: PostDetailProps) {
       return acc + 1 + replyCount;
     }, 0);
   }
-  
+
   // 댓글+대댓글 합산
   const totalComments = getTotalCommentCount(comments);
 
@@ -70,9 +70,12 @@ export function PostDetail({ post }: PostDetailProps) {
   const handleDeleteReply = async (commentId: string, replyId: string) => {
     if (window.confirm("대댓글을 삭제하시겠습니까?")) {
       try {
-        const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`,
+          {
+            method: "DELETE",
+          }
+        );
         if (response.ok) {
           fetchComments();
           toast.success("대댓글이 삭제되었습니다.");
@@ -95,7 +98,7 @@ export function PostDetail({ post }: PostDetailProps) {
         },
         body: JSON.stringify({ comment_content: newContent }),
       });
-      
+
       if (response.ok) {
         fetchComments();
         toast.success("댓글이 수정되었습니다.");
@@ -110,14 +113,17 @@ export function PostDetail({ post }: PostDetailProps) {
   // 대댓글 수정 함수
   const handleEditReply = async (commentId: string, replyId: string, newContent: string) => {
     try {
-      const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ reply_content: newContent }),
-      });
-      
+      const response = await fetch(
+        `/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ reply_content: newContent }),
+        }
+      );
+
       if (response.ok) {
         fetchComments();
         toast.success("대댓글이 수정되었습니다.");
@@ -132,13 +138,13 @@ export function PostDetail({ post }: PostDetailProps) {
   if (!post) {
     return <div className="p-8 text-center">밈을 찾을 수 없습니다.</div>;
   }
- 
+
   return (
-    <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">
-      <Card className="w-full mx-auto md:flex md:flex-row md:h-[700px] overflow-hidden">
+    <div className="container mx-auto px-2 py-4 md:px-4 md:py-8">
+      <Card className="mx-auto w-full overflow-hidden md:flex md:h-[700px] md:flex-row">
         <VideoSection mediaUrl={post.post_media_url} title={post.post_title} />
-        <div className="md:w-2/5 flex flex-col md:h-full md:overflow-y-auto">
-          <CardContent className="flex-1 flex flex-col p-4 md:p-6">
+        <div className="flex flex-col md:h-full md:w-2/5 md:overflow-y-auto">
+          <CardContent className="flex flex-1 flex-col p-4 md:p-6">
             <PostHeader
               userId={post.user_id}
               username={post.user_detail_username}
@@ -153,10 +159,8 @@ export function PostDetail({ post }: PostDetailProps) {
               likes={post.post_likes}
               comments={totalComments}
             />
-            <ActionButtons
-              onCommentClick={() => commentInputRef.current?.focus()}
-            />
-            <div className="flex-1 flex flex-col min-h-[200px]">
+            <ActionButtons onCommentClick={() => commentInputRef.current?.focus()} />
+            <div className="flex min-h-[200px] flex-1 flex-col">
               <CommentSection
                 postId={post.post_id}
                 comments={comments}

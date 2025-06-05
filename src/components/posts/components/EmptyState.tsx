@@ -1,24 +1,19 @@
-import { EmptyStateProps } from "../types";
+import { EmptyStateProps } from "@/utils/types/posts";
 
 export default function EmptyState({ isLoading }: EmptyStateProps) {
   if (isLoading) {
     return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+      <div className="py-8 text-center">
+        <div className="mx-auto size-8 animate-spin rounded-full border-b-2 border-purple-600"></div>
         <p className="mt-2 text-gray-600 dark:text-gray-400">로딩 중...</p>
       </div>
     );
   }
 
   return (
-    <div className="text-center py-12">
-      <div className="text-gray-400 mb-4">
-        <svg
-          className="mx-auto h-12 w-12"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+    <div className="py-12 text-center">
+      <div className="mb-4 text-gray-400">
+        <svg className="mx-auto size-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -27,12 +22,8 @@ export default function EmptyState({ isLoading }: EmptyStateProps) {
           />
         </svg>
       </div>
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-        게시물이 없습니다
-      </h3>
-      <p className="text-gray-500 dark:text-gray-400">
-        아직 게시물이 없습니다.
-      </p>
+      <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">게시물이 없습니다</h3>
+      <p className="text-gray-500 dark:text-gray-400">아직 게시물이 없습니다.</p>
     </div>
   );
 }
