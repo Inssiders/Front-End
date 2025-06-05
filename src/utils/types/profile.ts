@@ -48,3 +48,40 @@ export interface ProfilePostsResponse {
   data: ProfilePostsData;
   message: string;
 }
+
+// Profile UI용 Post 인터페이스
+export interface Post {
+  id: number | string;
+  title: string;
+  category: string;
+  image?: string;
+  post_media_url?: string;
+  media_url?: string;
+  type?: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  likes: number;
+  comments: number;
+  shares: number;
+  views?: number;
+  isLiked?: boolean;
+  isBookmarked?: boolean;
+  likedAt?: string;
+}
+
+// Profile 데이터 인터페이스
+export interface ProfileData {
+  user_id: string;
+  user_detail_username?: string;
+  user_detail_profile_url?: string;
+  user_detail_introduction?: string;
+  user_created_at?: string;
+  posts?: number;
+  followers?: number;
+  following?: number;
+}
+
+// Meme에서 Post로 변환하는 유틸리티 타입
+export type MemeToPost = (meme: Meme, prefix?: string) => Post;

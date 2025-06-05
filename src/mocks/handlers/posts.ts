@@ -47,10 +47,11 @@ const generateLinks = (
 
 // Helper function to filter memes based on search criteria
 const filterMemes = (searchParams: URLSearchParams, data = memesData) => {
+  console.log("[MSW] filterMemes 호출됨", searchParams.toString());
   let filteredData = [...data];
 
   const keyword = searchParams.get("keyword");
-  const categoryId = searchParams.get("category_id");
+  const category = searchParams.get("category");
   const sort = searchParams.get("sort");
   const profileFilter = searchParams.get("profile_filter");
   const userId = searchParams.get("user_id");
@@ -63,9 +64,15 @@ const filterMemes = (searchParams: URLSearchParams, data = memesData) => {
     );
   }
 
-  if (categoryId) {
+  if (category) {
     filteredData = filteredData.filter(
-      (meme) => meme.category_id === Number(categoryId)
+      (meme) => meme.category === String(category)
+    );
+    console.log(
+      "[MSW] 필터링된 category_id:",
+      category,
+      "결과 개수:",
+      filteredData.length
     );
   }
 
@@ -94,9 +101,7 @@ const filterMemes = (searchParams: URLSearchParams, data = memesData) => {
 
 export const handlers = [
   // GET - 게시물 목록 조회
-  http.get(`${BASE_URL}/api/posts`, ({ request }) => {
-    console.log("[MSW] Intercepted GET request to (BASE_URL):", request.url);
-
+  http.get(`/api/posts`, ({ request }) => {
     const url = new URL(request.url);
     const searchParams = url.searchParams;
 

@@ -1,13 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Heart, MessageCircle, Share2, TrendingUp, Flame, Clock } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  TrendingUp,
+  Flame,
+  Clock,
+} from "lucide-react";
+import Link from "next/link";
 
 // 트렌딩 콘텐츠 데이터
 const trendingData = {
@@ -134,10 +141,10 @@ const trendingData = {
       shares: 245,
     },
   ],
-}
+};
 
 export default function TrendingSection() {
-  const [activeTab, setActiveTab] = useState("hot")
+  const [activeTab, setActiveTab] = useState("hot");
 
   const container = {
     hidden: { opacity: 0 },
@@ -147,20 +154,24 @@ export default function TrendingSection() {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
+  };
 
   return (
     <section className="py-20 bg-white dark:bg-gray-950">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
           <div>
-            <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">지금 뜨는 트렌드</h2>
-            <p className="text-gray-600 dark:text-gray-400">인싸이더가 엄선한 최신 트렌드를 확인하세요</p>
+            <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
+              지금 뜨는 트렌드
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              인싸이더가 엄선한 최신 트렌드를 확인하세요
+            </p>
           </div>
 
           <Link href="/trending">
@@ -170,7 +181,12 @@ export default function TrendingSection() {
           </Link>
         </div>
 
-        <Tabs defaultValue="hot" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs
+          defaultValue="hot"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
           <TabsList className="mb-8 bg-gray-100 dark:bg-gray-800 p-1 rounded-full w-full max-w-md mx-auto">
             <TabsTrigger
               value="hot"
@@ -212,7 +228,7 @@ export default function TrendingSection() {
         </Tabs>
       </div>
     </section>
-  )
+  );
 }
 
 function TrendingCard({ item }: { item: any }) {
@@ -220,9 +236,15 @@ function TrendingCard({ item }: { item: any }) {
     <motion.div variants={item}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900">
         <div className="relative">
-          <img src={item.image || "/placeholder.svg"} alt={item.title} className="w-full aspect-video object-cover" />
+          <img
+            src={item.image || "/placeholder.svg"}
+            alt={item.title}
+            className="w-full aspect-video object-cover"
+          />
           <div className="absolute top-3 left-3">
-            <span className="px-3 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">{item.category}</span>
+            <span className="px-3 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">
+              {item.category}
+            </span>
           </div>
         </div>
 
@@ -236,10 +258,17 @@ function TrendingCard({ item }: { item: any }) {
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center">
               <Avatar className="h-8 w-8 mr-2">
-                <AvatarImage src={item.author.avatar || "/placeholder.svg"} alt={item.author.name} />
-                <AvatarFallback>{item.author.name.substring(0, 2)}</AvatarFallback>
+                <AvatarImage
+                  src={item.author.avatar || "/placeholder.svg"}
+                  alt={item.author.name}
+                />
+                <AvatarFallback>
+                  {item.author.name.substring(0, 2)}
+                </AvatarFallback>
               </Avatar>
-              <span className="text-sm text-gray-700 dark:text-gray-300">{item.author.name}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                {item.author.name}
+              </span>
             </div>
           </div>
 
@@ -260,5 +289,5 @@ function TrendingCard({ item }: { item: any }) {
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }
