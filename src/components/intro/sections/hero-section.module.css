@@ -172,11 +172,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    45deg,
-    rgba(0, 245, 255, 0.1),
-    rgba(255, 107, 157, 0.1)
-  );
+  background: linear-gradient(45deg, rgba(0, 245, 255, 0.1), rgba(255, 107, 157, 0.1));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -223,11 +219,7 @@
 .memeCardBackground {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    45deg,
-    rgba(0, 245, 255, 0.3),
-    rgba(255, 107, 157, 0.3)
-  );
+  background: linear-gradient(45deg, rgba(0, 245, 255, 0.3), rgba(255, 107, 157, 0.3));
   border-radius: 1.5rem;
   transform: rotate(3deg);
   filter: blur(20px);
@@ -240,7 +232,8 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 1.5rem;
   border-radius: 1.5rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transform: rotate(-2deg);
   transition: all 0.3s ease;
@@ -248,7 +241,9 @@
 
 .memeCard:hover {
   transform: rotate(0deg);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 0 40px rgba(0, 245, 255, 0.3);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.15),
+    0 0 40px rgba(0, 245, 255, 0.3);
 }
 
 .bestMemeBadge {
@@ -287,11 +282,7 @@
   cursor: pointer;
   overflow: hidden;
   border-radius: 1rem;
-  background: linear-gradient(
-    45deg,
-    rgba(0, 245, 255, 0.1),
-    rgba(255, 107, 157, 0.1)
-  );
+  background: linear-gradient(45deg, rgba(0, 245, 255, 0.1), rgba(255, 107, 157, 0.1));
 }
 
 .memeOverlay {
@@ -382,13 +373,15 @@
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 30px rgba(0, 245, 255, 0.3),
+  box-shadow:
+    0 10px 30px rgba(0, 245, 255, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .startButton:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 20px 40px rgba(0, 245, 255, 0.4),
+  box-shadow:
+    0 20px 40px rgba(0, 245, 255, 0.4),
     0 0 40px rgba(255, 107, 157, 0.3);
 }
 

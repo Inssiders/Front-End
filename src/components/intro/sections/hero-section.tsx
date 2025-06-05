@@ -48,9 +48,7 @@ export function HeroSection({
         {letters.map((letter, index) => (
           <motion.span
             key={index}
-            className={`${styles.brandLetter} ${
-              letter.special ? styles.brandLetterSpecial : ""
-            }`}
+            className={`${styles.brandLetter} ${letter.special ? styles.brandLetterSpecial : ""}`}
             animate={{
               y: hoveredLetter === index ? -8 : 0,
               transition: { type: "spring", stiffness: 300, damping: 10 },
@@ -77,9 +75,7 @@ export function HeroSection({
       <div className={styles.heroContent}>
         {/* Left Content */}
         <div className={styles.leftContent}>
-          <div className={`${styles.trendingBadge} hidden lg:block`}>
-            최신 밈 🔥
-          </div>
+          <div className={`${styles.trendingBadge} hidden lg:block`}>최신 밈 🔥</div>
           <div className={`${styles.trendingLine} hidden sm:block`} />
 
           <div className="mb-8">
@@ -89,21 +85,13 @@ export function HeroSection({
               <span>밈 트렌드의</span>
               {renderInteractiveText()}
             </h2>
-            <p className={styles.description}>
-              ✨ 지금 가장 핫한 밈과 트렌드를 한눈에! 🚀
-            </p>
+            <p className={styles.description}>✨ 지금 가장 핫한 밈과 트렌드를 한눈에! 🚀</p>
           </div>
 
           <div className={styles.tags}>
-            <span className={`${styles.tag} ${styles.tagPrimary}`}>
-              #최신 밈
-            </span>
-            <span className={`${styles.tag} ${styles.tagSecondary}`}>
-              #요즘 유행
-            </span>
-            <span className={`${styles.tag} ${styles.tagTertiary}`}>
-              #트렌드
-            </span>
+            <span className={`${styles.tag} ${styles.tagPrimary}`}>#최신 밈</span>
+            <span className={`${styles.tag} ${styles.tagSecondary}`}>#요즘 유행</span>
+            <span className={`${styles.tag} ${styles.tagTertiary}`}>#트렌드</span>
           </div>
         </div>
 
@@ -122,9 +110,7 @@ export function HeroSection({
               >
                 <div className={styles.memeOverlay}>
                   <p className={styles.overlayTitle}>밈 보기</p>
-                  <p className={styles.overlayDescription}>
-                    클릭하여 더 많은 밈을 확인하세요
-                  </p>
+                  <p className={styles.overlayDescription}>클릭하여 더 많은 밈을 확인하세요</p>
                   <Link href="/posts">
                     <div className={styles.overlayButton}>
                       <ArrowRight size={isMobile ? 16 : 20} />
@@ -138,7 +124,7 @@ export function HeroSection({
                     alt="Featured meme"
                     width={400}
                     height={400}
-                    className="object-contain max-h-full max-w-full"
+                    className="max-h-full max-w-full object-contain"
                     priority
                   />
                 </div>
@@ -154,10 +140,7 @@ export function HeroSection({
           <button className={styles.startButton}>
             <div className={styles.buttonContent}>
               <span>더 많은 밈 보러가기</span>
-              <ArrowRight
-                className={styles.buttonIcon}
-                size={isMobile ? 18 : 20}
-              />
+              <ArrowRight className={styles.buttonIcon} size={isMobile ? 18 : 20} />
             </div>
           </button>
         </Link>

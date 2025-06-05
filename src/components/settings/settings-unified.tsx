@@ -79,16 +79,13 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
         nickname: data.data?.nickname || profileData.nickname,
         bio: data.data?.bio || profileData.bio,
         accountVisible: data.data?.accountVisible ?? privacyData.accountVisible,
-        followerVisible:
-          data.data?.followerVisible ?? privacyData.followerVisible,
+        followerVisible: data.data?.followerVisible ?? privacyData.followerVisible,
       });
 
       toast.success("설정이 성공적으로 저장되었습니다.");
     } catch (error) {
       console.error("설정 저장 에러:", error);
-      toast.error(
-        error instanceof Error ? error.message : "설정 저장에 실패했습니다."
-      );
+      toast.error(error instanceof Error ? error.message : "설정 저장에 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -122,9 +119,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
       toast.success("비밀번호가 성공적으로 변경되었습니다.");
     } catch (error) {
       console.error("비밀번호 변경 에러:", error);
-      toast.error(
-        error instanceof Error ? error.message : "비밀번호 변경에 실패했습니다."
-      );
+      toast.error(error instanceof Error ? error.message : "비밀번호 변경에 실패했습니다.");
     } finally {
       setPasswordLoading(false);
     }
@@ -175,7 +170,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
       <Card className={styles.profileCard}>
         <CardHeader className={styles.profileCardHeader}>
           <CardTitle className={styles.profileCardTitle}>
-            <User className="h-5 w-5 mr-2" />
+            <User className="mr-2 size-5" />
             프로필 정보
           </CardTitle>
         </CardHeader>
@@ -189,26 +184,16 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
               >
                 <Avatar className={styles.profileImage}>
                   <AvatarImage
-                    src={
-                      user.profileImage ||
-                      "/placeholder.svg?height=96&width=96&text=MS"
-                    }
+                    src={user.profileImage || "/placeholder.svg?height=96&width=96&text=MS"}
                     alt="프로필 이미지"
                   />
-                  <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-400 text-white text-xl font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-400 text-xl font-bold text-white">
                     {user.nickname?.charAt(0)?.toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Button
-                    type="button"
-                    size="icon"
-                    className={styles.profileImageButton}
-                  >
-                    <Camera className="h-4 w-4" />
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Button type="button" size="icon" className={styles.profileImageButton}>
+                    <Camera className="size-4" />
                   </Button>
                 </motion.div>
               </motion.div>
@@ -220,7 +205,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                   transition={{ delay: 0.1 }}
                 >
                   <Label htmlFor="username" className={styles.profileLabel}>
-                    <User className="h-4 w-4 mr-2 text-purple-600" />
+                    <User className="mr-2 size-4 text-purple-600" />
                     닉네임
                   </Label>
                   <Input
@@ -243,7 +228,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                   transition={{ delay: 0.2 }}
                 >
                   <Label htmlFor="bio" className={styles.profileLabel}>
-                    <Shield className="h-4 w-4 mr-2 text-purple-600" />
+                    <Shield className="mr-2 size-4 text-purple-600" />
                     소개
                   </Label>
                   <Textarea
@@ -267,7 +252,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                   transition={{ delay: 0.3 }}
                 >
                   <Label htmlFor="email" className={styles.profileLabel}>
-                    <Mail className="h-4 w-4 mr-2 text-purple-600" />
+                    <Mail className="mr-2 size-4 text-purple-600" />
                     이메일
                   </Label>
                   <Input
@@ -289,19 +274,13 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
               className={styles.privacySection}
             >
               <h3 className={styles.privacySectionTitle}>
-                <Lock className="h-5 w-5 mr-2 text-purple-600" />
+                <Lock className="mr-2 size-5 text-purple-600" />
                 개인정보 설정
               </h3>
               <div className={styles.privacyGrid}>
-                <motion.div
-                  className={styles.privacyItem}
-                  whileHover={{ scale: 1.02 }}
-                >
+                <motion.div className={styles.privacyItem} whileHover={{ scale: 1.02 }}>
                   <div className={styles.privacyItemContent}>
-                    <Label
-                      htmlFor="public-profile"
-                      className={styles.privacyLabel}
-                    >
+                    <Label htmlFor="public-profile" className={styles.privacyLabel}>
                       공개 프로필
                     </Label>
                     <p className={styles.privacyDescription}>
@@ -321,15 +300,9 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                   />
                 </motion.div>
 
-                <motion.div
-                  className={styles.privacyItem}
-                  whileHover={{ scale: 1.02 }}
-                >
+                <motion.div className={styles.privacyItem} whileHover={{ scale: 1.02 }}>
                   <div className={styles.privacyItemContent}>
-                    <Label
-                      htmlFor="public-followers"
-                      className={styles.privacyLabel}
-                    >
+                    <Label htmlFor="public-followers" className={styles.privacyLabel}>
                       팔로워 공개
                     </Label>
                     <p className={styles.privacyDescription}>
@@ -357,11 +330,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className={styles.submitButton}
-              >
+              <Button type="submit" disabled={isLoading} className={styles.submitButton}>
                 <AnimatePresence mode="wait">
                   {isLoading ? (
                     <motion.div
@@ -382,7 +351,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                       exit={{ opacity: 0 }}
                       className={styles.submitTextContainer}
                     >
-                      <Save className="h-4 w-4 mr-2" />
+                      <Save className="mr-2 size-4" />
                       설정 저장
                     </motion.div>
                   )}
@@ -397,7 +366,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
       <Card className={styles.passwordCard}>
         <CardHeader className={styles.passwordCardHeader}>
           <CardTitle className={styles.passwordCardTitle}>
-            <KeyRound className="h-5 w-5 mr-2" />
+            <KeyRound className="mr-2 size-5" />
             비밀번호 변경
           </CardTitle>
         </CardHeader>
@@ -408,11 +377,8 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <Label
-                htmlFor="current-password"
-                className={styles.passwordLabel}
-              >
-                <Lock className="h-4 w-4 mr-2 text-red-600" />
+              <Label htmlFor="current-password" className={styles.passwordLabel}>
+                <Lock className="mr-2 size-4 text-red-600" />
                 현재 비밀번호
               </Label>
               <div className={styles.passwordInputContainer}>
@@ -442,9 +408,9 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                   }
                 >
                   {showPasswords.current ? (
-                    <EyeOff className="h-4 w-4" />
+                    <EyeOff className="size-4" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <Eye className="size-4" />
                   )}
                 </Button>
               </div>
@@ -456,7 +422,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
               transition={{ delay: 0.2 }}
             >
               <Label htmlFor="new-password" className={styles.passwordLabel}>
-                <KeyRound className="h-4 w-4 mr-2 text-red-600" />새 비밀번호
+                <KeyRound className="mr-2 size-4 text-red-600" />새 비밀번호
               </Label>
               <div className={styles.passwordInputContainer}>
                 <Input
@@ -478,15 +444,9 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                   variant="ghost"
                   size="icon"
                   className={styles.passwordToggleButton}
-                  onClick={() =>
-                    setShowPasswords((prev) => ({ ...prev, new: !prev.new }))
-                  }
+                  onClick={() => setShowPasswords((prev) => ({ ...prev, new: !prev.new }))}
                 >
-                  {showPasswords.new ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPasswords.new ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </Button>
               </div>
               {passwordData.newPassword && (
@@ -497,22 +457,16 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                 >
                   <div className={styles.passwordStrengthBar}>
                     <div
-                      className={`${
-                        styles.passwordStrengthFill
-                      } ${getPasswordStrengthColor(
+                      className={`${styles.passwordStrengthFill} ${getPasswordStrengthColor(
                         passwordStrength(passwordData.newPassword)
                       )}`}
                       style={{
-                        width: `${
-                          (passwordStrength(passwordData.newPassword) / 5) * 100
-                        }%`,
+                        width: `${(passwordStrength(passwordData.newPassword) / 5) * 100}%`,
                       }}
                     />
                   </div>
                   <span className={styles.passwordStrengthText}>
-                    {getPasswordStrengthText(
-                      passwordStrength(passwordData.newPassword)
-                    )}
+                    {getPasswordStrengthText(passwordStrength(passwordData.newPassword))}
                   </span>
                 </motion.div>
               )}
@@ -523,11 +477,8 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <Label
-                htmlFor="confirm-password"
-                className={styles.passwordLabel}
-              >
-                <Shield className="h-4 w-4 mr-2 text-red-600" />새 비밀번호 확인
+              <Label htmlFor="confirm-password" className={styles.passwordLabel}>
+                <Shield className="mr-2 size-4 text-red-600" />새 비밀번호 확인
               </Label>
               <div className={styles.passwordInputContainer}>
                 <Input
@@ -543,8 +494,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                   required
                   className={`${styles.passwordInput} ${
                     passwordData.confirmPassword
-                      ? passwordData.newPassword ===
-                        passwordData.confirmPassword
+                      ? passwordData.newPassword === passwordData.confirmPassword
                         ? styles.passwordInputValid
                         : styles.passwordInputInvalid
                       : styles.passwordInputDefault
@@ -563,18 +513,17 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                   }
                 >
                   {showPasswords.confirm ? (
-                    <EyeOff className="h-4 w-4" />
+                    <EyeOff className="size-4" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <Eye className="size-4" />
                   )}
                 </Button>
                 {passwordData.confirmPassword && (
                   <div className={styles.passwordCheckIcon}>
-                    {passwordData.newPassword ===
-                    passwordData.confirmPassword ? (
-                      <Check className="h-4 w-4 text-green-500" />
+                    {passwordData.newPassword === passwordData.confirmPassword ? (
+                      <Check className="size-4 text-green-500" />
                     ) : (
-                      <X className="h-4 w-4 text-red-500" />
+                      <X className="size-4 text-red-500" />
                     )}
                   </div>
                 )}
@@ -592,15 +541,14 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                         : styles.passwordCheckTextInvalid
                     }`}
                   >
-                    {passwordData.newPassword ===
-                    passwordData.confirmPassword ? (
+                    {passwordData.newPassword === passwordData.confirmPassword ? (
                       <>
-                        <Check className="h-3 w-3 mr-1" />
+                        <Check className="mr-1 size-3" />
                         비밀번호가 일치합니다
                       </>
                     ) : (
                       <>
-                        <X className="h-3 w-3 mr-1" />
+                        <X className="mr-1 size-3" />
                         비밀번호가 일치하지 않습니다
                       </>
                     )}
@@ -624,10 +572,9 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                   >
                     {passwordData.newPassword.length < 8
                       ? "새 비밀번호는 최소 8자 이상이어야 합니다"
-                      : passwordData.newPassword !==
-                        passwordData.confirmPassword
-                      ? "비밀번호 확인이 일치하지 않습니다"
-                      : "모든 필드를 입력해주세요"}
+                      : passwordData.newPassword !== passwordData.confirmPassword
+                        ? "비밀번호 확인이 일치하지 않습니다"
+                        : "모든 필드를 입력해주세요"}
                   </motion.p>
                 )}
                 <Button
@@ -660,7 +607,7 @@ export default function SettingsUnified({ user }: SettingsUnifiedProps) {
                         exit={{ opacity: 0 }}
                         className={styles.passwordSubmitTextContainer}
                       >
-                        <KeyRound className="h-4 w-4 mr-2" />
+                        <KeyRound className="mr-2 size-4" />
                         비밀번호 변경
                       </motion.div>
                     )}

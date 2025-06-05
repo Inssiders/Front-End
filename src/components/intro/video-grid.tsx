@@ -82,9 +82,7 @@ function VideoGrid({
   gifUrls = defaultGifUrls,
 }: VideoGridProps) {
   const [frames, setFrames] = useState<Frame[]>([]);
-  const [hovered, setHovered] = useState<{ row: number; col: number } | null>(
-    null
-  );
+  const [hovered, setHovered] = useState<{ row: number; col: number } | null>(null);
   const [hoverSize, setHoverSize] = useState(6);
 
   const toFrame = useCallback(
@@ -139,39 +137,29 @@ function VideoGrid({
 
   const getTransformOrigin = useCallback(
     (x: number, y: number) => {
-      const vertical =
-        y === 0 ? "top" : y === gridSize / 2 ? "center" : "bottom";
-      const horizontal =
-        x === 0 ? "left" : x === gridSize / 2 ? "center" : "right";
+      const vertical = y === 0 ? "top" : y === gridSize / 2 ? "center" : "bottom";
+      const horizontal = x === 0 ? "left" : x === gridSize / 2 ? "center" : "right";
       return `${vertical} ${horizontal}`;
     },
     [gridSize]
   );
 
   return (
-    <div className={`space-y-4 w-full h-full ${className}`}>
+    <div className={`size-full space-y-4 ${className}`}>
       <div
-        className="relative w-full h-full min-h-[480px]"
+        className="relative size-full min-h-[480px]"
         style={{
           display: "grid",
           gridTemplateRows: getRowSizes(),
           gridTemplateColumns: getColSizes(),
           gap: `${gapSize}px`,
-          transition:
-            "grid-template-rows 0.4s ease, grid-template-columns 0.4s ease",
+          transition: "grid-template-rows 0.4s ease, grid-template-columns 0.4s ease",
         }}
       >
         {frames.map((frame, index) => {
-          const row = Math.floor(
-            frame.defaultPos.y / (gridSize / Math.sqrt(gifUrls.length))
-          );
-          const col = Math.floor(
-            frame.defaultPos.x / (gridSize / Math.sqrt(gifUrls.length))
-          );
-          const transformOrigin = getTransformOrigin(
-            frame.defaultPos.x,
-            frame.defaultPos.y
-          );
+          const row = Math.floor(frame.defaultPos.y / (gridSize / Math.sqrt(gifUrls.length)));
+          const col = Math.floor(frame.defaultPos.x / (gridSize / Math.sqrt(gifUrls.length)));
+          const transformOrigin = getTransformOrigin(frame.defaultPos.x, frame.defaultPos.y);
 
           return (
             <GridCell
