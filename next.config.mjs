@@ -171,8 +171,7 @@ const nextConfig = {
     ],
   },
   env: {
-    NEXT_PUBLIC_API_MOCKING:
-      process.env.NODE_ENV === "development" ? "enabled" : "",
+    NEXT_PUBLIC_API_MOCKING: process.env.NODE_ENV === "development" ? "enabled" : "",
   },
   // MSW를 위한 웹팩 설정
   webpack: (config, { dev, isServer }) => {
