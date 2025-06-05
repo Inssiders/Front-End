@@ -83,10 +83,7 @@ interface ProfileUpdateResponse {
 }
 
 // 이메일 인증 코드 저장을 위한 임시 저장소
-const emailVerificationStore = new Map<
-  string,
-  { code: string; expiresAt: number }
->();
+const emailVerificationStore = new Map<string, { code: string; expiresAt: number }>();
 
 // 이메일 인증 요청 제한을 위한 저장소
 const emailRateLimitStore = new Map<string, number>();
@@ -96,8 +93,7 @@ const handlers = [
   // 토큰 발급/갱신
   http.post(`${BASE_URL}/api/auth/token`, async ({ request }) => {
     const body = (await request.json()) as TokenRequest;
-    const { email, password, grant_type, uuid, refresh_token, client_id } =
-      body;
+    const { email, password, grant_type, uuid, refresh_token, client_id } = body;
 
     // authorization_code 방식
     if (grant_type === "authorization_code" && uuid) {
@@ -140,11 +136,7 @@ const handlers = [
     }
 
     // refresh_token 방식
-    if (
-      grant_type === "refresh_token" &&
-      refresh_token &&
-      client_id === "inssider-app"
-    ) {
+    if (grant_type === "refresh_token" && refresh_token && client_id === "inssider-app") {
       return HttpResponse.json({
         message: "토큰 발급에 성공했습니다.",
         data: {
@@ -255,8 +247,7 @@ const handlers = [
           type: "https://api.inssider.com/problems/rate-limit-exceeded",
           title: "너무 많은 요청",
           status: 429,
-          detail:
-            "최근 1분 내 재요청은 허용되지 않습니다. 잠시 뒤에 다시 시도하세요.",
+          detail: "최근 1분 내 재요청은 허용되지 않습니다. 잠시 뒤에 다시 시도하세요.",
           instance: "/api/auth/email/challenge",
         },
         {
@@ -295,11 +286,7 @@ const handlers = [
 
     const verification = emailVerificationStore.get(email);
 
-    if (
-      !verification ||
-      verification.expiresAt < Date.now() ||
-      verification.code !== otp
-    ) {
+    if (!verification || verification.expiresAt < Date.now() || verification.code !== otp) {
       return HttpResponse.json(
         {
           type: "https://api.example.com/problems/invalid-request",
@@ -326,8 +313,7 @@ const handlers = [
 
   // 회원가입
   http.post(`${BASE_URL}/api/accounts`, async ({ request }) => {
-    const { register_type, email, password } =
-      (await request.json()) as AccountCreateRequest;
+    const { register_type, email, password } = (await request.json()) as AccountCreateRequest;
 
     // Authorization 헤더 확인
     const authHeader = request.headers.get("Authorization");
@@ -337,8 +323,7 @@ const handlers = [
           type: "https://api.example.com/problems/invalid-requests",
           title: "인가되지 않은 접근입니다.",
           status: 401,
-          detail:
-            "인가 토큰이 제공되지 않았거나, 이미 삭제되어 유효하지 않은 상태입니다.",
+          detail: "인가 토큰이 제공되지 않았거나, 이미 삭제되어 유효하지 않은 상태입니다.",
           instance: "/api/accounts",
         },
         { status: 401 }
@@ -417,8 +402,7 @@ const handlers = [
     const { password } = (await request.json()) as PasswordChangeRequest;
 
     // 비밀번호 유효성 검사 (예시: 최소 8자, 영문+숫자+특수문자)
-    const passwordRegex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!passwordRegex.test(password)) {
       return HttpResponse.json(
         {

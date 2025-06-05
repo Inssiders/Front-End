@@ -18,9 +18,7 @@ const generateLinks = (
   };
 
   if (page !== undefined) {
-    const totalPages = Math.ceil(
-      seedPosts.length / Number(params.get("size") || 10)
-    );
+    const totalPages = Math.ceil(seedPosts.length / Number(params.get("size") || 10));
     if (page > 1) {
       const prevParams = new URLSearchParams(params);
       prevParams.set("page", String(page - 1));
@@ -66,22 +64,17 @@ const filterMemes = (searchParams: URLSearchParams, data: Post[]) => {
   }
 
   if (category) {
-    filteredData = filteredData.filter(
-      (meme) => meme.category_id === Number(category)
-    );
+    filteredData = filteredData.filter((meme) => meme.category_id === Number(category));
   }
 
   if (sort === "created_at") {
     filteredData.sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
   }
 
   if (userId) {
-    filteredData = filteredData.filter(
-      (meme) => meme.account_id === Number(userId)
-    );
+    filteredData = filteredData.filter((meme) => meme.account_id === Number(userId));
   }
 
   if (profileFilter === "posts") {
@@ -139,9 +132,7 @@ export const handlers = [
 
       const items = filteredData.slice(startIndex, startIndex + size);
       const nextCursor =
-        items.length === size
-          ? btoa(items[items.length - 1].created_at)
-          : undefined;
+        items.length === size ? btoa(items[items.length - 1].created_at) : undefined;
 
       return HttpResponse.json({
         message: "콘텐츠 조회에 성공했습니다",
@@ -153,12 +144,7 @@ export const handlers = [
             nextCursor: nextCursor,
           },
         },
-        _links: generateLinks(
-          "/api/posts",
-          searchParams,
-          undefined,
-          nextCursor
-        ),
+        _links: generateLinks("/api/posts", searchParams, undefined, nextCursor),
       });
     }
 

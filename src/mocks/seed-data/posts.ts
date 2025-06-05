@@ -3,8 +3,7 @@ import { Post } from "@/utils/types/posts";
 export const seedPosts: Post[] = [
   {
     id: 0,
-    title:
-      "이거 다 알면 드라마 중독 ㅇㅇ 드라마 밈 TOP10 #shorts #밈 #트렌드 #호박고구마",
+    title: "이거 다 알면 드라마 중독 ㅇㅇ 드라마 밈 TOP10 #shorts #밈 #트렌드 #호박고구마",
     content:
       "이거 다 알면 드라마 중독임 ㅋㅋㅋㅋㅋ\nㄴ(삐삑 검거 완)\n\n-\n\n자세한 내용이 궁금하다면?\n프로필 링크 속 브랜더쿠 홈페이지를 확인하세요! 👆",
     media_url: "https://www.youtube.com/embed/j0cpk88cY58",
@@ -17,8 +16,7 @@ export const seedPosts: Post[] = [
   },
   {
     id: 1,
-    title:
-      "(개정판) K MEME의 역사 | 2005-2022 추억의 유행어, 짤방, 밈 복습하기",
+    title: "(개정판) K MEME의 역사 | 2005-2022 추억의 유행어, 짤방, 밈 복습하기",
     content:
       "#밈 #유행어 #추억 #2010년대 #2000년대 #짤방\n\n00:00 2005년\n01:19 2006년\n02:29 2007년\n04:07 2008년\n06:19 2009년\n08:21 2010년\n09:30 2011년\n10:57 2012년\n12:52 2013년\n15:31 2014년\n17:45 2015년\n19:37 2016년\n21:00 2017년\n21:55 2018년\n22:48 2019년\n24:05 2020년\n25:35 2021년\n27:15 2022년",
     media_url: "https://www.youtube.com/embed/thpZloYjF8k",
@@ -43,8 +41,7 @@ export const seedPosts: Post[] = [
   },
   {
     id: 3,
-    title:
-      "2023 밈/유행어 Quiz (#신서유기 #지구오락실 #MT게임 #야유회 #술자리게임#밈 #meme )",
+    title: "2023 밈/유행어 Quiz (#신서유기 #지구오락실 #MT게임 #야유회 #술자리게임#밈 #meme )",
     content:
       "2023 밈/유행어 Quiz\n\n올한해 마무리를 밈과 유행어로 알아보세요!\n (#신서유기 #지구오락실 #MT게임 #야유회 #술자리게임)",
     media_url: "https://www.youtube.com/embed/AU8pD8aJiBM",
@@ -57,8 +54,7 @@ export const seedPosts: Post[] = [
   },
   {
     id: 4,
-    title:
-      "[#또보장] 😂웃음 참기 챌린지💦 스브스 드라마 밈(meme) 총 정리 #드라마밈",
+    title: "[#또보장] 😂웃음 참기 챌린지💦 스브스 드라마 밈(meme) 총 정리 #드라마밈",
     content:
       "스브스 드라마 속 밈(meme) 모아보기👀\n\n0:00 전설의 익룡짤 #웃어요엄마\n0:30 그거 아세요? 조인성씨... 입에 주먹 넣은 적 없다는 사실😂 #발리에서생긴일\n01:47 강쥐 둥절🐶 #신기생뎐\n02:03 레이저 빔 #신기생뎐\n04:23 공포의 회전목마 #천국의계단\n04:50 사랑은 돌아오는 거야 #천국의계단\n05:18 뚝심있는 두한의 사달라💸 #야인시대\n07:11내가 고자라니....!!! #야인시대\n09:15 스토리는 내가 짤게, 글씨는 누가 쓸래? #순풍산부인과\n10:30 분노의 양치질🔥 #홍콩익스프레스\n10:44 집 나가면 개고생 #아내의유혹\n11:18 병맛 CG #아내의유혹\n\n\nCopyright Ⓒ SBS. All rights reserved. 무단 전재, 재배포 및 AI학습 이용 금지",
     media_url: "https://www.youtube.com/embed/LNnr8kz4oLw",
@@ -199,10 +195,8 @@ export const seedPosts: Post[] = [
   },
   {
     id: 15,
-    title:
-      "밈 천재 오해원 아껴주시고 성원해주시고.. | 라디오스타 | TVPP | MBC 240828 방송",
-    content:
-      "#TVPP #라디오스타 #해원\n\nⓒ MBC&iMBC 무단 전재, 재배포 및 이용(AI학습 포함) 금지",
+    title: "밈 천재 오해원 아껴주시고 성원해주시고.. | 라디오스타 | TVPP | MBC 240828 방송",
+    content: "#TVPP #라디오스타 #해원\n\nⓒ MBC&iMBC 무단 전재, 재배포 및 이용(AI학습 포함) 금지",
     media_url: "https://www.youtube.com/embed/PqtdvsUNK9U",
     media_upload_time: "2025-01-03T05:00:19Z",
     account_id: 1,
@@ -341,8 +335,7 @@ export const seedPosts: Post[] = [
   },
   {
     id: 26,
-    title:
-      "아이돌이 최초로 만들어낸 유행밈 TOP3 #세븐틴 #아이브 #뉴진스 #스키즈 #에스파",
+    title: "아이돌이 최초로 만들어낸 유행밈 TOP3 #세븐틴 #아이브 #뉴진스 #스키즈 #에스파",
     content: "#세븐틴 #아이브 #뉴진스 #스키즈 #에스파",
     media_url: "https://www.youtube.com/embed/gTnX0oyrbYE",
     media_upload_time: "2024-06-13T09:00:25Z",
@@ -508,8 +501,7 @@ export const seedPosts: Post[] = [
   },
   {
     id: 39,
-    title:
-      '"꽁꽁 얼어붙은 한강 위로 고양이가 걸어 다닙니다" 원본 영상 [shorts]',
+    title: '"꽁꽁 얼어붙은 한강 위로 고양이가 걸어 다닙니다" 원본 영상 [shorts]',
     content:
       "\"꽁꽁 얼어붙은 한강 위로 고양이가 걸어 다닙니다\" 원본 영상 [shorts]🐺🐺\n\n지하철역 동파사고로 출근길 물벼락…한강물도 곳곳 '꽁꽁' \n한강 위를 걷는 고양이, 2년 전 한파에 무슨 일이?\n\n편집 :  조민수, 송청원, 조수연\n\n#MBN #Shorts #꽁꽁얼어붙은한강위로고양이 #한강고양이 #한강고양이원본 #한강고양이뉴스 #한강위고양이 #겨울한강 #한강얼음고양이 #고양이 #쇼츠 #엠비엔뉴스 #MBNNEWS \n\n\n☞ MBN 유튜브 구독하기  ☞ https://goo.gl/6ZsJGT\n📢 MBN 유튜브 커뮤니티 https://www.youtube.com/user/mbn/community?disable_polymer=1\n\nMBN 페이스북 http://www.facebook.com/mbntv\nMBN 인스타그램 https://www.instagram.com/mbn_news/",
     media_url: "https://www.youtube.com/embed/_jKpx0qUqXw",
@@ -534,8 +526,7 @@ export const seedPosts: Post[] = [
   },
   {
     id: 41,
-    title:
-      "10분 만에 온몸 뒤덮었다…현재 난리난 서울 상황 #JTBC #상암동클라스 #Shorts",
+    title: "10분 만에 온몸 뒤덮었다…현재 난리난 서울 상황 #JTBC #상암동클라스 #Shorts",
     content:
       "최근 서울에 하루살이 떼가 나타났습니다. 불빛만 있다면 온갖 곳에 몰려드는데요. 영상으로 볼 건데요. 벌레를 싫어하는 분들은 마음의 준비 먼저 해주시죠. \n\n📌 시리즈 더 보기 https://youtube.com/playlist?list=PL3Eb1N33oAXhXoDEuXiBlCRtivzPWiehd\n\n▶ 기사 전문 https://news.jtbc.co.kr/article/article.aspx?news_id=NB12127005\n▶ 시리즈 더 보기 https://youtube.com/playlist?list=PL3Eb1N33oAXgR19x0t6Q852WRxbXle3ea\n\n#서울 #동양하루살이 #벌레 #상암동클라스 #쇼츠\n📢본방 후 유튜브에서 앵커들과 더 가까이! \n☞JTBC 모바일라이브 시청하기 https://bit.ly/3iYhEqa\n\n☞JTBC유튜브 구독하기 (https://bit.ly/2hYgWZg)\n☞JTBC유튜브 커뮤니티 (https://bit.ly/2LZIwke)\n\n#JTBC뉴스 공식 페이지\n(홈페이지) https://news.jtbc.co.kr\n(APP) https://news.jtbc.co.kr/Etc/SmartPhoneReport.aspx\n\n페이스북 https://www.facebook.com/jtbcnews\n트위터 https://twitter.com/JTBC_news\n인스타그램 https://www.instagram.com/jtbcnews\n\n☏ 제보하기 https://news.jtbc.co.kr/Etc/InterNetReport.aspx\n방송사 : JTBC (https://jtbc.co.kr)",
     media_url: "https://www.youtube.com/embed/WUojCeq-NQ4",
@@ -634,8 +625,7 @@ export const seedPosts: Post[] = [
   },
   {
     id: 49,
-    title:
-      "10분 만에 온몸 뒤덮었다…현재 난리난 서울 상황 #JTBC #상암동클라스 #Shorts",
+    title: "10분 만에 온몸 뒤덮었다…현재 난리난 서울 상황 #JTBC #상암동클라스 #Shorts",
     content:
       "최근 서울에 하루살이 떼가 나타났습니다. 불빛만 있다면 온갖 곳에 몰려드는데요. 영상으로 볼 건데요. 벌레를 싫어하는 분들은 마음의 준비 먼저 해주시죠. \n\n📌 시리즈 더 보기 https://youtube.com/playlist?list=PL3Eb1N33oAXhXoDEuXiBlCRtivzPWiehd\n\n▶ 기사 전문 https://news.jtbc.co.kr/article/article.aspx?news_id=NB12127005\n▶ 시리즈 더 보기 https://youtube.com/playlist?list=PL3Eb1N33oAXgR19x0t6Q852WRxbXle3ea\n\n#서울 #동양하루살이 #벌레 #상암동클라스 #쇼츠\n📢본방 후 유튜브에서 앵커들과 더 가까이! \n☞JTBC 모바일라이브 시청하기 https://bit.ly/3iYhEqa\n\n☞JTBC유튜브 구독하기 (https://bit.ly/2hYgWZg)\n☞JTBC유튜브 커뮤니티 (https://bit.ly/2LZIwke)\n\n#JTBC뉴스 공식 페이지\n(홈페이지) https://news.jtbc.co.kr\n(APP) https://news.jtbc.co.kr/Etc/SmartPhoneReport.aspx\n\n페이스북 https://www.facebook.com/jtbcnews\n트위터 https://twitter.com/JTBC_news\n인스타그램 https://www.instagram.com/jtbcnews\n\n☏ 제보하기 https://news.jtbc.co.kr/Etc/InterNetReport.aspx\n방송사 : JTBC (https://jtbc.co.kr)",
     media_url: "https://www.youtube.com/embed/WUojCeq-NQ4",

@@ -2,8 +2,7 @@ import { setupWorker } from "msw/browser";
 import { handlers } from "./handlers";
 
 // 환경변수에서 baseUrl 가져오기
-const baseUrl =
-  process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL || "";
+const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL || "";
 
 // MSW 워커 인스턴스 생성
 export const worker = setupWorker(...handlers);
@@ -79,8 +78,7 @@ const waitForServiceWorkerReady = async () => {
   }
 
   // 서비스 워커 활성화 대기
-  const serviceWorker =
-    registration.installing || registration.waiting || registration.active;
+  const serviceWorker = registration.installing || registration.waiting || registration.active;
   if (serviceWorker && serviceWorker.state !== "activated") {
     await new Promise<void>((resolve) => {
       serviceWorker.addEventListener("statechange", () => {
