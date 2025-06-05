@@ -17,14 +17,22 @@ function constructUrl(path: string): string {
 
 // Utility function to transform meme data to post format
 export function transformMemeToPost(meme: any, prefix: string = ""): Post {
+  // 🚨 디버깅: 원본 데이터 확인
+
+  // media_url이 YouTube URL인지 확인
+  const isYouTubeUrl =
+    meme.media_url &&
+    (meme.media_url.includes("youtube.com") ||
+      meme.media_url.includes("youtu.be"));
+
   return {
     id: `${prefix}${meme.id}`,
     title: meme.title,
     category: `카테고리 ${meme.category_id}`,
-    image:
-      meme.media_url ||
-      "/placeholder.svg?height=400&width=400&text=" +
-        encodeURIComponent(meme.title),
+    // YouTube URL이면 image는 undefined, 아니면 media_url 사용
+    image: !isYouTubeUrl ? meme.media_url : undefined,
+    // YouTube URL이면 youtubeUrl로 설정
+    youtubeUrl: isYouTubeUrl ? meme.media_url : undefined,
     post_media_url: meme.media_url,
     media_url: meme.media_url,
     type: "video",
@@ -77,7 +85,6 @@ export async function fetchProfilePosts(
   // 서버사이드에서만 캐시 설정 적용
   if (isServerSide) {
     fetchOptions.next = {
-      revalidate: 3600, // 1시간
       tags: [`profile-${userId}`, `${profileFilter}-${userId}`, "posts"],
     };
   } else {
@@ -85,7 +92,7 @@ export async function fetchProfilePosts(
     fetchOptions.cache = "no-store";
   }
 
-  const response = await apiFetch(`/posts?${params.toString()}`, fetchOptions);
+  const response = await apiFetch(`posts?${params.toString()}`, fetchOptions);
 
   if (!response.ok) {
     throw new Error("프로필 데이터를 가져오는데 실패했습니다");
@@ -186,7 +193,6 @@ export async function triggerRevalidation(options: {
     }
 
     const result = await response.json();
-    console.log("[ISR] Revalidation triggered:", result);
     return result;
   } catch (error) {
     console.error("[ISR] Failed to trigger revalidation:", error);

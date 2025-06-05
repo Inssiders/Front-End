@@ -1,5 +1,6 @@
+import { Post } from "@/utils/types/posts";
 import { http, HttpResponse } from "msw";
-import { memesData } from "../seed-data/memes";
+import { seedPosts } from "../seed-data/posts";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL;
 
@@ -18,7 +19,7 @@ const generateLinks = (
 
   if (page !== undefined) {
     const totalPages = Math.ceil(
-      memesData.length / Number(params.get("size") || 10)
+      seedPosts.length / Number(params.get("size") || 10)
     );
     if (page > 1) {
       const prevParams = new URLSearchParams(params);
@@ -46,8 +47,7 @@ const generateLinks = (
 };
 
 // Helper function to filter memes based on search criteria
-const filterMemes = (searchParams: URLSearchParams, data = memesData) => {
-  console.log("[MSW] filterMemes 호출됨", searchParams.toString());
+const filterMemes = (searchParams: URLSearchParams, data: Post[]) => {
   let filteredData = [...data];
 
   const keyword = searchParams.get("keyword");
@@ -60,19 +60,14 @@ const filterMemes = (searchParams: URLSearchParams, data = memesData) => {
     filteredData = filteredData.filter(
       (meme) =>
         meme.title.toLowerCase().includes(keyword.toLowerCase()) ||
-        meme.content.toLowerCase().includes(keyword.toLowerCase())
+        meme.content?.toLowerCase().includes(keyword.toLowerCase()) ||
+        meme.media_url?.toLowerCase().includes(keyword.toLowerCase())
     );
   }
 
   if (category) {
     filteredData = filteredData.filter(
-      (meme) => meme.category === String(category)
-    );
-    console.log(
-      "[MSW] 필터링된 category_id:",
-      category,
-      "결과 개수:",
-      filteredData.length
+      (meme) => meme.category_id === Number(category)
     );
   }
 
@@ -85,7 +80,7 @@ const filterMemes = (searchParams: URLSearchParams, data = memesData) => {
 
   if (userId) {
     filteredData = filteredData.filter(
-      (meme) => meme.user_id === Number(userId)
+      (meme) => meme.account_id === Number(userId)
     );
   }
 
@@ -100,8 +95,33 @@ const filterMemes = (searchParams: URLSearchParams, data = memesData) => {
 };
 
 export const handlers = [
+  // GET - 카테고리 목록 조회
+  http.get(`${BASE_URL}/api/categories`, () => {
+    const categories = [
+      { id: 1, name: "KPOP", label: "K-POP", count: 45 },
+      { id: 2, name: "ENTERTAINMENT", label: "연예인", count: 38 },
+      { id: 3, name: "DRAMA", label: "드라마", count: 22 },
+      { id: 4, name: "INFLUENCER", label: "인플루언서", count: 31 },
+      { id: 5, name: "NEWS", label: "뉴스", count: 15 },
+      { id: 6, name: "MOVIE", label: "영화", count: 27 },
+      { id: 7, name: "ANIMATION", label: "애니메이션", count: 19 },
+      { id: 8, name: "CHALLENGE", label: "챌린지", count: 42 },
+      { id: 9, name: "NEW_SLANG", label: "신조어", count: 33 },
+      { id: 10, name: "TRENDING", label: "트렌딩", count: 67 },
+      { id: 99, name: "ETC", label: "기타", count: 8 },
+      { id: 999, name: "USER_CONTENTS", label: "사용자 콘텐츠", count: 12 },
+    ];
+
+    return HttpResponse.json({
+      message: "카테고리 조회에 성공했습니다",
+      data: {
+        categories: categories,
+      },
+    });
+  }),
+
   // GET - 게시물 목록 조회
-  http.get(`/api/posts`, ({ request }) => {
+  http.get(`${BASE_URL}/api/posts`, ({ request }) => {
     const url = new URL(request.url);
     const searchParams = url.searchParams;
 
@@ -110,7 +130,7 @@ export const handlers = [
     const profileFilter = searchParams.get("profile_filter");
     const cursor = searchParams.get("cursor");
 
-    const filteredData = filterMemes(searchParams);
+    const filteredData = filterMemes(searchParams, seedPosts);
 
     if (profileFilter) {
       const startIndex = cursor
@@ -162,8 +182,6 @@ export const handlers = [
 
   // POST - 새 게시물 작성
   http.post(`${BASE_URL}/api/posts`, async ({ request }) => {
-    console.log("[MSW] Intercepted POST request to (BASE_URL):", request.url);
-
     const authHeader = request.headers.get("Authorization");
 
     if (!authHeader?.includes("Bearer")) {
@@ -190,10 +208,8 @@ export const handlers = [
 
   // GET - 단일 게시물 조회
   http.get(`${BASE_URL}/api/posts/:id`, ({ params, request }) => {
-    console.log("[MSW] Intercepted GET request to (BASE_URL):", request.url);
-
     const { id } = params;
-    const post = memesData[Number(id) - 1];
+    const post = seedPosts[Number(id) - 1];
 
     if (!post) {
       return HttpResponse.json(
@@ -216,8 +232,6 @@ export const handlers = [
 
   // DELETE - 게시물 삭제
   http.delete(`${BASE_URL}/api/posts/:id`, ({ params, request }) => {
-    console.log("[MSW] Intercepted DELETE request to (BASE_URL):", request.url);
-
     const { id } = params;
     const authHeader = request.headers.get("Authorization");
 

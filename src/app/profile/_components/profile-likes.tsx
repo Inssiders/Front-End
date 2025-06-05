@@ -1,14 +1,14 @@
 "use client";
 
+import PostsGrid from "@/components/posts/post-grid";
 import {
   fetchProfilePosts,
   transformMemeToPost,
   triggerRevalidation,
-} from "@/utils/fetch";
+} from "@/utils/fetch/profile";
 import { ProfilePostsResponse } from "@/utils/types/profile";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import PostsGrid from "./post-grid";
 
 interface ProfileLikesProps {
   id: string;
@@ -39,13 +39,8 @@ export default function ProfileLikes({
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       // 첫 번째 페이지이고 초기 데이터가 있으면 사용
       if (!pageParam && initialData) {
-        console.log("[ProfileLikes] Using initial server data");
         return initialData;
       }
-
-      console.log(
-        `[ProfileLikes] Fetching likes for user ${id}, cursor: ${pageParam}...`
-      );
 
       const result = await fetchProfilePosts(id, {
         profileFilter: "likes", // 좋아요한 게시물 조회
@@ -53,7 +48,6 @@ export default function ProfileLikes({
         cursor: pageParam,
       });
 
-      console.log("[ProfileLikes] API Response:", result);
       return result;
     },
     initialPageParam: initialData
@@ -77,7 +71,6 @@ export default function ProfileLikes({
       (entries) => {
         const [target] = entries;
         if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          console.log("[ProfileLikes] Loading more likes...");
           fetchNextPage();
         }
       },
@@ -98,16 +91,14 @@ export default function ProfileLikes({
   const likedPosts = useMemo(() => {
     // 초기 데이터가 있고 React Query 데이터가 없으면 초기 데이터 사용
     if (initialData && !data?.pages?.length) {
-      return initialData.data.memes.map((meme) =>
-        transformMemeToPost(meme, "likes-")
-      );
+      return initialData.data.memes.map((meme) => transformMemeToPost(meme));
     }
 
     // React Query 데이터 사용
     if (!data?.pages) return [];
 
     const allMemes = data.pages.flatMap((page) => page.data.memes);
-    return allMemes.map((meme) => transformMemeToPost(meme, "likes-"));
+    return allMemes.map((meme) => transformMemeToPost(meme));
   }, [data, initialData, id]);
 
   // ISR 캐시 무효화 및 React Query 캐시 재검증
@@ -117,7 +108,6 @@ export default function ProfileLikes({
       await queryClient.invalidateQueries({
         queryKey: ["profileLikes", id],
       });
-      console.log(`[ProfileLikes] Cache invalidated for user ${id}`);
     } catch (error) {
       console.error("[ProfileLikes] Failed to refresh cache:", error);
     }
@@ -194,16 +184,16 @@ export default function ProfileLikes({
 
   return (
     <div className="space-y-6">
-      {/* 피드 스타일 좋아요 게시물 그리드 */}
+      {/* 프로필 좋아요 게시물 그리드 */}
       <PostsGrid
         posts={likedPosts}
         loading={isActuallyLoading}
-        layout={feedMode ? "feed" : "grid"}
+        layout="grid"
         columns={4}
         showAuthor={true}
         showActions={true}
         enableHoverPlay={enableHoverPlay}
-        feedMode={feedMode}
+        feedMode={false}
         className="profile-likes-grid"
       />
 

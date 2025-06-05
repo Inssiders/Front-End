@@ -94,44 +94,6 @@ const waitForServiceWorkerReady = async () => {
   return registration;
 };
 
-// 네트워크 차단 테스트
-const testNetworkInterception = async () => {
-  try {
-    const testResponse = await fetch(
-      "/server/posts?profile_filter=posts&size=10&user_id=1",
-      {
-        signal: AbortSignal.timeout(3000),
-      }
-    );
-
-    if (testResponse.ok) {
-      console.log("[MSW] ✅ Ready - intercepting requests");
-      return true;
-    }
-    return false;
-  } catch (error) {
-    const errorMessage = (error as Error).message;
-
-    if (
-      errorMessage.includes("ENOTFOUND") ||
-      errorMessage.includes("ERR_NAME_NOT_RESOLVED") ||
-      errorMessage.includes("NetworkError")
-    ) {
-      console.error("[MSW] ❌ Not intercepting - DNS error occurred");
-      return false;
-    }
-
-    if (errorMessage.includes("CORS")) {
-      console.error("[MSW] ❌ CORS error - MSW should prevent this");
-      return false;
-    }
-
-    // 다른 에러는 MSW가 작동할 수 있음을 의미
-    console.log("[MSW] ✅ Ready - intercepting requests");
-    return true;
-  }
-};
-
 // 워커 시작
 export const startWorker = async () => {
   if (typeof window === "undefined") {
@@ -139,8 +101,6 @@ export const startWorker = async () => {
   }
 
   try {
-    console.log("[MSW] Starting worker...");
-
     // 기존 MSW 워커 정지
     try {
       await worker.stop();
@@ -154,14 +114,7 @@ export const startWorker = async () => {
     // 추가 대기 시간으로 완전한 초기화 보장
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // 네트워크 차단 테스트
-    const isWorking = await testNetworkInterception();
-
-    if (!isWorking) {
-      console.error("[MSW] 💡 Try: Hard refresh (Ctrl+Shift+R)");
-    }
-
-    return isWorking;
+    return true;
   } catch (error) {
     console.error("[MSW] Failed to start:", error);
     throw error;

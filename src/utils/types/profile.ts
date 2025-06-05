@@ -55,6 +55,7 @@ export interface Post {
   title: string;
   category: string;
   image?: string;
+  youtubeUrl?: string; // YouTube URL 추가
   post_media_url?: string;
   media_url?: string;
   type?: string;
