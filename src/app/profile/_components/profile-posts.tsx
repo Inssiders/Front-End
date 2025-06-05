@@ -1,14 +1,14 @@
 "use client";
 
+import PostsGrid from "@/components/posts/post-grid";
 import {
   fetchProfilePosts,
   transformMemeToPost,
   triggerRevalidation,
-} from "@/utils/fetch";
+} from "@/utils/fetch/profile";
 import { ProfilePostsResponse } from "@/utils/types/profile";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import PostsGrid from "./post-grid";
 
 interface ProfilePostsProps {
   id: string;
@@ -39,13 +39,8 @@ export default function ProfilePosts({
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       // 첫 번째 페이지이고 초기 데이터가 있으면 사용
       if (!pageParam && initialData) {
-        console.log("[ProfilePosts] Using initial server data");
         return initialData;
       }
-
-      console.log(
-        `[ProfilePosts] Fetching posts for user ${id}, cursor: ${pageParam}...`
-      );
 
       const result = await fetchProfilePosts(id, {
         profileFilter: "posts",
@@ -53,7 +48,6 @@ export default function ProfilePosts({
         cursor: pageParam,
       });
 
-      console.log("[ProfilePosts] API Response:", result);
       return result;
     },
     initialPageParam: initialData
@@ -78,7 +72,6 @@ export default function ProfilePosts({
       (entries) => {
         const [target] = entries;
         if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          console.log("[ProfilePosts] Loading more posts...");
           fetchNextPage();
         }
       },
@@ -99,16 +92,14 @@ export default function ProfilePosts({
   const posts = useMemo(() => {
     // 초기 데이터가 있고 React Query 데이터가 없으면 초기 데이터 사용
     if (initialData && !data?.pages?.length) {
-      return initialData.data.memes.map((meme) =>
-        transformMemeToPost(meme, "posts-")
-      );
+      return initialData.data.memes.map((meme) => transformMemeToPost(meme));
     }
 
     // React Query 데이터 사용
     if (!data?.pages) return [];
 
     const allMemes = data.pages.flatMap((page) => page.data.memes);
-    return allMemes.map((meme) => transformMemeToPost(meme, "posts-"));
+    return allMemes.map((meme) => transformMemeToPost(meme));
   }, [data, initialData, id]);
 
   // ISR 캐시 무효화 및 React Query 캐시 재검증
@@ -121,8 +112,6 @@ export default function ProfilePosts({
       await queryClient.invalidateQueries({
         queryKey: ["profilePosts", id],
       });
-
-      console.log(`[ProfilePosts] Cache invalidated for user ${id}`);
     } catch (error) {
       console.error("[ProfilePosts] Failed to refresh cache:", error);
     }
@@ -200,16 +189,16 @@ export default function ProfilePosts({
 
   return (
     <div className="space-y-6">
-      {/* 피드 스타일 게시물 그리드 */}
+      {/* 프로필 게시물 그리드 */}
       <PostsGrid
         posts={posts}
         loading={isActuallyLoading}
-        layout={feedMode ? "feed" : "grid"}
+        layout="grid"
         columns={4}
         showAuthor={true}
         showActions={true}
         enableHoverPlay={enableHoverPlay}
-        feedMode={feedMode}
+        feedMode={false}
         className="profile-posts-grid"
       />
 

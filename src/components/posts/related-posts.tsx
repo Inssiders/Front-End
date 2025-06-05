@@ -5,7 +5,6 @@ interface RelatedPostsProps {
 }
 
 export function RelatedPosts({ post }: RelatedPostsProps) {
-  console.log(post);
   return (
     <div className="mt-12">
       <h2 className="text-2xl font-bold mb-6">관련 밈</h2>
