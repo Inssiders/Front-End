@@ -116,6 +116,46 @@ body {
     animation: gradient-xy 3s ease infinite;
     background-size: 400% 400%;
   }
+
+  /* 애니메이션 지연 클래스 */
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  /* 네온 글로우 효과 유틸리티 */
+  .neon-glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  }
+
+  .neon-glow-purple {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  }
+
+  .neon-glow-pink {
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+  }
+
+  /* 글래스모피즘 유틸리티 */
+  .glass-effect {
+    backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  /* 텍스트 네온 효과 */
+  .text-neon-cyan {
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  }
+
+  .text-neon-pink {
+    color: #ff00ff;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+  }
 }
 
 @keyframes gradient-xy {
