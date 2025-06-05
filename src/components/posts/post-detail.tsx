@@ -43,28 +43,89 @@ export function PostDetail({ post }: PostDetailProps) {
       return acc + 1 + replyCount;
     }, 0);
   }
+  
   // 댓글+대댓글 합산
   const totalComments = getTotalCommentCount(comments);
 
   // 댓글 삭제 함수
   const handleDeleteComment = async (commentId: string) => {
     if (window.confirm("댓글을 삭제하시겠습니까?")) {
-      await fetch(`/api/posts/${post.post_id}/comments/${commentId}`, {
-        method: "DELETE",
-      });
-      fetchComments();
-      toast.success("댓글이 삭제되었습니다.");
+      try {
+        const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          fetchComments();
+          toast.success("댓글이 삭제되었습니다.");
+        } else {
+          toast.error("댓글 삭제에 실패했습니다.");
+        }
+      } catch (error) {
+        toast.error("댓글 삭제 중 오류가 발생했습니다.");
+      }
     }
   };
 
   // 대댓글 삭제 함수
   const handleDeleteReply = async (commentId: string, replyId: string) => {
     if (window.confirm("대댓글을 삭제하시겠습니까?")) {
-      await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
-        method: "DELETE",
+      try {
+        const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          fetchComments();
+          toast.success("대댓글이 삭제되었습니다.");
+        } else {
+          toast.error("대댓글 삭제에 실패했습니다.");
+        }
+      } catch (error) {
+        toast.error("대댓글 삭제 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
+  // 댓글 수정 함수
+  const handleEditComment = async (commentId: string, newContent: string) => {
+    try {
+      const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ comment_content: newContent }),
       });
-      fetchComments();
-      toast.success("대댓글이 삭제되었습니다.");
+      
+      if (response.ok) {
+        fetchComments();
+        toast.success("댓글이 수정되었습니다.");
+      } else {
+        toast.error("댓글 수정에 실패했습니다.");
+      }
+    } catch (error) {
+      toast.error("댓글 수정 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 대댓글 수정 함수
+  const handleEditReply = async (commentId: string, replyId: string, newContent: string) => {
+    try {
+      const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reply_content: newContent }),
+      });
+      
+      if (response.ok) {
+        fetchComments();
+        toast.success("대댓글이 수정되었습니다.");
+      } else {
+        toast.error("대댓글 수정에 실패했습니다.");
+      }
+    } catch (error) {
+      toast.error("대댓글 수정 중 오류가 발생했습니다.");
     }
   };
 
@@ -103,6 +164,8 @@ export function PostDetail({ post }: PostDetailProps) {
                 onReply={(commentId, username) => setReplyTo({ commentId, username })}
                 onDeleteComment={handleDeleteComment}
                 onDeleteReply={handleDeleteReply}
+                onEditComment={handleEditComment}
+                onEditReply={handleEditReply}
               />
               <CommentForm
                 postId={post.post_id}
