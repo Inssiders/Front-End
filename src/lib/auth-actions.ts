@@ -25,9 +25,7 @@ export async function createAccount(data: {
 
     // 서버 API 호출
     const response = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-      }/server/accounts`,
+      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/server/accounts`,
       {
         method: "POST",
         headers: {

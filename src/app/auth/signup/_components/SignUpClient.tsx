@@ -37,9 +37,7 @@ const steps = [
 export default function SignUpClient() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [verificationStep, setVerificationStep] = useState<
-    "email" | "code" | "signup"
-  >("email");
+  const [verificationStep, setVerificationStep] = useState<"email" | "code" | "signup">("email");
   const [verificationCode, setVerificationCode] = useState("");
   const [authorizationCode, setAuthorizationCode] = useState("");
   const [error, setError] = useState("");
@@ -55,9 +53,7 @@ export default function SignUpClient() {
   });
 
   // 현재 스텝의 인덱스
-  const currentStepIndex = steps.findIndex(
-    (step) => step.id === verificationStep
-  );
+  const currentStepIndex = steps.findIndex((step) => step.id === verificationStep);
   const progressPercentage = ((currentStepIndex + 1) / steps.length) * 100;
 
   // 이메일 인증 코드 요청
@@ -80,17 +76,13 @@ export default function SignUpClient() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(
-          error.detail || "이메일 인증 코드 발송에 실패했습니다."
-        );
+        throw new Error(error.detail || "이메일 인증 코드 발송에 실패했습니다.");
       }
 
       setVerificationStep("code");
       setError("");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
+      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -126,9 +118,7 @@ export default function SignUpClient() {
       setVerificationStep("signup");
       setError("");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
+      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -147,9 +137,7 @@ export default function SignUpClient() {
 
       router.push("/auth/signin");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
+      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -168,10 +156,7 @@ export default function SignUpClient() {
       <div className={styles.progressSection}>
         {/* 진행 바 */}
         <div className={styles.progressBarContainer}>
-          <div
-            className={styles.progressBar}
-            style={{ width: `${progressPercentage}%` }}
-          ></div>
+          <div className={styles.progressBar} style={{ width: `${progressPercentage}%` }}></div>
         </div>
 
         {/* 스텝 인디케이터 */}
@@ -220,12 +205,9 @@ export default function SignUpClient() {
           {verificationStep === "signup" && "⚡ 계정 생성"}
         </h2>
         <p className={styles.headerDescription}>
-          {verificationStep === "email" &&
-            "✨ 마법같은 여정의 시작을 위해 이메일을 입력하세요"}
-          {verificationStep === "code" &&
-            "🎯 받으신 6자리 코드로 신원을 확인해주세요"}
-          {verificationStep === "signup" &&
-            "🔑 안전한 비밀번호로 당신의 공간을 보호하세요"}
+          {verificationStep === "email" && "✨ 마법같은 여정의 시작을 위해 이메일을 입력하세요"}
+          {verificationStep === "code" && "🎯 받으신 6자리 코드로 신원을 확인해주세요"}
+          {verificationStep === "signup" && "🔑 안전한 비밀번호로 당신의 공간을 보호하세요"}
         </p>
       </div>
 
@@ -245,9 +227,7 @@ export default function SignUpClient() {
                 className={styles.emailInput}
                 {...register("email")}
               />
-              {errors.email && (
-                <p className={styles.errorMessage}>⚠️ {errors.email.message}</p>
-              )}
+              {errors.email && <p className={styles.errorMessage}>⚠️ {errors.email.message}</p>}
             </div>
             {verificationStep === "email" && (
               <button
@@ -256,11 +236,7 @@ export default function SignUpClient() {
                 disabled={isLoading}
                 className={styles.actionButton}
               >
-                {isLoading ? (
-                  <div className={styles.spinnerSmall}></div>
-                ) : (
-                  "🚀 발송"
-                )}
+                {isLoading ? <div className={styles.spinnerSmall}></div> : "🚀 발송"}
               </button>
             )}
           </div>
@@ -290,11 +266,7 @@ export default function SignUpClient() {
                 disabled={isLoading}
                 className={styles.actionButton}
               >
-                {isLoading ? (
-                  <div className={styles.spinnerSmall}></div>
-                ) : (
-                  "🔍 확인"
-                )}
+                {isLoading ? <div className={styles.spinnerSmall}></div> : "🔍 확인"}
               </button>
             </div>
           </div>
@@ -315,9 +287,7 @@ export default function SignUpClient() {
                 {...register("password")}
               />
               {errors.password && (
-                <p className={styles.errorMessage}>
-                  ⚠️ {errors.password.message}
-                </p>
+                <p className={styles.errorMessage}>⚠️ {errors.password.message}</p>
               )}
             </div>
 
@@ -333,17 +303,11 @@ export default function SignUpClient() {
                 {...register("passwordConfirm")}
               />
               {errors.passwordConfirm && (
-                <p className={styles.errorMessage}>
-                  ⚠️ {errors.passwordConfirm.message}
-                </p>
+                <p className={styles.errorMessage}>⚠️ {errors.passwordConfirm.message}</p>
               )}
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={styles.submitButton}
-            >
+            <button type="submit" disabled={isLoading} className={styles.submitButton}>
               {isLoading ? (
                 <>
                   <div className={styles.spinnerLarge}></div>

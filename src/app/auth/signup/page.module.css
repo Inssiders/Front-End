@@ -150,7 +150,8 @@
   margin-bottom: 1.5rem;
   background: linear-gradient(135deg, #667eea, #764ba2);
   border-radius: 1.25rem;
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3),
+  box-shadow:
+    0 10px 25px rgba(102, 126, 234, 0.3),
     0 0 40px rgba(102, 126, 234, 0.2);
   transition: all 0.3s ease;
   animation: iconPulse 3s ease-in-out infinite;
@@ -158,18 +159,21 @@
 
 .brandIcon:hover {
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4),
+  box-shadow:
+    0 15px 35px rgba(102, 126, 234, 0.4),
     0 0 60px rgba(102, 126, 234, 0.3);
 }
 
 @keyframes iconPulse {
   0%,
   100% {
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3),
+    box-shadow:
+      0 10px 25px rgba(102, 126, 234, 0.3),
       0 0 40px rgba(102, 126, 234, 0.2);
   }
   50% {
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4),
+    box-shadow:
+      0 15px 35px rgba(102, 126, 234, 0.4),
       0 0 60px rgba(102, 126, 234, 0.3);
   }
 }

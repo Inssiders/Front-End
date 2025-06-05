@@ -79,9 +79,7 @@ export async function refreshAccessToken(): Promise<boolean> {
 
   try {
     const response = await fetch(
-      `${
-        process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL
-      }/api/auth/token`,
+      `${process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/token`,
       {
         method: "POST",
         headers: {
