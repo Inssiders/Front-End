@@ -128,6 +128,30 @@ export async function apiPut<T = any>(
 }
 
 /**
+ * PATCH 요청
+ */
+export async function apiPatch<T = any>(
+  endpoint: string,
+  data?: any,
+  options: ApiFetchOptions = {}
+): Promise<T> {
+  const response = await apiFetch(endpoint, {
+    ...options,
+    method: "PATCH",
+    body: data ? JSON.stringify(data) : undefined,
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Request failed" }));
+    throw new Error(error.message || error.detail || "Request failed");
+  }
+
+  return response.json();
+}
+
+/**
  * DELETE 요청
  */
 export async function apiDelete<T = any>(
@@ -305,6 +329,21 @@ export const authApi = {
   // 프로필 조회
   async getProfile(id: string) {
     return apiGet(`profiles/${id}`);
+  },
+
+  // 프로필 업데이트
+  async updateProfile(data: {
+    nickname: string;
+    introduction: string;
+    account_visibility: boolean;
+    follower_visibility: boolean;
+  }) {
+    return apiPatch("profiles/me", data);
+  },
+
+  // 비밀번호 변경
+  async changePassword(password: string) {
+    return apiPatch("accounts/me/password", { password });
   },
 
   // 회원탈퇴

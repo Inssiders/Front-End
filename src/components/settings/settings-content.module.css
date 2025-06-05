@@ -1,0 +1,17 @@
+/* 컨텐츠 컨테이너 */
+.contentContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 0.5rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .contentContainer {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* 모션 래퍼 */
+.motionWrapper {
+  @apply w-full;
+}

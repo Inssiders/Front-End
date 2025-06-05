@@ -1,0 +1,74 @@
+/* 메인 헤더 컨테이너 */
+.headerContainer {
+  @apply relative bg-gradient-to-br from-purple-600 via-pink-600 to-indigo-700 text-white py-6 sm:py-8 overflow-hidden;
+}
+
+/* 배경 애니메이션 영역 */
+.backgroundWrapper {
+  @apply absolute inset-0;
+}
+
+/* 플로팅 파티클 */
+.floatingParticle {
+  @apply absolute w-1.5 h-1.5 bg-white/20 rounded-full;
+}
+
+/* 배경 그라데이션 오버레이 */
+.gradientOverlay {
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent;
+}
+
+/* 컨테이너 래퍼 */
+.contentWrapper {
+  @apply container mx-auto px-2 sm:px-4 relative z-10;
+}
+
+/* 중앙 정렬 컨테이너 */
+.centerContainer {
+  @apply text-center;
+}
+
+/* 설정 아이콘 버튼 */
+.settingsButton {
+  @apply inline-flex items-center justify-center p-2 bg-white/20 backdrop-blur-sm rounded-full mb-3 cursor-pointer;
+}
+
+/* 설정 아이콘 크기 */
+.settingsIcon {
+  @apply h-4 w-4 mr-2;
+}
+
+/* 설정 라벨 텍스트 */
+.settingsLabel {
+  @apply text-xs sm:text-sm font-medium;
+}
+
+/* 스파클 아이콘 래퍼 */
+.sparkleWrapper {
+  @apply ml-2;
+}
+
+/* 스파클 아이콘 */
+.sparkleIcon {
+  @apply h-3 w-3;
+}
+
+/* 메인 제목 */
+.mainTitle {
+  @apply text-2xl sm:text-3xl md:text-4xl font-bold mb-3;
+}
+
+/* 제목 스팬 (일반) */
+.titleSpan {
+  @apply inline-block;
+}
+
+/* 제목 스팬 (그라데이션) */
+.titleSpanGradient {
+  @apply inline-block bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent;
+}
+
+/* 설명 텍스트 */
+.description {
+  @apply text-sm sm:text-base text-white/90 max-w-2xl mx-auto leading-relaxed mb-4;
+}
