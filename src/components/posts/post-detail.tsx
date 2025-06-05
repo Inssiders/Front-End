@@ -10,6 +10,7 @@ import { ActionButtons } from "./components/action-buttons";
 import { CommentSection } from "./components/comment-section";
 import { CommentForm } from "./components/comment-form";
 import { RelatedPosts } from "./related-posts";
+import toast from "react-hot-toast";
 
 interface PostDetailProps {
   post: any; // TODO: 타입 정의 필요
@@ -20,6 +21,8 @@ export function PostDetail({ post }: PostDetailProps) {
   const [comments, setComments] = useState(
     post.comments_list || post.comments || post.comment_list || []
   );
+  const [replyTo, setReplyTo] = useState<{ commentId: string; username: string } | null>(null);
+
   const fetchComments = async () => {
     const res = await fetch(`/api/posts/${post.post_id}/comments`);
     if (res.ok) {
@@ -27,8 +30,103 @@ export function PostDetail({ post }: PostDetailProps) {
       setComments(data.comments);
     }
   };
+
   const handleCommentSubmit = () => {
+    setReplyTo(null); // 답글 등록 후 replyTo 초기화
     fetchComments();
+  };
+
+  function getTotalCommentCount(comments: any[]) {
+    if (!Array.isArray(comments)) return 0;
+    return comments.reduce((acc, comment) => {
+      const replyCount = Array.isArray(comment.replies) ? comment.replies.length : 0;
+      return acc + 1 + replyCount;
+    }, 0);
+  }
+  
+  // 댓글+대댓글 합산
+  const totalComments = getTotalCommentCount(comments);
+
+  // 댓글 삭제 함수
+  const handleDeleteComment = async (commentId: string) => {
+    if (window.confirm("댓글을 삭제하시겠습니까?")) {
+      try {
+        const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          fetchComments();
+          toast.success("댓글이 삭제되었습니다.");
+        } else {
+          toast.error("댓글 삭제에 실패했습니다.");
+        }
+      } catch (error) {
+        toast.error("댓글 삭제 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
+  // 대댓글 삭제 함수
+  const handleDeleteReply = async (commentId: string, replyId: string) => {
+    if (window.confirm("대댓글을 삭제하시겠습니까?")) {
+      try {
+        const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          fetchComments();
+          toast.success("대댓글이 삭제되었습니다.");
+        } else {
+          toast.error("대댓글 삭제에 실패했습니다.");
+        }
+      } catch (error) {
+        toast.error("대댓글 삭제 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
+  // 댓글 수정 함수
+  const handleEditComment = async (commentId: string, newContent: string) => {
+    try {
+      const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ comment_content: newContent }),
+      });
+      
+      if (response.ok) {
+        fetchComments();
+        toast.success("댓글이 수정되었습니다.");
+      } else {
+        toast.error("댓글 수정에 실패했습니다.");
+      }
+    } catch (error) {
+      toast.error("댓글 수정 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 대댓글 수정 함수
+  const handleEditReply = async (commentId: string, replyId: string, newContent: string) => {
+    try {
+      const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reply_content: newContent }),
+      });
+      
+      if (response.ok) {
+        fetchComments();
+        toast.success("대댓글이 수정되었습니다.");
+      } else {
+        toast.error("대댓글 수정에 실패했습니다.");
+      }
+    } catch (error) {
+      toast.error("대댓글 수정 중 오류가 발생했습니다.");
+    }
   };
 
   if (!post) {
@@ -53,17 +151,28 @@ export function PostDetail({ post }: PostDetailProps) {
               categoryName={post.category_name}
               tagNames={post.tag_names}
               likes={post.post_likes}
-              comments={comments.length > 0 ? comments.length : post.post_comments}
+              comments={totalComments}
             />
             <ActionButtons
               onCommentClick={() => commentInputRef.current?.focus()}
             />
             <div className="flex-1 flex flex-col min-h-[200px]">
-              <CommentSection comments={comments} />
-              <CommentForm 
-                postId={post.post_id} 
+              <CommentSection
+                postId={post.post_id}
+                comments={comments}
+                onRefresh={handleCommentSubmit}
+                onReply={(commentId, username) => setReplyTo({ commentId, username })}
+                onDeleteComment={handleDeleteComment}
+                onDeleteReply={handleDeleteReply}
+                onEditComment={handleEditComment}
+                onEditReply={handleEditReply}
+              />
+              <CommentForm
+                postId={post.post_id}
                 commentInputRef={commentInputRef as React.RefObject<HTMLTextAreaElement>}
                 onCommentSubmit={handleCommentSubmit}
+                replyTo={replyTo}
+                onCancelReply={() => setReplyTo(null)}
               />
             </div>
           </CardContent>

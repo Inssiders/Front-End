@@ -4,234 +4,87 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Bookmark, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
+import { Eye, Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useInfiniteMemes } from "@/hooks/use-infinite-user-posts";
 import PostsLoading from "./post-loading";
-
-// 밈 데이터 (실제로는 API에서 가져올 것)
-export const postsData = [
-  {
-    id: 1,
-    title: "아무말 대잔치 밈 시리즈",
-    category: "유머",
-    image: "/placeholder.svg?height=400&width=400&text=아무말 대잔치",
-    author: {
-      name: "밈지니어스",
-      avatar: "/placeholder.svg?height=40&width=40&text=MG",
-    },
-    likes: 2453,
-    comments: 342,
-    shares: 128,
-    isLiked: false,
-    isBookmarked: false,
-  },
-  {
-    id: 2,
-    title: "BTS 정국 리액션 모음",
-    category: "K-POP",
-    image: "/placeholder.svg?height=400&width=400&text=정국 리액션",
-    author: {
-      name: "K-팝인사이더",
-      avatar: "/placeholder.svg?height=40&width=40&text=KP",
-    },
-    likes: 5621,
-    comments: 873,
-    shares: 1204,
-    isLiked: true,
-    isBookmarked: false,
-  },
-  {
-    id: 3,
-    title: "드라마 '더 글로리' 명장면 밈",
-    category: "드라마",
-    image: "/placeholder.svg?height=400&width=400&text=더 글로리 밈",
-    author: {
-      name: "드라마퀸",
-      avatar: "/placeholder.svg?height=40&width=40&text=DQ",
-    },
-    likes: 1832,
-    comments: 421,
-    shares: 367,
-    isLiked: false,
-    isBookmarked: true,
-  },
-  {
-    id: 4,
-    title: "귀여운 고양이 리액션 모음",
-    category: "동물",
-    image: "/placeholder.svg?height=400&width=400&text=고양이 리액션",
-    author: {
-      name: "애니멀러버",
-      avatar: "/placeholder.svg?height=40&width=40&text=AL",
-    },
-    likes: 3245,
-    comments: 231,
-    shares: 542,
-    isLiked: false,
-    isBookmarked: false,
-  },
-  {
-    id: 5,
-    title: "에스파 카리나 표정 모음",
-    category: "K-POP",
-    image: "/placeholder.svg?height=400&width=400&text=카리나 표정",
-    author: {
-      name: "뮤직러버",
-      avatar: "/placeholder.svg?height=40&width=40&text=ML",
-    },
-    likes: 4521,
-    comments: 562,
-    shares: 721,
-    isLiked: true,
-    isBookmarked: false,
-  },
-  {
-    id: 6,
-    title: "직장인 공감 밈 시리즈",
-    category: "텍스트",
-    image: "/placeholder.svg?height=400&width=400&text=직장인 밈",
-    author: {
-      name: "오피스워커",
-      avatar: "/placeholder.svg?height=40&width=40&text=OW",
-    },
-    likes: 2187,
-    comments: 318,
-    shares: 452,
-    isLiked: false,
-    isBookmarked: false,
-  },
-  {
-    id: 7,
-    title: "유재석 표정 모음집",
-    category: "연예인",
-    image: "/placeholder.svg?height=400&width=400&text=유재석 표정",
-    author: {
-      name: "예능매니아",
-      avatar: "/placeholder.svg?height=40&width=40&text=EM",
-    },
-    likes: 3876,
-    comments: 456,
-    shares: 678,
-    isLiked: false,
-    isBookmarked: false,
-  },
-  {
-    id: 8,
-    title: "영화 '범죄도시' 명대사 밈",
-    category: "유머",
-    image: "/placeholder.svg?height=400&width=400&text=범죄도시 밈",
-    author: {
-      name: "무비버프",
-      avatar: "/placeholder.svg?height=40&width=40&text=MB",
-    },
-    likes: 2654,
-    comments: 387,
-    shares: 521,
-    isLiked: false,
-    isBookmarked: true,
-  },
-];
 
 interface Post {
   id: number | string;
   title: string;
+  description?: string;
   category: string;
+  category_id: Number;
+  youtubeUrl?: string;
   image?: string;
-  post_media_url?: string;
-  type?: string;
   author: {
     name: string;
     avatar: string;
   };
   likes: number;
   comments: number;
-  shares: number;
+  shares?: number;
   views?: number;
   isLiked?: boolean;
   isBookmarked?: boolean;
   likedAt?: string;
 }
 
-interface PostsGridProps {
-  posts?: Post[];
-  loading?: boolean;
-  layout?: "grid" | "list" | "masonry";
-  columns?: number;
-  showAuthor?: boolean;
-  showActions?: boolean;
-  onPostClick?: (post: Post) => void;
-  className?: string;
-  ref?: React.RefObject<HTMLDivElement>;
+function HoverVideo({ youtubeUrl }: { youtubeUrl: string }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const videoId = youtubeUrl.split("v=")[1];
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1`;
+
+  return (
+    <div
+      className="w-full aspect-square relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {isHovered ? (
+        <iframe
+          src={embedUrl}
+          title="YouTube video"
+          allow="autoplay; encrypted-media"
+          allowFullScreen
+          className="w-full h-full"
+        />
+      ) : (
+        <img
+          src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+          alt="Video thumbnail"
+          className="w-full h-full object-cover"
+        />
+      )}
+    </div>
+  );
 }
 
-export default function PostsGrid({
-  posts,
-  loading,
-  layout = "grid",
-  columns = 4,
-  showAuthor = true,
-  showActions = true,
-  onPostClick,
-  className = "",
-  ref,
-}: PostsGridProps) {
-  const [internalPosts, setInternalPosts] = useState(posts ?? postsData);
-  const [internalLoading, setInternalLoading] = useState(loading ?? true);
+export default function PostsGrid() {
+  const searchParams = useSearchParams();
+  const selectedCategory = searchParams.get("category");
 
-  useEffect(() => {
-    if (typeof loading === "boolean") {
-      setInternalLoading(loading);
-    } else {
-      // 데이터 로딩 시뮬레이션
-      setInternalLoading(true);
-      const timer = setTimeout(() => {
-        setInternalLoading(false);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [loading]);
+  const { data, isLoading, isFetchingNextPage, hasNextPage, target } =
+    useInfiniteMemes({
+      category: selectedCategory || undefined,
+      size: 8,
+    });
 
-  useEffect(() => {
-    if (posts) setInternalPosts(posts);
-  }, [posts]);
+  const allPosts = useMemo(() => {
+    return data?.pages.flatMap((page) => page.items) ?? [];
+  }, [data]);
 
-  const toggleLike = (id: number) => {
-    setInternalPosts((prevPosts: Post[]) =>
-      prevPosts.map((post: Post) => {
-        if (post.id === id) {
-          return {
-            ...post,
-            isLiked: !post.isLiked,
-            likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-          };
-        }
-        return post;
-      })
-    );
-  };
-
-  const toggleBookmark = (id: number) => {
-    setInternalPosts((prevPosts: Post[]) =>
-      prevPosts.map((post: Post) => {
-        if (post.id === id) {
-          return {
-            ...post,
-            isBookmarked: !post.isBookmarked,
-          };
-        }
-        return post;
-      })
-    );
+  const toggleLike = (id: number | string) => {
+    console.log("좋아요 클릭:", id);
   };
 
   const container = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
+      transition: { staggerChildren: 0.1 },
     },
   };
 
@@ -240,82 +93,48 @@ export default function PostsGrid({
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
-  if (internalLoading) {
-    return <PostsLoading />;
-  }
+  if (isLoading && !data) return <PostsLoading />;
 
   return (
-    <div className={`container mx-auto px-4 py-8 ${className}`} ref={ref}>
+    <div className="container mx-auto px-4 py-8">
       <motion.div
         variants={container}
         initial="hidden"
         animate="show"
-        className={`grid grid-cols-1 ${
-          layout === "grid"
-            ? `sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-${columns}`
-            : layout === "list"
-            ? "grid-cols-1"
-            : "sm:grid-cols-2 md:grid-cols-3"
-        } gap-6`}
+        className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6`}
       >
-        {internalPosts.map((post: Post) => (
-          <motion.div
-            key={post.id}
-            variants={item}
-            onClick={() => onPostClick?.(post)}
-          >
-            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900 h-full">
-              <div className="relative">
-                {post.post_media_url ? (
-                  <iframe
-                    src={post.post_media_url}
-                    title={post.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full aspect-square object-cover"
-                  />
-                ) : (
-                  <img
-                    src={post.image || "/placeholder.svg"}
-                    alt={post.title}
-                    className="w-full aspect-square object-cover"
-                  />
-                )}
-                <div className="absolute top-3 left-3">
-                  <Badge className="bg-purple-600 hover:bg-purple-700">
-                    {post.category}
-                  </Badge>
-                </div>
-                {showActions && (
-                  <button
-                    className="absolute top-3 right-3 bg-black/30 hover:bg-black/50 text-white p-1.5 rounded-full transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleBookmark(
-                        typeof post.id === "string"
-                          ? parseInt(post.id)
-                          : post.id
-                      );
-                    }}
-                    aria-label="북마크"
-                  >
-                    <Bookmark
-                      className={`h-4 w-4 ${
-                        post.isBookmarked ? "fill-current text-yellow-400" : ""
-                      }`}
+        {allPosts.length === 0 ? (
+          <p className="col-span-full text-center text-gray-500 dark:text-gray-400">
+            결과가 없습니다
+          </p>
+        ) : (
+          allPosts.map((post: Post) => (
+            <motion.div key={post.id} variants={item}>
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900 h-full">
+                <div className="relative">
+                  {post.youtubeUrl ? (
+                    <HoverVideo youtubeUrl={post.youtubeUrl} />
+                  ) : (
+                    <img
+                      src={post.image || "/placeholder.svg"}
+                      alt={post.title}
+                      className="w-full aspect-square object-cover"
                     />
-                  </button>
-                )}
-              </div>
+                  )}
+                  <div className="absolute top-3 left-3">
+                    <Badge className="bg-main-700 hover:bg-main-800 text-white font-normal">
+                      {post.category}
+                    </Badge>
+                  </div>
+                </div>
 
-              <CardContent className="p-4">
-                <Link href={`/posts/${post.id}`}>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                    {post.title}
-                  </h3>
-                </Link>
+                <CardContent className="p-4">
+                  <Link href={`/posts/${post.id}`}>
+                    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white hover:text-main-600 dark:hover:text-purple-400 transition-colors">
+                      {post.title}
+                    </h3>
+                  </Link>
 
-                {showAuthor && (
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center">
                       <Avatar className="h-6 w-6 mr-2">
@@ -330,31 +149,15 @@ export default function PostsGrid({
                       <span className="text-xs text-gray-700 dark:text-gray-300">
                         {post.author.name}
                       </span>
-                      {post.likedAt && (
-                        <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">
-                          {post.likedAt}
-                        </span>
-                      )}
                     </div>
                   </div>
-                )}
 
-                {showActions && (
                   <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs">
                     <button
-                      className={`flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors ${
-                        post.isLiked
-                          ? "text-purple-600 dark:text-purple-400"
-                          : ""
+                      className={`flex items-center hover:text-red-600 dark:hover:text-red-400 transition-colors ${
+                        post.isLiked ? "text-red-600 dark:text-red-400" : ""
                       }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleLike(
-                          typeof post.id === "string"
-                            ? parseInt(post.id)
-                            : post.id
-                        );
-                      }}
+                      onClick={() => toggleLike(post.id)}
                     >
                       <Heart
                         className={`h-3 w-3 mr-1 ${
@@ -363,27 +166,32 @@ export default function PostsGrid({
                       />
                       {post.likes.toLocaleString()}
                     </button>
-                    <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                    <div className="flex items-center hover:text-main-600 dark:hover:text-main-400 transition-colors">
                       <MessageCircle className="h-3 w-3 mr-1" />
                       {post.comments.toLocaleString()}
-                    </button>
-                    <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                      <Share2 className="h-3 w-3 mr-1" />
-                      {post.shares.toLocaleString()}
-                    </button>
+                    </div>
                     {post.views !== undefined && (
-                      <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                      <div className="flex items-center hover:text-main-600 dark:hover:text-main-400 transition-colors">
                         <Eye className="h-3 w-3 mr-1" />
                         {post.views.toLocaleString()}
-                      </button>
+                      </div>
                     )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))
+        )}
       </motion.div>
+
+      {hasNextPage && (
+        <div
+          ref={target}
+          className="h-16 flex justify-center items-center text-sm text-gray-500 dark:text-gray-400"
+        >
+          {isFetchingNextPage ? "로딩 중..." : "스크롤하여 더 보기"}
+        </div>
+      )}
     </div>
   );
 }

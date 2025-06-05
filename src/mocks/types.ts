@@ -41,6 +41,7 @@ export interface Post {
   media_upload_time: string;
   account_id: number;
   category_id: number;
+  category: string;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -161,6 +162,7 @@ export interface DetailComment {
   comment_user_id: string;
   user_username: string;
   user_profile_url: string;
+  replies: DetailComment[];
 }
 
 // 게시물 타입
@@ -186,6 +188,7 @@ export interface DetailPost {
 
   // 댓글 목록
   comments_list: DetailComment[];
+  
 }
 export interface DetailResponse {
   message: string;

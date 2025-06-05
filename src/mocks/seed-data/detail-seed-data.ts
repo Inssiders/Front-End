@@ -28,7 +28,17 @@ export const mockPosts = [
         comment_created_at: "2024-01-15T11:00:00Z",
         comment_user_id: "user456",
         user_username: "밈덕후",
-        user_profile_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+        user_profile_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        replies: [
+          {
+            reply_id: "r1",
+            reply_content: "저도 고양이 키우는데 정말 공감되는 내용이에요!\n우리 냥이도 이런 표정 자주 지어요 😂",
+            reply_created_at: "2024-01-15T12:30:00Z",
+            reply_user_id: "user789",
+            user_username: "냥집사",
+            user_profile_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+          }
+        ]
       },
       {
         comment_id: "c2", 
@@ -36,7 +46,17 @@ export const mockPosts = [
         comment_created_at: "2024-01-15T12:30:00Z",
         comment_user_id: "user789",
         user_username: "냥집사",
-        user_profile_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+        user_profile_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+        replies: [
+          {
+            reply_id: "r2",
+            reply_content: "저도 고양이 키우는데 정말 공감되는 내용이에요!\n우리 냥이도 이런 표정 자주 지어요 😂",
+            reply_created_at: "2024-01-15T12:30:00Z",
+            reply_user_id: "user789",
+            user_username: "냥집사",
+            user_profile_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+          }
+        ]
       },
       {
         comment_id: "c3",
@@ -45,6 +65,7 @@ export const mockPosts = [
         comment_user_id: "user101",
         user_username: "구독자1",
         user_profile_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+       
       }
     ]
   },
