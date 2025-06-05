@@ -1,12 +1,8 @@
 "use client";
 
 import PostsGrid from "@/components/posts/post-grid";
-import {
-  fetchProfilePosts,
-  transformMemeToPost,
-  triggerRevalidation,
-} from "@/utils/fetch/profile";
-import { ProfilePostsResponse } from "@/utils/types/profile";
+import { fetchProfilePosts, transformMemeToPost, triggerRevalidation } from "@/utils/fetch/profile";
+import { ProfilePostsResponse } from "@/utils/types/posts";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
@@ -26,42 +22,31 @@ export default function ProfileLikes({
   const queryClient = useQueryClient();
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-    error,
-  } = useInfiniteQuery({
-    queryKey: ["profileLikes", id],
-    queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
-      // 첫 번째 페이지이고 초기 데이터가 있으면 사용
-      if (!pageParam && initialData) {
-        return initialData;
-      }
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
+    useInfiniteQuery({
+      queryKey: ["profileLikes", id],
+      queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
+        // 첫 번째 페이지이고 초기 데이터가 있으면 사용
+        if (!pageParam && initialData) {
+          return initialData;
+        }
 
-      const result = await fetchProfilePosts(id, {
-        profileFilter: "likes", // 좋아요한 게시물 조회
-        size: 20,
-        cursor: pageParam,
-      });
+        const result = await fetchProfilePosts(id, {
+          profileFilter: "likes", // 좋아요한 게시물 조회
+          size: 20,
+          cursor: pageParam,
+        });
 
-      return result;
-    },
-    initialPageParam: initialData
-      ? initialData.data.pageInfo.nextCursor
-      : undefined,
-    getNextPageParam: (lastPage) => {
-      return lastPage.data.pageInfo.next
-        ? lastPage.data.pageInfo.nextCursor
-        : undefined;
-    },
-    enabled: !!id,
-    staleTime: 1000 * 60 * 5, // 5분
-    gcTime: 1000 * 60 * 30, // 30분
-  });
+        return result;
+      },
+      initialPageParam: initialData ? initialData.data.pageInfo.nextCursor : undefined,
+      getNextPageParam: (lastPage) => {
+        return lastPage.data.pageInfo.next ? lastPage.data.pageInfo.nextCursor : undefined;
+      },
+      enabled: !!id,
+      staleTime: 1000 * 60 * 5, // 5분
+      gcTime: 1000 * 60 * 30, // 30분
+    });
 
   // 무한스크롤 Intersection Observer 설정
   useEffect(() => {
@@ -117,8 +102,8 @@ export default function ProfileLikes({
 
   if (isActuallyLoading) {
     return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+      <div className="py-8 text-center">
+        <div className="mx-auto size-8 animate-spin rounded-full border-b-2 border-purple-600"></div>
         <p className="mt-2 text-gray-600 dark:text-gray-400">로딩 중...</p>
       </div>
     );
@@ -126,20 +111,20 @@ export default function ProfileLikes({
 
   if (isError) {
     return (
-      <div className="text-center py-8">
-        <p className="text-red-500 mb-4">
+      <div className="py-8 text-center">
+        <p className="mb-4 text-red-500">
           좋아요한 게시물을 불러오는데 실패했습니다. {(error as Error)?.message}
         </p>
-        <div className="flex gap-2 justify-center">
+        <div className="flex justify-center gap-2">
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700"
           >
             다시 시도
           </button>
           <button
             onClick={handleRefresh}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            className="rounded-lg bg-gray-600 px-4 py-2 text-white transition-colors hover:bg-gray-700"
           >
             캐시 새로고침
           </button>
@@ -150,14 +135,9 @@ export default function ProfileLikes({
 
   if (!likedPosts || likedPosts.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="text-gray-400 mb-4">
-          <svg
-            className="mx-auto h-12 w-12"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+      <div className="py-12 text-center">
+        <div className="mb-4 text-gray-400">
+          <svg className="mx-auto size-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -166,7 +146,7 @@ export default function ProfileLikes({
             />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+        <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
           아직 좋아요한 게시물이 없습니다
         </h3>
         <p className="text-gray-500 dark:text-gray-400">
@@ -174,7 +154,7 @@ export default function ProfileLikes({
         </p>
         <button
           onClick={handleRefresh}
-          className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          className="mt-4 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700"
         >
           새로고침
         </button>
@@ -202,7 +182,7 @@ export default function ProfileLikes({
         <div ref={loadMoreRef} className="py-8 text-center">
           {isFetchingNextPage ? (
             <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+              <div className="size-6 animate-spin rounded-full border-b-2 border-purple-600"></div>
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                 더 많은 게시물을 불러오는 중...
               </p>
@@ -210,7 +190,7 @@ export default function ProfileLikes({
           ) : (
             <button
               onClick={() => fetchNextPage()}
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="rounded-lg bg-purple-600 px-6 py-2 text-white transition-colors hover:bg-purple-700"
             >
               더 보기
             </button>
@@ -220,10 +200,8 @@ export default function ProfileLikes({
 
       {/* 모든 게시물을 로드했을 때 */}
       {!hasNextPage && likedPosts.length > 0 && (
-        <div className="text-center py-8">
-          <p className="text-gray-500 dark:text-gray-400">
-            모든 좋아요 게시물을 확인했습니다 💖
-          </p>
+        <div className="py-8 text-center">
+          <p className="text-gray-500 dark:text-gray-400">모든 좋아요 게시물을 확인했습니다 💖</p>
         </div>
       )}
     </div>
