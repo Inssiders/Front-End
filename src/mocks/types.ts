@@ -41,6 +41,7 @@ export interface Post {
   media_upload_time: string;
   account_id: number;
   category_id: number;
+  category: string;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
