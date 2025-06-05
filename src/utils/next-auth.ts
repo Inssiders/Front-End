@@ -3,12 +3,12 @@ import { NextAuthOptions, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {
-  fetchProfile,
   loginWithPassword,
   refreshAccessToken,
   register,
   requestEmailVerification,
-} from "./fetch";
+} from "./fetch/auth";
+import { fetchProfile } from "./fetch/profile";
 
 // 타입 확장
 
@@ -196,8 +196,6 @@ export const authOptions: NextAuthOptions = {
         const refreshExpired = token.refreshTokenExp < currentTime;
 
         if (refreshExpired) {
-          console.log("Refresh token has expired, forcing re-authentication");
-
           try {
             await removeAuthTokens();
           } catch (error) {
@@ -208,10 +206,6 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (refreshExpiresSoon) {
-          console.log(
-            "Refresh token expiring soon, attempting proactive refresh"
-          );
-
           // 리프레시 토큰이 만료되기 전에 미리 갱신 시도
           try {
             const response = await refreshAccessToken(token.refreshToken);
@@ -244,8 +238,6 @@ export const authOptions: NextAuthOptions = {
 
       // 토큰이 이미 완전히 만료된 경우 (버퍼 시간 없이)
       if (token.exp && token.exp < currentTime) {
-        console.log("Token has expired, attempting refresh...");
-
         // 리프레시 토큰으로 갱신 시도
         if (token.refreshToken) {
           try {
@@ -305,10 +297,6 @@ export const authOptions: NextAuthOptions = {
               error instanceof Error &&
               error.message.includes("refresh_token")
             ) {
-              console.log(
-                "Refresh token may be expired, attempting final refresh..."
-              );
-
               // 마지막으로 한 번 더 시도 (리프레시 토큰 갱신)
               try {
                 const finalResponse = await refreshAccessToken(
@@ -337,10 +325,6 @@ export const authOptions: NextAuthOptions = {
                 console.error("최종 토큰 갱신도 실패했습니다:", finalError);
               }
             }
-
-            // 리프레시 토큰도 만료되었거나 최종 갱신도 실패한 경우 강제 로그아웃
-            console.log("Forcing logout due to token refresh failure");
-
             // 쿠키 삭제
             try {
               await removeAuthTokens();
@@ -352,9 +336,6 @@ export const authOptions: NextAuthOptions = {
             return { ...token, error: "RefreshAccessTokenError" };
           }
         } else {
-          // 리프레시 토큰이 없는 경우 강제 로그아웃
-          console.log("No refresh token available, forcing logout");
-
           try {
             await removeAuthTokens();
           } catch (error) {
@@ -367,8 +348,6 @@ export const authOptions: NextAuthOptions = {
 
       // 토큰 만료 5분 전에 갱신
       if (token.exp && token.exp < currentTime + 300) {
-        console.log("Token expiring soon, refreshing...");
-
         try {
           const response = await refreshAccessToken(token.refreshToken);
           const accountId = token.sub;

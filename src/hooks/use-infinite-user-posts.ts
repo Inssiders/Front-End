@@ -7,21 +7,37 @@ const PAGE_SIZE_DEFAULT = 12;
 
 export function useInfiniteMemes({
   category,
+  userId,
+  profileFilter,
   size = PAGE_SIZE_DEFAULT,
+  enabled = true,
 }: {
   category?: string;
+  userId?: string;
+  profileFilter?: "posts" | "likes";
   size?: number;
+  enabled?: boolean;
 }) {
   const queryResult = useInfiniteQuery({
-    queryKey: ["memes", category],
+    queryKey: ["memes", category, userId, profileFilter],
+    enabled,
     queryFn: async ({ pageParam = 1 }) => {
-      const url = new URL("/api/posts", window.location.origin);
+      // 프로필 모드일 때는 다른 엔드포인트 사용
+      const isProfileMode = userId && profileFilter;
+      const url = new URL(
+        isProfileMode ? `/server/users/${userId}/posts` : "/server/posts",
+        window.location.origin
+      );
 
       url.searchParams.set("page", String(pageParam));
       url.searchParams.set("size", String(size));
 
       if (category) {
         url.searchParams.set("category", category);
+      }
+
+      if (isProfileMode) {
+        url.searchParams.set("filter", profileFilter);
       }
 
       const res = await fetch(url.toString());
@@ -63,7 +79,8 @@ export function useInfiniteMemes({
   const target = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!target.current) return;
+    if (!enabled || !target.current) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (
@@ -83,7 +100,7 @@ export function useInfiniteMemes({
       if (target.current) observer.unobserve(target.current);
       observer.disconnect();
     };
-  }, [queryResult.hasNextPage, queryResult.isFetchingNextPage]);
+  }, [enabled, queryResult.hasNextPage, queryResult.isFetchingNextPage]);
 
   return { ...queryResult, target };
 }

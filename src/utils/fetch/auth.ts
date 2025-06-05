@@ -33,7 +33,6 @@ export async function apiFetch(
         : "";
 
     url = `${baseUrl}/server/${endpoint}`;
-    console.log(url);
   }
 
   const defaultHeaders: Record<string, string> = {

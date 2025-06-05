@@ -34,7 +34,6 @@ export function MSWProvider({ children }: { children: React.ReactNode }) {
 
         const { startWorker } = await import("../mocks/browser");
 
-        console.log("[MSW Context] Starting worker...");
         const workerStarted = await startWorker();
 
         if (!workerStarted) {

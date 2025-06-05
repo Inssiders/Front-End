@@ -1,6 +1,6 @@
 import { ProfileDetail } from "@/app/profile/_components/profile-detail";
 import { ProfileDetailLoading } from "@/app/profile/_components/profile-detail-loading";
-import { fetchProfilePosts } from "@/utils/fetch";
+import { fetchProfilePosts } from "@/utils/fetch/profile";
 import { ProfileData } from "@/utils/types/profile";
 import { Suspense } from "react";
 
