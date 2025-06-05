@@ -1,5 +1,5 @@
+import { type ApiMeme, type Post } from "../types/posts";
 import {
-  type Post,
   type ProfileResponse as ProfileDataResponse,
   type ProfilePostsResponse as ProfilePostsDataResponse,
 } from "../types/profile";
@@ -16,39 +16,28 @@ function constructUrl(path: string): string {
 }
 
 // Utility function to transform meme data to post format
-export function transformMemeToPost(meme: any, prefix: string = ""): Post {
-  // 🚨 디버깅: 원본 데이터 확인
-
-  // media_url이 YouTube URL인지 확인
-  const isYouTubeUrl =
-    meme.media_url &&
-    (meme.media_url.includes("youtube.com") ||
-      meme.media_url.includes("youtu.be"));
-
+export function transformMemeToPost(meme: ApiMeme, id?: number | string): Post {
   return {
-    id: `${prefix}${meme.id}`,
+    id: id || Date.now().toString() + Math.random().toString(36).substr(2, 9),
     title: meme.title,
-    category: `카테고리 ${meme.category_id}`,
-    // YouTube URL이면 image는 undefined, 아니면 media_url 사용
-    image: !isYouTubeUrl ? meme.media_url : undefined,
-    // YouTube URL이면 youtubeUrl로 설정
-    youtubeUrl: isYouTubeUrl ? meme.media_url : undefined,
-    post_media_url: meme.media_url,
+    content: meme.content,
+    category_id: meme.category_id,
     media_url: meme.media_url,
-    type: "video",
+    media_upload_time: meme.media_upload_time,
+    account_id: meme.user_id,
+    created_at: meme.created_at,
+    updated_at: meme.updated_at,
+    is_deleted: false,
+
+    // UI를 위한 추가 정보 - 실제 API에서 제공되면 매핑, 아니면 기본값
     author: {
-      name: meme.user?.nickname || "익명",
-      avatar:
-        meme.user?.profileUrl ||
-        "/placeholder.svg?height=40&width=40&text=" +
-          (meme.user?.nickname?.[0] || "U"),
+      account_id: meme.user_id,
+      account_name: `User ${meme.user_id}`, // API에 실제 이름 필드가 있으면 해당 필드 사용
+      profile_image: "/placeholder.svg", // API에 실제 프로필 이미지 필드가 있으면 해당 필드 사용
     },
-    likes: meme.like_count || 0,
-    comments: meme.comment_count || 0,
-    shares: 0,
-    views: 0,
-    isLiked: meme.is_liked || false,
-    isBookmarked: false,
+    likes: 0, // API에서 제공되는 좋아요 수가 있으면 해당 필드 사용
+    comment_count: 0, // API에서 제공되는 댓글 수가 있으면 해당 필드 사용
+    is_liked: false, // API에서 제공되는 좋아요 상태가 있으면 해당 필드 사용
   };
 }
 
@@ -102,9 +91,7 @@ export async function fetchProfilePosts(
 }
 
 // 프로필 정보 조회 (오버로드)
-export async function fetchProfile(
-  accountId: string
-): Promise<ProfileDataResponse>;
+export async function fetchProfile(accountId: string): Promise<ProfileDataResponse>;
 export async function fetchProfile(
   accountId: string,
   accessToken: string

@@ -1,7 +1,7 @@
 "use client";
 
 import PostsGrid from "@/components/posts/post-grid";
-import { useInfiniteEmpathyMemes } from "@/hooks/use-infinite-user-posts";
+import { useInfiniteMemes } from "@/hooks/use-infinite-user-posts";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
@@ -19,11 +19,9 @@ interface EmpathyMemeContainerProps {
   initialPosts: any[];
 }
 
-export default function EmpathyMemeContainer({
-  initialPosts,
-}: EmpathyMemeContainerProps) {
-  const { data, isFetchingNextPage, target } = useInfiniteEmpathyMemes({
-    pageSize: 9,
+export default function EmpathyMemeContainer({ initialPosts }: EmpathyMemeContainerProps) {
+  const { data, isFetchingNextPage, target } = useInfiniteMemes({
+    size: 9,
   });
 
   const [circles, setCircles] = useState<FloatingCircle[]>([]);
@@ -68,7 +66,7 @@ export default function EmpathyMemeContainer({
   return (
     <div className="space-y-8">
       {/* Banner Section */}
-      <div className="relative h-[300px] rounded-xl overflow-hidden">
+      <div className="relative h-[300px] overflow-hidden rounded-xl">
         {/* Animated background gradients */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600"
@@ -117,20 +115,20 @@ export default function EmpathyMemeContainer({
         </motion.div>
         {/* Content overlay */}
         <motion.div
-          className="relative h-full flex flex-col items-center justify-center text-white p-6 text-center z-10"
+          className="relative z-10 flex h-full flex-col items-center justify-center p-6 text-center text-white"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <motion.h1
-            className="text-4xl font-bold mb-4"
+            className="mb-4 text-4xl font-bold"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
             공감밈
           </motion.h1>
           <motion.p
-            className="text-xl max-w-2xl"
+            className="max-w-2xl text-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.5 }}

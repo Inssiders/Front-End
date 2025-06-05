@@ -7,10 +7,9 @@ export const metadata: Metadata = {
 };
 
 async function getMockData() {
-  const res = await fetch(
-    `${process.env.SERVER_URL || ""}/mock-data/all-mock-data.json`,
-    { cache: "no-store" }
-  );
+  const res = await fetch(`${process.env.SERVER_URL || ""}/mock-data/all-mock-data.json`, {
+    cache: "no-store",
+  });
   const allData = await res.json();
 
   // Transform data to match PostsGrid shape

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useDataSource } from "@/contexts/data-source-context"
+import { useState, useEffect } from "react";
+import { useDataSource } from "@/contexts/data-source-context";
 
 type DataType =
   | "posts"
@@ -12,15 +12,15 @@ type DataType =
   | "live"
   | "profile"
   | "points"
-  | "creator-studio"
+  | "creator-studio";
 
 type FetchParams = {
-  id?: string
-  type?: string
-  filter?: string
-  page?: number
-  limit?: number
-}
+  id?: string;
+  type?: string;
+  filter?: string;
+  page?: number;
+  limit?: number;
+};
 
 /**
  * Custom hook to fetch data with fallback to local mock data
@@ -29,67 +29,67 @@ type FetchParams = {
  * @returns The fetched data, loading state, and error state
  */
 export function useData<T>(dataType: DataType, params: FetchParams = {}) {
-  const [data, setData] = useState<T | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-  const { dataSource } = useDataSource()
+  const [data, setData] = useState<T | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const { dataSource } = useDataSource();
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
       try {
         // If we're in loading state, wait
         if (dataSource === "loading") {
-          return
+          return;
         }
 
         // If we're using the API and we're online
         if (dataSource === "api") {
           try {
-            const apiUrl = buildApiUrl(dataType, params)
+            const apiUrl = buildApiUrl(dataType, params);
             const response = await fetch(apiUrl, {
               signal: AbortSignal.timeout(5000),
-            })
+            });
 
             if (!response.ok) {
-              throw new Error(`API responded with status: ${response.status}`)
+              throw new Error(`API responded with status: ${response.status}`);
             }
 
-            const apiData = await response.json()
-            setData(apiData)
-            setIsLoading(false)
-            return
+            const apiData = await response.json();
+            setData(apiData);
+            setIsLoading(false);
+            return;
           } catch (apiError) {
-            console.warn("API fetch failed, falling back to local data:", apiError)
+            console.warn("API fetch failed, falling back to local data:", apiError);
             // Continue to local data fallback
           }
         }
 
         // If API fetch failed or we're using local data
-        const mockDataUrl = `/mock-data/${dataType}.json`
-        const mockResponse = await fetch(mockDataUrl)
+        const mockDataUrl = `/mock-data/${dataType}.json`;
+        const mockResponse = await fetch(mockDataUrl);
 
         if (!mockResponse.ok) {
-          throw new Error(`Failed to load mock data: ${mockResponse.status}`)
+          throw new Error(`Failed to load mock data: ${mockResponse.status}`);
         }
 
-        const mockData = await mockResponse.json()
+        const mockData = await mockResponse.json();
 
         // Extract the relevant part of the mock data based on params
-        let result = mockData
+        let result = mockData;
 
         if (params.id) {
           // If we're looking for a specific item detail
-          const detailKey = getDetailKey(dataType)
+          const detailKey = getDetailKey(dataType);
           if (detailKey && mockData[detailKey]) {
-            result = mockData[detailKey]
+            result = mockData[detailKey];
           } else if (Array.isArray(mockData[dataType])) {
             // Try to find the item in the array
-            const item = mockData[dataType].find((item: any) => item.id === params.id)
+            const item = mockData[dataType].find((item: any) => item.id === params.id);
             if (item) {
-              result = item
+              result = item;
             }
           }
         } else if (params.type) {
@@ -100,25 +100,25 @@ export function useData<T>(dataType: DataType, params: FetchParams = {}) {
               [dataType]: mockData[dataType].filter(
                 (item: any) =>
                   item.category?.toLowerCase() === params.type?.toLowerCase() ||
-                  item.type?.toLowerCase() === params.type?.toLowerCase(),
+                  item.type?.toLowerCase() === params.type?.toLowerCase()
               ),
-            }
+            };
           }
         }
 
-        setData(result as T)
+        setData(result as T);
       } catch (error) {
-        console.error("Error fetching data:", error)
-        setError(error instanceof Error ? error : new Error(String(error)))
+        console.error("Error fetching data:", error);
+        setError(error instanceof Error ? error : new Error(String(error)));
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [dataType, JSON.stringify(params), dataSource])
+    fetchData();
+  }, [dataType, JSON.stringify(params), dataSource]);
 
-  return { data, isLoading, error }
+  return { data, isLoading, error };
 }
 
 /**
@@ -126,32 +126,32 @@ export function useData<T>(dataType: DataType, params: FetchParams = {}) {
  */
 function buildApiUrl(dataType: DataType, params: FetchParams): string {
   // This would be replaced with your actual API URL structure
-  let baseUrl = `/api/${dataType}`
+  let baseUrl = `/api/${dataType}`;
 
   if (params.id) {
-    baseUrl += `/${params.id}`
+    baseUrl += `/${params.id}`;
   }
 
-  const queryParams = new URLSearchParams()
+  const queryParams = new URLSearchParams();
 
   if (params.type) {
-    queryParams.append("type", params.type)
+    queryParams.append("type", params.type);
   }
 
   if (params.filter) {
-    queryParams.append("filter", params.filter)
+    queryParams.append("filter", params.filter);
   }
 
   if (params.page) {
-    queryParams.append("page", params.page.toString())
+    queryParams.append("page", params.page.toString());
   }
 
   if (params.limit) {
-    queryParams.append("limit", params.limit.toString())
+    queryParams.append("limit", params.limit.toString());
   }
 
-  const queryString = queryParams.toString()
-  return queryString ? `${baseUrl}?${queryString}` : baseUrl
+  const queryString = queryParams.toString();
+  return queryString ? `${baseUrl}?${queryString}` : baseUrl;
 }
 
 /**
@@ -168,7 +168,7 @@ function getDetailKey(dataType: DataType): string | null {
     profile: "profileDetail",
     points: "pointsDetail",
     "creator-studio": "creatorStudioDetail",
-  }
+  };
 
-  return detailKeys[dataType] || null
+  return detailKeys[dataType] || null;
 }

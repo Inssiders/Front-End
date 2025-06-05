@@ -15,10 +15,7 @@ export interface ApiFetchOptions extends RequestInit {
  * 쿠키에 저장된 JWT 토큰이 자동으로 포함됩니다
  * 401 에러는 NextAuth의 JWT callback에서 자동으로 처리됩니다
  */
-export async function apiFetch(
-  endpoint: string,
-  options: ApiFetchOptions = {}
-): Promise<Response> {
+export async function apiFetch(endpoint: string, options: ApiFetchOptions = {}): Promise<Response> {
   const { skipAuth = false, ...fetchOptions } = options;
 
   // URL 구성 - 서버사이드에서는 절대 URL 필요
@@ -28,9 +25,7 @@ export async function apiFetch(
     url = endpoint;
   } else {
     const baseUrl =
-      typeof window === "undefined"
-        ? process.env.NEXTAUTH_URL || "http://localhost:3000"
-        : "";
+      typeof window === "undefined" ? process.env.NEXTAUTH_URL || "http://localhost:3000" : "";
 
     url = `${baseUrl}/server/${endpoint}`;
   }
@@ -59,19 +54,14 @@ export async function apiFetch(
 /**
  * GET 요청
  */
-export async function apiGet<T = any>(
-  endpoint: string,
-  options: ApiFetchOptions = {}
-): Promise<T> {
+export async function apiGet<T = any>(endpoint: string, options: ApiFetchOptions = {}): Promise<T> {
   const response = await apiFetch(endpoint, {
     ...options,
     method: "GET",
   });
 
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Request failed" }));
+    const error = await response.json().catch(() => ({ message: "Request failed" }));
     throw new Error(error.message || error.detail || "Request failed");
   }
 
@@ -93,9 +83,7 @@ export async function apiPost<T = any>(
   });
 
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Request failed" }));
+    const error = await response.json().catch(() => ({ message: "Request failed" }));
     throw new Error(error.message || error.detail || "Request failed");
   }
 
@@ -117,9 +105,7 @@ export async function apiPut<T = any>(
   });
 
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Request failed" }));
+    const error = await response.json().catch(() => ({ message: "Request failed" }));
     throw new Error(error.message || error.detail || "Request failed");
   }
 
@@ -141,9 +127,7 @@ export async function apiPatch<T = any>(
   });
 
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Request failed" }));
+    const error = await response.json().catch(() => ({ message: "Request failed" }));
     throw new Error(error.message || error.detail || "Request failed");
   }
 
@@ -163,9 +147,7 @@ export async function apiDelete<T = any>(
   });
 
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Request failed" }));
+    const error = await response.json().catch(() => ({ message: "Request failed" }));
     throw new Error(error.message || error.detail || "Request failed");
   }
 
@@ -206,13 +188,7 @@ export async function loginWithPassword(email: string, password: string) {
 }
 
 // 일반 로그인 (클라이언트용)
-export async function login({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) {
+export async function login({ email, password }: { email: string; password: string }) {
   return loginWithPassword(email, password);
 }
 
@@ -253,13 +229,7 @@ export async function register({
 }
 
 // 비밀번호 재설정
-export async function resetPassword({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) {
+export async function resetPassword({ email, password }: { email: string; password: string }) {
   const response = await apiFetch("accounts/reset-password", {
     method: "POST",
     body: JSON.stringify({
@@ -317,11 +287,7 @@ export const authApi = {
   },
 
   // 회원가입
-  async register(data: {
-    register_type: "password";
-    email: string;
-    password: string;
-  }) {
+  async register(data: { register_type: "password"; email: string; password: string }) {
     return apiPost("accounts", data);
   },
 
