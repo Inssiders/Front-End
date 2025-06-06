@@ -71,9 +71,6 @@ export default function PostsGrid({
 
     // 무한스크롤 데이터 사용 (초기 데이터 포함)
     const allPosts = infiniteData?.pages.flatMap((page) => page.items) ?? [];
-    console.log(
-      `📄 게시물 데이터 업데이트: ${allPosts.length}개 (페이지 수: ${infiniteData?.pages.length || 0})`
-    );
 
     return allPosts;
   }, [isControlled, hasInitialData, controlledPosts, infiniteData]);

@@ -7,9 +7,6 @@ export function usePageCache() {
     // 페이지가 bfcache에서 복원될 때 이벤트 리스너
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        // bfcache에서 복원된 경우
-        console.log("Page restored from bfcache");
-
         // 스크롤 위치 즉시 복원 시도
         const savedScrollY = sessionStorage.getItem("scrollY");
         if (savedScrollY) {

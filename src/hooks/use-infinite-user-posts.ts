@@ -118,33 +118,26 @@ export function useInfiniteMemes({
   const executeFetchNextPage = useCallback(async () => {
     // 중복 호출 방지 조건들
     if (isLoadingNext) {
-      console.log("⏸️ 무한스크롤 중복 방지: 이미 로딩 중");
       return;
     }
 
     if (!queryResult.hasNextPage) {
-      console.log("⏸️ 무한스크롤 중복 방지: 더 이상 페이지 없음");
       return;
     }
 
     if (queryResult.isFetchingNextPage) {
-      console.log("⏸️ 무한스크롤 중복 방지: React Query에서 이미 가져오는 중");
       return;
     }
 
     if (!canFetchNext()) {
-      console.log("⏸️ 무한스크롤 중복 방지: 쿨다운 시간 미달");
       return;
     }
 
     try {
-      console.log("🔄 무한스크롤 실행: 새 페이지 로딩 시작");
       setIsLoadingNext(true);
       lastFetchTime.current = Date.now();
 
       await queryResult.fetchNextPage();
-
-      console.log("✅ 무한스크롤 완료: 새 페이지 로딩 성공");
     } catch (error) {
       console.error("❌ 무한스크롤 실패:", error);
     } finally {

@@ -131,7 +131,6 @@ export const handlers = [
   http.get(`${BASE_URL}/api/posts`, ({ request }) => {
     const url = new URL(request.url);
     const searchParams = url.searchParams;
-    console.log(url);
 
     const page = Number(searchParams.get("page") || 1);
     const size = Number(searchParams.get("size") || 10);
