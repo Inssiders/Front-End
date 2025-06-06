@@ -23,7 +23,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
   const post = await res.json();
 
   return (
-    <main className="flex flex-col min-h-screen bg-gray-50">
+    <main className="flex min-h-screen flex-col bg-gray-50">
       <PostDetail post={post} />
     </main>
   );

@@ -43,18 +43,17 @@ export default function SearchPage() {
   }, [q, memes]);
 
   return (
-    <div className="max-w-7xl mx-auto py-12 px-4">
-      <h1 className="text-2xl font-bold mb-4">트렌드 검색 결과</h1>
+    <div className="mx-auto max-w-7xl px-4 py-12">
+      <h1 className="mb-4 text-2xl font-bold">트렌드 검색 결과</h1>
       {q ? (
         <>
           <div className="mb-6 text-lg">
-            <span className="font-semibold text-purple-600">"{q}"</span>에 대한
-            검색 결과
+            <span className="font-semibold text-purple-600">"{q}"</span>에 대한 검색 결과
           </div>
           {filteredMemes.length > 0 || loading ? (
             <MemesGrid posts={filteredMemes} loading={loading} />
           ) : (
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-8 text-center text-gray-500 dark:text-gray-400">
+            <div className="rounded-xl bg-gray-50 p-8 text-center text-gray-500 dark:bg-gray-800 dark:text-gray-400">
               <span className="text-lg">검색 결과가 없습니다.</span>
             </div>
           )}

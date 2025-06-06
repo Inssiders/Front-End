@@ -52,10 +52,7 @@ export function autoplayYouTubeOnHover(el: HTMLElement, videoIdOrUrl: string) {
 export function resetYouTubeThumbnail(el: HTMLElement, videoIdOrUrl: string) {
   const videoId = extractVideoId(videoIdOrUrl);
   if (!videoId) {
-    console.error(
-      "Invalid YouTube URL or video ID for thumbnail:",
-      videoIdOrUrl
-    );
+    console.error("Invalid YouTube URL or video ID for thumbnail:", videoIdOrUrl);
     return null;
   }
 

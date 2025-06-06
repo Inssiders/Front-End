@@ -25,8 +25,7 @@ function transformMemeToProfileData(meme: any, userId: string): ProfileData {
     user_detail_username: meme.user?.nickname || `사용자${userId}`,
     user_detail_profile_url:
       meme.user?.profileUrl || "/placeholder.svg?height=150&width=150&text=U",
-    user_detail_introduction:
-      meme.user?.bio || "안녕하세요! 인싸이더에서 활동중입니다.",
+    user_detail_introduction: meme.user?.bio || "안녕하세요! 인싸이더에서 활동중입니다.",
     user_created_at: meme.created_at,
     posts: 0, // 실제 게시물 수는 별도로 계산 필요
     followers: 0, // 실제 팔로워 수는 별도 API 필요
@@ -36,10 +35,7 @@ function transformMemeToProfileData(meme: any, userId: string): ProfileData {
 
 export const revalidate = 3600; // 1시간 (3600초) ISR 재생성 주기
 
-export default async function ProfileDetailPage({
-  params,
-  searchParams,
-}: ProfileDetailPageProps) {
+export default async function ProfileDetailPage({ params, searchParams }: ProfileDetailPageProps) {
   // params가 해결되기를 기다립니다
   const { id: userId } = await params;
   const { tab } = await searchParams;
@@ -66,8 +62,7 @@ export default async function ProfileDetailPage({
       : {
           user_id: userId,
           user_detail_username: `사용자${userId}`,
-          user_detail_profile_url:
-            "/placeholder.svg?height=150&width=150&text=U",
+          user_detail_profile_url: "/placeholder.svg?height=150&width=150&text=U",
           user_detail_introduction: "안녕하세요! 인싸이더에서 활동중입니다.",
           user_created_at: new Date().toISOString(),
           posts: postsData.data.memes.length,
@@ -79,7 +74,7 @@ export default async function ProfileDetailPage({
     profile.posts = postsData.data.memes.length;
 
     return (
-      <main className="flex flex-col min-h-screen bg-gray-50">
+      <main className="flex min-h-screen flex-col bg-gray-50">
         <Suspense fallback={<ProfileDetailLoading />}>
           <ProfileDetail
             profile={profile}
@@ -93,11 +88,9 @@ export default async function ProfileDetailPage({
   } catch (error) {
     console.error("프로필 조회 오류:", error);
     return (
-      <main className="flex flex-col min-h-screen bg-gray-50">
-        <div className="text-center py-10">
-          <h1 className="text-2xl font-bold text-gray-900">
-            프로필을 불러오는데 실패했습니다.
-          </h1>
+      <main className="flex min-h-screen flex-col bg-gray-50">
+        <div className="py-10 text-center">
+          <h1 className="text-2xl font-bold text-gray-900">프로필을 불러오는데 실패했습니다.</h1>
           <p className="mt-2 text-gray-600">잠시 후 다시 시도해주세요.</p>
         </div>
       </main>

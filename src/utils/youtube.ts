@@ -132,9 +132,7 @@ export function convertToEmbedUrl(
   if (url.includes("vimeo.com")) {
     const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
     if (vimeoMatch && vimeoMatch[1]) {
-      const vimeoUrl = new URL(
-        `https://player.vimeo.com/video/${vimeoMatch[1]}`
-      );
+      const vimeoUrl = new URL(`https://player.vimeo.com/video/${vimeoMatch[1]}`);
       if (options.autoplay) vimeoUrl.searchParams.set("autoplay", "1");
       if (options.mute) vimeoUrl.searchParams.set("muted", "1");
       if (options.loop) vimeoUrl.searchParams.set("loop", "1");
@@ -153,8 +151,7 @@ export function convertToEmbedUrl(
 // YouTube Shorts URL 감지
 export function isYouTubeShorts(url: string): boolean {
   return (
-    url.includes("youtube.com/shorts/") ||
-    (url.includes("youtu.be/") && url.includes("shorts"))
+    url.includes("youtube.com/shorts/") || (url.includes("youtu.be/") && url.includes("shorts"))
   );
 }
 

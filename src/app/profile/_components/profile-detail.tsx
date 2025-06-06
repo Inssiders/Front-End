@@ -2,13 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileData, ProfilePostsResponse } from "@/utils/types/profile";
@@ -49,9 +43,7 @@ export function ProfileDetail({
         params.set("tab", newTab);
       }
 
-      const newURL = `${pathname}${
-        params.toString() ? `?${params.toString()}` : ""
-      }`;
+      const newURL = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
       router.replace(newURL, { scroll: false });
     },
     [pathname, router, searchParams]
@@ -83,11 +75,11 @@ export function ProfileDetail({
   return (
     <div className="container mx-auto px-4 py-8">
       <Card className="overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-200 to-orange-100 h-48 w-full" />
+        <div className="h-48 w-full bg-gradient-to-r from-blue-200 to-orange-100" />
         <CardContent className="mt-6">
           <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/3 flex flex-col items-center md:items-start">
-              <Avatar className="w-32 h-32 border-4 border-white mb-4">
+            <div className="flex flex-col items-center md:w-1/3 md:items-start">
+              <Avatar className="mb-4 size-32 border-4 border-white">
                 <AvatarImage
                   src={profile.user_detail_profile_url || "/placeholder.svg"}
                   alt={profile.user_detail_username || profile.user_id}
@@ -96,73 +88,50 @@ export function ProfileDetail({
                   {profile.user_detail_username?.[0] || profile.user_id?.[0]}
                 </AvatarFallback>
               </Avatar>
-              <CardTitle className="text-2xl font-bold mb-1">
+              <CardTitle className="mb-1 text-2xl font-bold">
                 {profile.user_detail_username || profile.user_id}
               </CardTitle>
               <CardDescription className="mb-4">
                 @{profile.user_detail_username || profile.user_id}
               </CardDescription>
-              <div className="flex gap-2 mb-6">
-                <Badge
-                  variant="secondary"
-                  className="flex flex-col items-center px-4 py-2"
-                >
-                  <span className="font-bold">
-                    {profile.posts?.toLocaleString() ?? 0}
-                  </span>
+              <div className="mb-6 flex gap-2">
+                <Badge variant="secondary" className="flex flex-col items-center px-4 py-2">
+                  <span className="font-bold">{profile.posts?.toLocaleString() ?? 0}</span>
                   <span className="text-xs text-gray-500">게시물</span>
                 </Badge>
                 {profile.followers !== undefined && (
-                  <Badge
-                    variant="secondary"
-                    className="flex flex-col items-center px-4 py-2"
-                  >
-                    <span className="font-bold">
-                      {profile.followers.toLocaleString()}
-                    </span>
+                  <Badge variant="secondary" className="flex flex-col items-center px-4 py-2">
+                    <span className="font-bold">{profile.followers.toLocaleString()}</span>
                     <span className="text-xs text-gray-500">팔로워</span>
                   </Badge>
                 )}
                 {profile.following !== undefined && (
-                  <Badge
-                    variant="secondary"
-                    className="flex flex-col items-center px-4 py-2"
-                  >
-                    <span className="font-bold">
-                      {profile.following.toLocaleString()}
-                    </span>
+                  <Badge variant="secondary" className="flex flex-col items-center px-4 py-2">
+                    <span className="font-bold">{profile.following.toLocaleString()}</span>
                     <span className="text-xs text-gray-500">팔로잉</span>
                   </Badge>
                 )}
               </div>
-              <Card className="bg-gray-50 p-4 rounded-lg w-full mb-6">
-                <CardHeader className="p-0 mb-2">
-                  <CardTitle className="text-base font-bold mb-2">
-                    소개
-                  </CardTitle>
+              <Card className="mb-6 w-full rounded-lg bg-gray-50 p-4">
+                <CardHeader className="mb-2 p-0">
+                  <CardTitle className="mb-2 text-base font-bold">소개</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <p className="text-gray-700 mb-4">
+                  <p className="mb-4 text-gray-700">
                     {profile.user_detail_introduction || "소개가 없습니다."}
                   </p>
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-sm text-gray-500">
                     가입일:{" "}
                     {profile.user_created_at
-                      ? new Date(profile.user_created_at).toLocaleDateString(
-                          "ko-KR"
-                        )
+                      ? new Date(profile.user_created_at).toLocaleDateString("ko-KR")
                       : "-"}
                   </p>
                 </CardContent>
               </Card>
             </div>
-            <div className="md:w-2/3 mt-8 md:mt-0 md:pl-8">
-              <Tabs
-                value={activeTab}
-                onValueChange={handleTabChange}
-                className="w-full"
-              >
-                <TabsList className="w-full mb-4">
+            <div className="mt-8 md:mt-0 md:w-2/3 md:pl-8">
+              <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+                <TabsList className="mb-4 w-full">
                   <TabsTrigger value="posts">게시물</TabsTrigger>
                   <TabsTrigger value="likes">좋아요</TabsTrigger>
                 </TabsList>

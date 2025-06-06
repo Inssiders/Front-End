@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import Footer from "./footer";
 import Header from "./header";
 import { Web3CubeLoader } from "./loader";
+import styles from "./provider.module.css";
 
 interface Props {
   children?: React.ReactNode;
@@ -18,6 +19,11 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      refetchOnMount: false, // 마운트 시 캐시된 데이터 우선 사용
+      staleTime: 5 * 60 * 1000, // 5분 동안 데이터를 fresh로 간주
+      gcTime: 30 * 60 * 1000, // 30분 동안 캐시 유지
+      retry: 1, // 재시도 횟수 줄여서 빠른 응답
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
 });
@@ -40,11 +46,31 @@ export const NextProvider = ({ children }: Props) => {
 
 export const NextLayout = ({ children }: Props) => {
   return (
-    <div className="flex relative flex-col min-h-screen w-full bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
-      <Header />
-      <main className="flex-1 pt-16 flex flex-col">{children}</main>
+    <div className={styles.layoutContainer}>
+      {/* 떠다니는 네온 파티클들 */}
+      <div className={styles.particlesContainer}>
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className={styles.particle} />
+        ))}
+      </div>
+
+      {/* 글래스모피즘 헤더 */}
+      <div className={styles.headerContainer}>
+        <Header />
+      </div>
+
+      {/* 메인 콘텐츠 영역 */}
+      <main className={styles.mainContent}>{children}</main>
+
+      {/* 토스터 */}
       <ToasterContext />
-      <Footer />
+
+      {/* 글래스모피즘 푸터 */}
+      <div className={styles.footerContainer}>
+        <Footer />
+      </div>
+
+      {/* 애널리틱스 */}
       <Analytics />
     </div>
   );

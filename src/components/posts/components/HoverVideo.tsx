@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { HoverVideoProps } from "../types";
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnail,
@@ -9,8 +8,14 @@ import {
   getYouTubeVideoId,
 } from "../utils/youtube";
 
+interface HoverVideoProps {
+  media_url: string;
+  enableHover?: boolean;
+  isHovered?: boolean;
+}
+
 export default function HoverVideo({
-  youtubeUrl,
+  media_url,
   enableHover = true,
   isHovered: externalHovered,
 }: HoverVideoProps) {
@@ -18,14 +23,13 @@ export default function HoverVideo({
   const [imageError, setImageError] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
 
-  const videoId = getYouTubeVideoId(youtubeUrl);
+  const videoId = getYouTubeVideoId(media_url);
   const thumbnailUrl = useFallback
     ? getYouTubeThumbnailFallback(videoId)
     : getYouTubeThumbnail(videoId);
 
   // 외부 또는 내부 hover 상태 결정
-  const isHovered =
-    externalHovered !== undefined ? externalHovered : internalHovered;
+  const isHovered = externalHovered !== undefined ? externalHovered : internalHovered;
 
   const handleMouseEnter = () => {
     if (enableHover && externalHovered === undefined) {
@@ -46,21 +50,16 @@ export default function HoverVideo({
       setImageError(true);
     }
   };
-
   // embed URL 생성 (hover 시에만)
-  const embedUrl = isHovered ? getYouTubeEmbedUrl(youtubeUrl) : "";
+  const embedUrl = isHovered ? getYouTubeEmbedUrl(media_url) : "";
 
   // 유효하지 않은 비디오 ID인 경우
   if (!videoId || !thumbnailUrl) {
     return (
-      <div className="w-full aspect-square relative overflow-hidden bg-gray-200 flex items-center justify-center">
+      <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-gray-200">
         <div className="text-center">
-          <span className="text-gray-500 text-sm">
-            유효하지 않은 YouTube URL
-          </span>
-          <small className="block text-xs text-gray-400 mt-1">
-            URL: {youtubeUrl}
-          </small>
+          <span className="text-sm text-gray-500">유효하지 않은 YouTube URL</span>
+          <small className="mt-1 block text-xs text-gray-400">URL: {media_url}</small>
         </div>
       </div>
     );
@@ -68,7 +67,7 @@ export default function HoverVideo({
 
   return (
     <div
-      className="w-full aspect-square relative overflow-hidden"
+      className="relative aspect-square w-full overflow-hidden"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -77,15 +76,15 @@ export default function HoverVideo({
         <img
           src={thumbnailUrl}
           alt="Video thumbnail"
-          className="w-full h-full object-cover"
+          className="size-full object-cover"
           onError={handleImageError}
         />
       ) : (
-        <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+        <div className="flex size-full items-center justify-center bg-gray-800">
           <div className="text-center">
-            <div className="text-white text-4xl mb-2">▶</div>
-            <div className="text-gray-300 text-xs">YouTube Video</div>
-            <div className="text-gray-400 text-xs mt-1">ID: {videoId}</div>
+            <div className="mb-2 text-4xl text-white">▶</div>
+            <div className="text-xs text-gray-300">YouTube Video</div>
+            <div className="mt-1 text-xs text-gray-400">ID: {videoId}</div>
           </div>
         </div>
       )}
@@ -98,7 +97,7 @@ export default function HoverVideo({
             title="YouTube video"
             allow="autoplay; encrypted-media"
             allowFullScreen
-            className="w-full h-full border-0"
+            className="size-full border-0"
             style={{ pointerEvents: "none" }}
           />
         </div>

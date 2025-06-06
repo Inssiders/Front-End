@@ -1,4 +1,5 @@
 import Link from "next/link";
+import styles from "./post-comments.module.css";
 
 interface PostCommentsProps {
   id: string;
@@ -8,13 +9,7 @@ interface PostCommentsProps {
   saved?: number;
 }
 
-export function PostComments({
-  id,
-  likes,
-  commentsCount,
-  shares,
-  saved,
-}: PostCommentsProps) {
+export function PostComments({ id, likes, commentsCount, shares, saved }: PostCommentsProps) {
   // Simulated comments
   const comments = Array(5)
     .fill(0)
@@ -50,68 +45,59 @@ export function PostComments({
     }));
 
   return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-bold mb-6">댓글 {comments.length}개</h2>
+    <div className={styles.container}>
+      <h2 className={styles.title}>댓글 {comments.length}개</h2>
 
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="space-y-6">
+      <div className={styles.commentsContainer}>
+        <div className={styles.commentsSpace}>
           {comments.map((comment) => (
-            <div key={comment.id} className="border-t pt-4">
-              <div className="flex items-start">
+            <div key={comment.id} className={styles.commentItem}>
+              <div className={styles.commentHeader}>
                 <Link href={`/profile/${comment.user.id}`}>
                   <img
                     src={comment.user.avatar || "/placeholder.svg"}
                     alt={comment.user.name}
-                    className="w-10 h-10 rounded-full mr-3"
+                    className={styles.avatar}
                   />
                 </Link>
-                <div className="flex-1">
-                  <div className="flex justify-between items-center mb-1">
-                    <Link
-                      href={`/profile/${comment.user.id}`}
-                      className="font-medium hover:underline"
-                    >
+                <div className={styles.commentContent}>
+                  <div className={styles.commentMeta}>
+                    <Link href={`/profile/${comment.user.id}`} className={styles.username}>
                       {comment.user.name}
                     </Link>
-                    <p className="text-gray-500 text-xs">{comment.timestamp}</p>
+                    <p className={styles.timestamp}>{comment.timestamp}</p>
                   </div>
-                  <p className="text-gray-700 mb-2">{comment.text}</p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <button className="text-gray-500 hover:text-gray-700 flex items-center gap-1">
+                  <p className={styles.commentText}>{comment.text}</p>
+                  <div className={styles.actionButtons}>
+                    <button className={`${styles.actionButton} ${styles.likeButton}`}>
                       <span>👍</span>
                       <span>{comment.likes}</span>
                     </button>
-                    <button className="text-gray-500 hover:text-gray-700">
-                      답글
-                    </button>
+                    <button className={styles.actionButton}>답글</button>
                   </div>
                   {comment.replies.length > 0 && (
-                    <div className="mt-4 ml-6 space-y-4">
+                    <div className={styles.repliesContainer}>
                       {comment.replies.map((reply) => (
-                        <div key={reply.id} className="flex items-start">
+                        <div key={reply.id} className={styles.replyItem}>
                           <Link href={`/profile/${reply.user.id}`}>
                             <img
                               src={reply.user.avatar || "/placeholder.svg"}
                               alt={reply.user.name}
-                              className="w-8 h-8 rounded-full mr-2"
+                              className={styles.replyAvatar}
                             />
                           </Link>
-                          <div>
-                            <div className="flex items-center mb-1">
+                          <div className={styles.replyContent}>
+                            <div className={styles.replyMeta}>
                               <Link
                                 href={`/profile/${reply.user.id}`}
-                                className="font-medium text-sm hover:underline"
+                                className={styles.replyUsername}
                               >
                                 {reply.user.name}
                               </Link>
-                              <p className="text-gray-500 text-xs ml-2">
-                                {reply.timestamp}
-                              </p>
+                              <p className={styles.replyTimestamp}>{reply.timestamp}</p>
                             </div>
-                            <p className="text-gray-700 text-sm mb-1">
-                              {reply.text}
-                            </p>
-                            <button className="text-gray-500 hover:text-gray-700 text-xs flex items-center gap-1">
+                            <p className={styles.replyText}>{reply.text}</p>
+                            <button className={styles.replyLikeButton}>
                               <span>👍</span>
                               <span>{reply.likes}</span>
                             </button>
@@ -127,26 +113,24 @@ export function PostComments({
         </div>
 
         <div className="mt-6 text-center">
-          <button className="text-blue-500 hover:text-blue-700 font-medium">
-            더 많은 댓글 보기
-          </button>
+          <button className={styles.loadMoreButton}>더 많은 댓글 보기</button>
         </div>
         {(likes !== undefined ||
           commentsCount !== undefined ||
           shares !== undefined ||
           saved !== undefined) && (
-          <div className="mt-6 flex gap-4 justify-center text-gray-500 text-sm border-t pt-4">
+          <div className={styles.statsContainer}>
             {likes !== undefined && (
-              <span>❤️ 좋아요 {likes.toLocaleString()}</span>
+              <span className={styles.statItem}>❤️ 좋아요 {likes.toLocaleString()}</span>
             )}
             {commentsCount !== undefined && (
-              <span>💬 댓글 {commentsCount.toLocaleString()}</span>
+              <span className={styles.statItem}>💬 댓글 {commentsCount.toLocaleString()}</span>
             )}
             {shares !== undefined && (
-              <span>🔗 공유 {shares.toLocaleString()}</span>
+              <span className={styles.statItem}>🔗 공유 {shares.toLocaleString()}</span>
             )}
             {saved !== undefined && (
-              <span> 🔖저장 {saved.toLocaleString()}</span>
+              <span className={styles.statItem}> 🔖저장 {saved.toLocaleString()}</span>
             )}
           </div>
         )}

@@ -31,8 +31,6 @@ export interface Follow {
   is_deleted: boolean;
 }
 
-
-
 export interface Post {
   id: number;
   title: string;
@@ -153,7 +151,6 @@ export interface AccountCreateResponse {
   };
 }
 
-
 // 댓글 타입
 export interface DetailComment {
   comment_id: string;
@@ -188,7 +185,6 @@ export interface DetailPost {
 
   // 댓글 목록
   comments_list: DetailComment[];
-  
 }
 export interface DetailResponse {
   message: string;

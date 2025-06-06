@@ -30,9 +30,15 @@ export function ReplyForm({ postId, commentId, onReplySubmit }: ReplyFormProps) 
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2 mt-2">
-      <Textarea {...form.register("reply")} placeholder="대댓글을 입력하세요..." className="resize-none min-h-[32px]" />
-      <Button type="submit" size="sm">등록</Button>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="mt-2 flex gap-2">
+      <Textarea
+        {...form.register("reply")}
+        placeholder="대댓글을 입력하세요..."
+        className="min-h-[32px] resize-none"
+      />
+      <Button type="submit" size="sm">
+        등록
+      </Button>
     </form>
   );
 }

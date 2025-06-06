@@ -1,10 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
 
 const meta: Meta<typeof Tooltip> = {
   title: "UI/Tooltip",
@@ -33,15 +28,11 @@ export const Hover: Story = {
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button
-            style={{ padding: 8, border: "1px solid #ddd", borderRadius: 4 }}
-          >
+          <button style={{ padding: 8, border: "1px solid #ddd", borderRadius: 4 }}>
             Hover me (툴팁 예시)
           </button>
         </TooltipTrigger>
-        <TooltipContent>
-          Tooltip이 마우스 오버 시 애니메이션과 함께 나타납니다.
-        </TooltipContent>
+        <TooltipContent>Tooltip이 마우스 오버 시 애니메이션과 함께 나타납니다.</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   ),

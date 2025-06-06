@@ -33,9 +33,7 @@ export function ProfileTabs({ userId = "1", initialTab }: ProfileTabsProps) {
         params.set("tab", newTab);
       }
 
-      const newURL = `${pathname}${
-        params.toString() ? `?${params.toString()}` : ""
-      }`;
+      const newURL = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
       router.replace(newURL, { scroll: false });
     },
     [pathname, router, searchParams]
@@ -60,24 +58,20 @@ export function ProfileTabs({ userId = "1", initialTab }: ProfileTabsProps) {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <Tabs
-        defaultValue="posts"
-        value={activeTab}
-        onValueChange={handleTabChange}
-      >
-        <TabsList className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-full max-w-3xl mx-auto mb-8">
+      <Tabs defaultValue="posts" value={activeTab} onValueChange={handleTabChange}>
+        <TabsList className="mx-auto mb-8 w-full max-w-3xl rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
           <TabsTrigger
             value="posts"
-            className="rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 flex-1"
+            className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
           >
-            <Grid3X3 className="h-4 w-4 mr-2" />
+            <Grid3X3 className="mr-2 size-4" />
             게시물
           </TabsTrigger>
           <TabsTrigger
             value="likes"
-            className="rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 flex-1"
+            className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
           >
-            <Heart className="h-4 w-4 mr-2" />
+            <Heart className="mr-2 size-4" />
             좋아요
           </TabsTrigger>
         </TabsList>

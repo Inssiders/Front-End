@@ -1,3 +1,5 @@
+import { ApiMeme, CursorPageInfo, Post } from "./posts";
+
 export interface ProfileResponse {
   message: string;
   data: {
@@ -11,65 +13,13 @@ export interface ProfileResponse {
   };
 }
 
-interface User {
-  id: number;
-  nickname: string;
-  profileUrl: string;
-}
-
-interface Meme {
-  id: number;
-  title: string;
-  content: string;
-  media_url?: string;
-  media_upload_time?: string;
-  created_at: string;
-  updated_at: string;
-  user_id: number;
-  category_id: number;
-  like_count?: number;
-  comment_count?: number;
-  is_liked?: boolean;
-  user?: User;
-}
-
-interface PageInfo {
-  next: boolean;
-  nextCursor?: string;
-}
-
-interface ProfilePostsData {
-  memes: Meme[];
-  pageInfo: PageInfo;
-}
-
+// posts.ts의 ProfilePostsResponse를 재사용
 export interface ProfilePostsResponse {
-  code: number;
-  data: ProfilePostsData;
   message: string;
-}
-
-// Profile UI용 Post 인터페이스
-export interface Post {
-  id: number | string;
-  title: string;
-  category: string;
-  image?: string;
-  youtubeUrl?: string; // YouTube URL 추가
-  post_media_url?: string;
-  media_url?: string;
-  type?: string;
-  author: {
-    name: string;
-    avatar: string;
+  data: {
+    memes: ApiMeme[];
+    pageInfo: CursorPageInfo;
   };
-  likes: number;
-  comments: number;
-  shares: number;
-  views?: number;
-  isLiked?: boolean;
-  isBookmarked?: boolean;
-  likedAt?: string;
 }
 
 // Profile 데이터 인터페이스
@@ -84,5 +34,5 @@ export interface ProfileData {
   following?: number;
 }
 
-// Meme에서 Post로 변환하는 유틸리티 타입
-export type MemeToPost = (meme: Meme, prefix?: string) => Post;
+// API Meme을 UI Post로 변환하는 유틸리티 타입
+export type MemeToPost = (meme: ApiMeme, id?: number | string) => Post;

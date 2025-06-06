@@ -96,7 +96,7 @@ export const db = factory({
     registerType: String,
     createdAt: () => new Date().toISOString(),
     updatedAt: () => new Date().toISOString(),
-  }
+  },
 });
 
 export type Database = typeof db;

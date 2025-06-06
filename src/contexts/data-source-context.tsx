@@ -1,13 +1,7 @@
 "use client";
 
 import { isApiReachable, isOnline } from "@/utils/network";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 type DataSource = "api" | "local" | "loading";
 
@@ -18,9 +12,7 @@ interface DataSourceContextType {
   checkConnectivity: () => Promise<void>;
 }
 
-const DataSourceContext = createContext<DataSourceContextType | undefined>(
-  undefined
-);
+const DataSourceContext = createContext<DataSourceContextType | undefined>(undefined);
 
 export function DataSourceProvider({ children }: { children: ReactNode }) {
   const [dataSource, setDataSource] = useState<DataSource>("loading");
@@ -69,9 +61,7 @@ export function DataSourceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <DataSourceContext.Provider
-      value={{ dataSource, isOffline, isApiDown, checkConnectivity }}
-    >
+    <DataSourceContext.Provider value={{ dataSource, isOffline, isApiDown, checkConnectivity }}>
       {children}
     </DataSourceContext.Provider>
   );

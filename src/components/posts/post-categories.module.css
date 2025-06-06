@@ -1,0 +1,238 @@
+/* 카테고리 컨테이너 */
+.container {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px) saturate(120%);
+  border-bottom: 1px solid rgba(249, 115, 22, 0.3);
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.1);
+  position: sticky;
+  top: 64px;
+  z-index: 40;
+  transition: all 0.3s ease;
+}
+
+.container:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 6px 25px rgba(249, 115, 22, 0.15);
+}
+
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .content {
+    flex-direction: row;
+    gap: 2rem;
+  }
+}
+
+/* 카테고리 래퍼 */
+.categoriesWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0 1rem 0;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(249, 115, 22, 0.3) transparent;
+}
+
+.categoriesWrapper::-webkit-scrollbar {
+  height: 4px;
+}
+
+.categoriesWrapper::-webkit-scrollbar-track {
+  background: rgba(249, 115, 22, 0.2);
+  border-radius: 2px;
+}
+
+.categoriesWrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #f97316, #f43f5e);
+  border-radius: 2px;
+}
+
+@media (min-width: 768px) {
+  .categoriesWrapper {
+    overflow: visible;
+    padding: 0;
+    width: auto;
+    justify-content: center;
+  }
+}
+
+/* 카테고리 버튼 */
+.categoryButton {
+  position: relative;
+  border-radius: 25px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  min-width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 버튼 글로우 효과 */
+.categoryButton::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #f97316, #f43f5e, #3b82f6, #ffbe0b, #f97316);
+  background-size: 300% 300%;
+  border-radius: 25px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  animation: gradientShift 3s ease infinite;
+}
+
+.categoryButton:hover::before,
+.categoryButton.active::before {
+  opacity: 1;
+}
+
+@keyframes gradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* 활성 상태 */
+.categoryButton.active {
+  background: linear-gradient(135deg, #f97316, #f43f5e);
+  color: white;
+  font-weight: 700;
+  border-color: transparent;
+  box-shadow:
+    0 8px 25px rgba(249, 115, 22, 0.4),
+    0 4px 15px rgba(244, 63, 94, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.categoryButton.active:hover {
+  background: linear-gradient(135deg, #f43f5e, #dc2626);
+  box-shadow:
+    0 12px 35px rgba(249, 115, 22, 0.5),
+    0 6px 20px rgba(244, 63, 94, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px) scale(1.08);
+}
+
+/* 비활성 상태 */
+.categoryButton.inactive {
+  color: rgba(107, 114, 128, 0.8);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(249, 115, 22, 0.3);
+  backdrop-filter: blur(15px);
+}
+
+.categoryButton.inactive:hover {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.2);
+  border-color: rgba(244, 63, 94, 0.5);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow:
+    0 6px 20px rgba(244, 63, 94, 0.2),
+    0 3px 10px rgba(249, 115, 22, 0.3);
+}
+
+/* 활성 버튼 펄스 효과 */
+.categoryButton.active::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ripple 2s infinite;
+}
+
+@keyframes ripple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+  }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 1rem;
+  }
+
+  .categoryButton {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+    min-width: 80px;
+  }
+
+  .categoriesWrapper {
+    gap: 0.5rem;
+    padding-bottom: 0.75rem;
+  }
+}
+
+/* 스크롤 페이드 효과 */
+.categoriesWrapper::before,
+.categoriesWrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.categoriesWrapper::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.8), transparent);
+}
+
+.categoriesWrapper::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.8), transparent);
+}
+
+@media (min-width: 768px) {
+  .categoriesWrapper::before,
+  .categoriesWrapper::after {
+    display: none;
+  }
+}
