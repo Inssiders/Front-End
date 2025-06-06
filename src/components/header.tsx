@@ -11,17 +11,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./header.module.css";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "./ui/command";
+import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -70,12 +63,7 @@ const ListItem = React.forwardRef<
 >(({ className, title, children, href, ...props }, ref) => {
   return (
     <li>
-      <Link
-        ref={ref}
-        href={href || "#"}
-        className={cn(styles.listItem, "hover:scale-105", className)}
-        {...props}
-      >
+      <Link ref={ref} href={href || "#"} className={cn(styles.listItem, "hover:scale-105", className)} {...props}>
         <div className={styles.listItemTitle}>{title}</div>
         <span className={styles.listItemDescription}>{children}</span>
       </Link>
@@ -94,7 +82,9 @@ export default function Header() {
   const [mounted, setMounted] = useState(false);
   const [openMobileMenu, setOpenMobileMenu] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const isScrollingUp = useScrollDirection();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -103,12 +93,7 @@ export default function Header() {
         if (isMobile) {
           setOpen((open) => !open);
         } else {
-          const searchInput = document.querySelector(
-            'input[placeholder="트렌드 검색... ✨"]'
-          ) as HTMLInputElement;
-          if (searchInput) {
-            searchInput.focus();
-          }
+          searchInputRef.current?.focus();
         }
       }
       if (e.key === "Escape") {
@@ -131,15 +116,26 @@ export default function Header() {
     (e?: React.FormEvent) => {
       if (e) {
         e.preventDefault();
+        e.stopPropagation();
       }
-      if (search.trim()) {
-        router.push(`/search?q=${encodeURIComponent(search.trim())}`);
-        setOpen(false);
-        setSearch("");
-        setIsSearchFocused(false);
-      }
+
+      // 이미 검색 중이면 중복 실행 방지
+      if (isSearching) return;
+
+      const trimmedSearch = search.trim();
+      if (!trimmedSearch) return;
+
+      setIsSearching(true);
+
+      router.push(`/search?q=${encodeURIComponent(trimmedSearch)}`);
+      setOpen(false);
+      setSearch("");
+      setIsSearchFocused(false);
+
+      // 검색 상태 리셋
+      setTimeout(() => setIsSearching(false), 1000);
     },
-    [search, router]
+    [search, router, isSearching]
   );
 
   const handleLogout = useCallback(() => {
@@ -175,10 +171,7 @@ export default function Header() {
             >
               <Link href="/" className={`${styles.logoContainer} group`}>
                 <div className={styles.logoGlowWrapper}>
-                  <motion.div
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                  >
+                  <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.6, ease: "easeInOut" }}>
                     <Image
                       src="/logo.png"
                       alt="인싸이더"
@@ -215,6 +208,7 @@ export default function Header() {
                       <Search className={styles.searchIcon} />
                     </motion.div>
                     <input
+                      ref={searchInputRef}
                       type="text"
                       placeholder="트렌드 검색... ✨"
                       value={search}
@@ -223,11 +217,7 @@ export default function Header() {
                       onBlur={() => setIsSearchFocused(false)}
                       className={styles.searchInput}
                     />
-                    <button
-                      type="submit"
-                      className={styles.searchButton}
-                      onClick={handleSearchSubmit}
-                    >
+                    <button type="submit" className={styles.searchButton}>
                       검색
                     </button>
                   </motion.div>
@@ -240,11 +230,7 @@ export default function Header() {
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
               >
-                <Button
-                  variant="outline"
-                  className={styles.searchMobile}
-                  onClick={() => setOpen(true)}
-                >
+                <Button variant="outline" className={styles.searchMobile} onClick={() => setOpen(true)}>
                   <Search className="mr-3 h-4 w-4" />
                   <span>검색... ✨</span>
                 </Button>
@@ -258,23 +244,15 @@ export default function Header() {
                   <NavigationMenuList>
                     {navItems.map((category) => (
                       <NavigationMenuItem key={category.category}>
-                        <NavigationMenuTrigger className={styles.navTrigger}>
-                          {category.category}
-                        </NavigationMenuTrigger>
+                        <NavigationMenuTrigger className={styles.navTrigger}>{category.category}</NavigationMenuTrigger>
                         <NavigationMenuContent className={styles.navContent}>
                           <ul className={styles.navItemsList}>
                             {category.items.map((item) => (
-                              <ListItem
-                                key={item.name}
-                                title={`${item.name} ${item.emoji}`}
-                                href={item.href}
-                              >
+                              <ListItem key={item.name} title={`${item.name} ${item.emoji}`} href={item.href}>
                                 <div className={styles.navItemContent}>
                                   <div className={styles.navItemIcon}>{item.icon}</div>
                                   <div className="flex flex-col">
-                                    <span className={styles.navItemDescription}>
-                                      {item.description}
-                                    </span>
+                                    <span className={styles.navItemDescription}>{item.description}</span>
                                   </div>
                                 </div>
                               </ListItem>
@@ -305,12 +283,7 @@ export default function Header() {
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className={styles.profileDropdown}
-                    align="end"
-                    sideOffset={12}
-                    alignOffset={0}
-                  >
+                  <DropdownMenuContent className={styles.profileDropdown} align="end" sideOffset={12} alignOffset={0}>
                     <DropdownMenuLabel className={styles.profileHeader}>
                       <div className={styles.profileInfo}>
                         <div className={styles.profileName}>{session.user?.nickname} ✨</div>
@@ -320,13 +293,8 @@ export default function Header() {
                     <DropdownMenuSeparator className={styles.profileSeparator} />
 
                     <DropdownMenuItem asChild className={styles.profileMenuItem}>
-                      <Link
-                        href={`/profile/${session.user?.id}`}
-                        className={styles.profileMenuLink}
-                      >
-                        <div
-                          className={`${styles.profileMenuIcon} ${styles.profileMenuIconProfile}`}
-                        >
+                      <Link href={`/profile/${session.user?.id}`} className={styles.profileMenuLink}>
+                        <div className={`${styles.profileMenuIcon} ${styles.profileMenuIconProfile}`}>
                           <User className="w-4 h-4 text-purple-600" />
                         </div>
                         <span className="font-semibold">프로필 🙋‍♂️</span>
@@ -335,9 +303,7 @@ export default function Header() {
 
                     <DropdownMenuItem asChild className={styles.profileMenuItem}>
                       <Link href="/settings" className={styles.profileMenuLink}>
-                        <div
-                          className={`${styles.profileMenuIcon} ${styles.profileMenuIconSettings}`}
-                        >
+                        <div className={`${styles.profileMenuIcon} ${styles.profileMenuIconSettings}`}>
                           <Settings className="w-4 h-4 text-cyan-600" />
                         </div>
                         <span className="font-semibold">설정 ⚙️</span>
@@ -348,9 +314,7 @@ export default function Header() {
 
                     <DropdownMenuItem className={styles.logoutMenuItem} onClick={handleLogout}>
                       <div className={styles.logoutContent}>
-                        <div
-                          className={`${styles.profileMenuIcon} ${styles.profileMenuIconLogout}`}
-                        >
+                        <div className={`${styles.profileMenuIcon} ${styles.profileMenuIconLogout}`}>
                           <LogOut className="w-4 h-4 text-red-500" />
                         </div>
                         <span className={styles.logoutText}>로그아웃 👋</span>
@@ -487,12 +451,6 @@ export default function Header() {
               placeholder="트렌드 검색... ✨"
               value={search}
               onValueChange={setSearch}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSearchSubmit();
-                }
-              }}
               className={styles.searchModalInput}
             />
           </form>
@@ -515,11 +473,7 @@ export default function Header() {
               </motion.div>
             </CommandEmpty>
             <CommandGroup heading="✨ 추천 검색어">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-              >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
                 <CommandItem
                   onSelect={() => {
                     setSearch("최신 트렌드");
@@ -543,11 +497,7 @@ export default function Header() {
                 </CommandItem>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
                 <CommandItem
                   onSelect={() => {
                     setSearch("인기 밈");

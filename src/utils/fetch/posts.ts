@@ -29,6 +29,7 @@ function convertApiMemeToPost(row: any): Post {
 // SSR용 posts 데이터 가져오기 함수
 export async function getPosts(params: {
   category?: string;
+  keyword?: string;
   page?: number;
   size?: number;
 }): Promise<{ posts: Post[]; hasNextPage: boolean; total: number }> {
@@ -41,6 +42,10 @@ export async function getPosts(params: {
 
     if (params.category) {
       url.searchParams.set("category_id", params.category);
+    }
+
+    if (params.keyword) {
+      url.searchParams.set("keyword", params.keyword);
     }
 
     const response = await fetch(url.toString(), {
