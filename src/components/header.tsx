@@ -298,121 +298,71 @@ export default function Header() {
               {status === "authenticated" ? (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: 3 }}
-                      whileTap={{ scale: 0.9 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Button variant="ghost" className={`${styles.profileTrigger} group`}>
-                        <div className={styles.profileGlow} />
-                        <Avatar className={styles.profileAvatar}>
-                          <AvatarImage
-                            src={session.user?.profileImage || "/placeholder.svg"}
-                            alt={session.user?.nickname || "프로필"}
-                            className="object-cover"
-                          />
-                          <AvatarFallback className={styles.profileFallback}>
-                            {session.user?.nickname?.substring(0, 2) || "사용자"}
-                          </AvatarFallback>
-                        </Avatar>
-                      </Button>
-                    </motion.div>
+                    <Button variant="ghost" className={`${styles.profileTrigger} group`}>
+                      <div className={styles.profileGlow} />
+                      <Avatar className={styles.profileAvatar}>
+                        <AvatarImage
+                          src={session.user?.profileImage || "/placeholder.svg"}
+                          alt={session.user?.nickname || "프로필"}
+                          className="object-cover"
+                        />
+                        <AvatarFallback className={styles.profileFallback}>
+                          {session.user?.nickname?.substring(0, 2) || "사용자"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     className={styles.profileDropdown}
                     align="end"
                     sideOffset={12}
                     alignOffset={0}
-                    asChild
                   >
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    >
-                      <DropdownMenuLabel className={styles.profileHeader}>
-                        <div className={styles.profileInfo}>
-                          <motion.div
-                            className={styles.profileName}
-                            initial={{ x: -10 }}
-                            animate={{ x: 0 }}
-                            transition={{ delay: 0.1 }}
-                          >
-                            {session.user?.nickname} ✨
-                          </motion.div>
-                          <motion.div
-                            className={styles.profileEmail}
-                            initial={{ x: -10 }}
-                            animate={{ x: 0 }}
-                            transition={{ delay: 0.2 }}
-                          >
-                            {session.user?.email}
-                          </motion.div>
+                    <DropdownMenuLabel className={styles.profileHeader}>
+                      <div className={styles.profileInfo}>
+                        <div className={styles.profileName}>{session.user?.nickname} ✨</div>
+                        <div className={styles.profileEmail}>{session.user?.email}</div>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className={styles.profileSeparator} />
+
+                    <DropdownMenuItem asChild className={styles.profileMenuItem}>
+                      <Link
+                        href={`/profile/${session.user?.id}`}
+                        className={styles.profileMenuLink}
+                      >
+                        <div
+                          className={`${styles.profileMenuIcon} ${styles.profileMenuIconProfile}`}
+                        >
+                          <User className="w-4 h-4 text-purple-600" />
                         </div>
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator className={styles.profileSeparator} />
+                        <span className="font-semibold">프로필 🙋‍♂️</span>
+                      </Link>
+                    </DropdownMenuItem>
 
-                      <motion.div
-                        initial={{ x: -10 }}
-                        animate={{ x: 0 }}
-                        transition={{ delay: 0.3 }}
-                      >
-                        <DropdownMenuItem asChild className={styles.profileMenuItem}>
-                          <Link
-                            href={`/profile/${session.user?.id}`}
-                            className={styles.profileMenuLink}
-                          >
-                            <motion.div
-                              className={`${styles.profileMenuIcon} ${styles.profileMenuIconProfile}`}
-                              whileHover={{ rotate: 5, scale: 1.1 }}
-                            >
-                              <User className="w-4 h-4 text-purple-600" />
-                            </motion.div>
-                            <span className="font-semibold">프로필 🙋‍♂️</span>
-                          </Link>
-                        </DropdownMenuItem>
-                      </motion.div>
+                    <DropdownMenuItem asChild className={styles.profileMenuItem}>
+                      <Link href="/settings" className={styles.profileMenuLink}>
+                        <div
+                          className={`${styles.profileMenuIcon} ${styles.profileMenuIconSettings}`}
+                        >
+                          <Settings className="w-4 h-4 text-cyan-600" />
+                        </div>
+                        <span className="font-semibold">설정 ⚙️</span>
+                      </Link>
+                    </DropdownMenuItem>
 
-                      <motion.div
-                        initial={{ x: -10 }}
-                        animate={{ x: 0 }}
-                        transition={{ delay: 0.4 }}
-                      >
-                        <DropdownMenuItem asChild className={styles.profileMenuItem}>
-                          <Link href="/settings" className={styles.profileMenuLink}>
-                            <motion.div
-                              className={`${styles.profileMenuIcon} ${styles.profileMenuIconSettings}`}
-                              whileHover={{ rotate: 90, scale: 1.1 }}
-                              transition={{ type: "spring", stiffness: 300 }}
-                            >
-                              <Settings className="w-4 h-4 text-cyan-600" />
-                            </motion.div>
-                            <span className="font-semibold">설정 ⚙️</span>
-                          </Link>
-                        </DropdownMenuItem>
-                      </motion.div>
+                    <DropdownMenuSeparator className={styles.profileSeparator} />
 
-                      <DropdownMenuSeparator className={styles.profileSeparator} />
-
-                      <motion.div
-                        initial={{ x: -10 }}
-                        animate={{ x: 0 }}
-                        transition={{ delay: 0.5 }}
-                      >
-                        <DropdownMenuItem className={styles.logoutMenuItem} onClick={handleLogout}>
-                          <div className={styles.logoutContent}>
-                            <motion.div
-                              className={`${styles.profileMenuIcon} ${styles.profileMenuIconLogout}`}
-                              whileHover={{ scale: 1.1 }}
-                            >
-                              <LogOut className="w-4 h-4 text-red-500" />
-                            </motion.div>
-                            <span className={styles.logoutText}>로그아웃 👋</span>
-                          </div>
-                        </DropdownMenuItem>
-                      </motion.div>
-                    </motion.div>
+                    <DropdownMenuItem className={styles.logoutMenuItem} onClick={handleLogout}>
+                      <div className={styles.logoutContent}>
+                        <div
+                          className={`${styles.profileMenuIcon} ${styles.profileMenuIconLogout}`}
+                        >
+                          <LogOut className="w-4 h-4 text-red-500" />
+                        </div>
+                        <span className={styles.logoutText}>로그아웃 👋</span>
+                      </div>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
