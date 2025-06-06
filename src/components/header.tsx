@@ -225,16 +225,18 @@ export default function Header() {
               </div>
 
               {/* 모바일 검색 버튼 with enhanced animations */}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              >
-                <Button variant="outline" className={styles.searchMobile} onClick={() => setOpen(true)}>
-                  <Search className="mr-3 h-4 w-4" />
-                  <span>검색... ✨</span>
-                </Button>
-              </motion.div>
+              {isMobile && (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button variant="outline" className={styles.searchMobile} onClick={() => setOpen(true)}>
+                    <Search className="mr-3 h-4 w-4" />
+                    <span>검색... ✨</span>
+                  </Button>
+                </motion.div>
+              )}
             </div>
 
             {/* 데스크톱 네비게이션 - 안정적인 레이아웃 */}

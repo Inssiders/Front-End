@@ -380,6 +380,7 @@
   box-shadow: 0 2px 10px rgba(249, 115, 22, 0.1);
   position: relative;
   overflow: hidden;
+  color: #3b82f6 !important;
 }
 
 .navTrigger::before {

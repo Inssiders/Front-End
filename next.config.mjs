@@ -176,7 +176,11 @@ const nextConfig = {
     NEXT_PUBLIC_API_MOCKING: process.env.NODE_ENV === "development" ? "enabled" : "",
   },
 
+  // Server Components 최적화 (새로운 위치)
+  serverExternalPackages: ["msw"],
+
   experimental: {
+    // 패키지 import 최적화
     optimizePackageImports: [
       "framer-motion",
       "lucide-react",
@@ -184,26 +188,42 @@ const nextConfig = {
       "@radix-ui/react-dropdown-menu",
       "@radix-ui/react-select",
       "@radix-ui/react-toast",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-button",
+      "@radix-ui/react-card",
+      "@radix-ui/react-input",
+      "@radix-ui/react-label",
+      "@radix-ui/react-switch",
+      "@radix-ui/react-textarea",
     ],
+    // Turbopack 관련 설정 제거 (기본 설정 사용)
   },
 
   // 컴파일러 최적화
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
+    // React의 개발 도구 제거 (production)
+    reactRemoveProperties: process.env.NODE_ENV === "production",
+    // 스타일 컴포넌트 최적화
+    styledComponents: true,
   },
-  // MSW를 위한 웹팩 설정
-  webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      // 개발 환경에서 클라이언트 사이드에서만 MSW 관련 설정
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
-    return config;
-  },
+
+  // Turbopack 환경에서 webpack 설정은 조건부로만 적용
+  ...(process.env.TURBOPACK !== "1" && {
+    webpack: (config, { dev, isServer }) => {
+      if (dev && !isServer) {
+        // 개발 환경에서 클라이언트 사이드에서만 MSW 관련 설정
+        config.resolve.fallback = {
+          ...config.resolve.fallback,
+          fs: false,
+          net: false,
+          tls: false,
+        };
+      }
+      return config;
+    },
+  }),
 };
 
 export default withPWA(nextConfig);

@@ -14,12 +14,7 @@ interface PostsPageClientProps {
   hasNextPage?: boolean;
 }
 
-export default function PostsPageClient({
-  categories,
-  category,
-  initialPosts,
-  hasNextPage,
-}: PostsPageClientProps) {
+export default function PostsPageClient({ categories, category, initialPosts, hasNextPage }: PostsPageClientProps) {
   // 페이지 캐시 및 뒤로가기 최적화 적용
   usePageCache();
   useBfCacheOptimization();

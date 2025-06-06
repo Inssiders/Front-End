@@ -1,4 +1,5 @@
 import { setupWorker } from "msw/browser";
+import { getMSWSetupDelay, logBundlerInfo } from "../lib/turbopack-compat";
 import { handlers } from "./handlers";
 
 // 환경변수에서 baseUrl 가져오기
@@ -40,8 +41,9 @@ const waitForServiceWorkerReady = async () => {
   // 기존 모든 서비스 워커 제거
   await clearExistingServiceWorkers();
 
-  // 잠시 대기하여 완전한 정리 보장
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  // Turbopack 호환성을 위한 지연시간 적용
+  const delay = getMSWSetupDelay();
+  await new Promise((resolve) => setTimeout(resolve, delay));
 
   // MSW 워커 시작
   await worker.start({
@@ -98,6 +100,9 @@ export const startWorker = async () => {
     return;
   }
 
+  // 번들러 정보 로그
+  logBundlerInfo();
+
   try {
     // 기존 MSW 워커 정지
     try {
@@ -109,9 +114,11 @@ export const startWorker = async () => {
     // 서비스 워커 완전 초기화
     await waitForServiceWorkerReady();
 
-    // 추가 대기 시간으로 완전한 초기화 보장
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Turbopack 호환성을 위한 추가 대기시간
+    const finalDelay = getMSWSetupDelay() * 2;
+    await new Promise((resolve) => setTimeout(resolve, finalDelay));
 
+    console.log("✅ MSW initialized with Turbopack compatibility");
     return true;
   } catch (error) {
     console.error("[MSW] Failed to start:", error);
