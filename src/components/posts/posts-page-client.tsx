@@ -5,6 +5,7 @@ import PostsGrid from "@/components/posts/post-grid";
 import PostsHeader from "@/components/posts/post-header";
 import { useBfCacheOptimization, usePageCache } from "@/hooks/use-page-cache";
 import { useEffect, useState } from "react";
+import styles from "./posts-page-client.module.css";
 
 interface PostsPageClientProps {
   categories: any;
@@ -39,44 +40,63 @@ export default function PostsPageClient({
 
   return (
     <>
-      {/* 고정 헤더 영역 */}
-      <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+      {/* 헤더 영역 - 고정 없음 */}
+      <header className={styles.header}>
         <PostsHeader />
-        <PostCategories categories={categories} />
       </header>
+      <PostCategories categories={categories} />
 
-      {/* 메인 콘텐츠 영역 - 자연스러운 무한스크롤을 위한 최적화된 레이아웃 */}
-      <main className="bg-white" style={{ minHeight: "calc(100vh - 90px)" }}>
-        {/* Footer 높이(90px) 고려한 최소 높이 설정 */}
-        <div className="container mx-auto px-4 py-8">
-          {/* 배경 장식 요소들 */}
-          <div className="relative">
-            <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full opacity-20 blur-sm pointer-events-none" />
-            <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full opacity-20 blur-sm pointer-events-none" />
-          </div>
+      {/* 메인 콘텐츠 영역 - Gen-Z 감성의 다이나믹 레이아웃 */}
+      <main className={styles.mainContainer}>
+        {/* Animated Background */}
+        <div className={styles.animatedBackground}>
+          {/* Base gradient */}
+          <div className={styles.baseGradient} />
 
-          {/* 게시물 그리드 - 스크롤이 자연스럽게 밀리도록 단순화된 구조 */}
-          <div className="relative z-10">
-            <PostsGrid
-              category={category}
-              columns={4}
-              layout="grid"
-              showAuthor={true}
-              showActions={true}
-              enableHoverPlay={true}
-              className=""
-              disableAnimation={isFromCache} // 캐시에서 복원시 애니메이션 비활성화
-              posts={initialPosts} // SSR 초기 데이터
-              loading={false}
-              hasNextPage={hasNextPage} // hasNextPage 정보 전달
-            />
+          {/* Floating orbs with CSS animations */}
+          <div className={styles.floatingOrb1} />
+          <div className={styles.floatingOrb2} />
+          <div className={styles.floatingOrb3} />
+          <div className={styles.floatingOrb4} />
+        </div>
+
+        {/* Clean & Modern Content Area */}
+        <div className={styles.contentArea}>
+          <div className={styles.contentContainer}>
+            {/* Minimal Glass Container */}
+            <div className={styles.glassContainer}>
+              {/* Simple Top Accent */}
+              <div className={styles.topAccent} />
+
+              {/* Clean Content Area */}
+              <div className={styles.contentWrapper}>
+                <PostsGrid
+                  category={category}
+                  columns={4}
+                  layout="grid"
+                  showAuthor={true}
+                  showActions={true}
+                  enableHoverPlay={true}
+                  className=""
+                  disableAnimation={isFromCache}
+                  posts={initialPosts}
+                  loading={false}
+                  hasNextPage={hasNextPage}
+                />
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Additional floating particles */}
+        <div className={styles.floatingParticle1} />
+        <div className={styles.floatingParticle2} />
+        <div className={styles.floatingParticle3} />
       </main>
 
       {/* 플로팅 액션 버튼 - Footer 위에 위치하도록 조정 */}
-      <div className="fixed bottom-24 right-6 z-50 md:hidden">
-        <button className="w-14 h-14 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform duration-300">
+      <div className={styles.floatingButton}>
+        <button className={styles.floatingButtonInner}>
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>

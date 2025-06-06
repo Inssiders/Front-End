@@ -16,14 +16,12 @@ export default async function EmpathyMeme() {
   ]);
 
   return (
-    <main className="container mx-auto py-6">
-      <EmpathyMemeContainer
-        categories={categories.data.categories}
-        category="99"
-        initialPosts={initialPosts.posts}
-        hasNextPage={initialPosts.hasNextPage}
-        headerType="posts"
-      />
-    </main>
+    <EmpathyMemeContainer
+      categories={categories.data.categories}
+      category="99"
+      initialPosts={initialPosts.posts}
+      hasNextPage={initialPosts.hasNextPage}
+      headerType="posts"
+    />
   );
 }

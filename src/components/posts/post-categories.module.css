@@ -4,8 +4,9 @@
   backdrop-filter: blur(20px) saturate(120%);
   border-bottom: 1px solid rgba(249, 115, 22, 0.3);
   box-shadow: 0 4px 20px rgba(249, 115, 22, 0.1);
+  position: -webkit-sticky;
   position: sticky;
-  top: 80px;
+  top: 0;
   z-index: 40;
   transition: all 0.3s ease;
 }
