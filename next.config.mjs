@@ -169,9 +169,27 @@ const nextConfig = {
         hostname: "*.jtvnw.net",
       },
     ],
+    formats: ["image/webp", "image/avif"],
+    minimumCacheTTL: 60,
   },
   env: {
     NEXT_PUBLIC_API_MOCKING: process.env.NODE_ENV === "development" ? "enabled" : "",
+  },
+
+  experimental: {
+    optimizePackageImports: [
+      "framer-motion",
+      "lucide-react",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-select",
+      "@radix-ui/react-toast",
+    ],
+  },
+
+  // 컴파일러 최적화
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
   },
   // MSW를 위한 웹팩 설정
   webpack: (config, { dev, isServer }) => {

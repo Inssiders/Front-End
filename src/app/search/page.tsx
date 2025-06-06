@@ -1,6 +1,6 @@
 "use client";
 
-import SearchContainer from "@/components/search/search-container";
+import { DynamicSearchContainer } from "@/components/common/dynamic-imports";
 import { getPosts } from "@/utils/fetch/posts";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -74,7 +74,7 @@ export default function SearchPage() {
   }, [posts, loading, hasNextPage, totalResults]);
 
   return (
-    <SearchContainer
+    <DynamicSearchContainer
       query={query}
       posts={searchResults.posts}
       loading={searchResults.loading}
