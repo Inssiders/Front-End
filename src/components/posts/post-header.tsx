@@ -15,7 +15,7 @@ export default function PostsHeader() {
     }));
   }, []);
   return (
-    <div className="relative min-h-[60vh] bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 overflow-hidden">
+    <div className="relative min-h-[35vh] bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 overflow-hidden">
       {/* Page Background Elements - moved from page.tsx */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Gradient Orbs */}
@@ -70,7 +70,7 @@ export default function PostsHeader() {
         ))}
       </div>
 
-      <div className="container mx-auto px-4 py-16 relative z-10">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -82,7 +82,7 @@ export default function PostsHeader() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center gap-2 px-6 py-3 mb-8 rounded-full bg-white/80 backdrop-blur-md border border-pink-200/50 shadow-lg"
+            className="inline-flex items-center gap-2 px-6 py-3 mb-6 rounded-full bg-white/80 backdrop-blur-md border border-pink-200/50 shadow-lg"
           >
             <Sparkles className="w-5 h-5 text-pink-500" />
             <span className="text-sm font-bold text-gray-800 tracking-wide">
@@ -96,13 +96,13 @@ export default function PostsHeader() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tight"
+            className="text-4xl md:text-6xl lg:text-7xl font-black mb-4 tracking-tight"
           >
             <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent drop-shadow-lg">
               밈 월드
             </span>
             <br />
-            <span className="text-gray-800 text-4xl md:text-5xl lg:text-6xl">갤러리</span>
+            <span className="text-gray-800 text-3xl md:text-4xl lg:text-5xl">갤러리</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -110,7 +110,7 @@ export default function PostsHeader() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.8 }}
-            className="text-lg md:text-xl lg:text-2xl text-gray-700 max-w-3xl mx-auto mb-8 leading-relaxed font-medium"
+            className="text-base md:text-lg lg:text-xl text-gray-700 max-w-3xl mx-auto mb-6 leading-relaxed font-medium"
           >
             🔥 핫한 밈부터 감성 짤까지! 지금 가장 트렌디한 콘텐츠를 만나보세요
             <span className="text-pink-500 font-bold">💖</span>
@@ -121,7 +121,7 @@ export default function PostsHeader() {
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.9, type: "spring", stiffness: 100 }}
-            className="flex justify-center gap-4 text-3xl md:text-4xl mb-12"
+            className="flex justify-center gap-4 text-2xl md:text-3xl mb-8"
           >
             {["🤩", "😎", "🔥", "💯", "✨", "🚀"].map((emoji, i) => (
               <motion.span
