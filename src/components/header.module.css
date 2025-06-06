@@ -324,10 +324,10 @@
   z-index: 50; /* NavigationMenu 가시성을 위해 추가 */
 }
 
-/* NavigationMenu Radix UI 전용 스타일 - hover 문제 해결 */
+/* NavigationMenu Radix UI 전용 스타일 - 안정적인 상호작용 */
 .navActions [data-radix-navigation-menu-viewport] {
   position: absolute !important;
-  top: 100% !important;
+  top: calc(100% + 8px) !important;
   left: 0 !important;
   z-index: 1000 !important;
   background: rgba(255, 255, 255, 0.98) !important;
@@ -337,11 +337,8 @@
   box-shadow:
     0 20px 60px rgba(249, 115, 22, 0.15),
     0 0 0 1px rgba(255, 255, 255, 0.4) inset !important;
-  margin-top: 8px !important;
   min-width: 400px !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: none !important;
+  pointer-events: auto !important;
 }
 
 .navActions [data-radix-navigation-menu-content] {
@@ -349,30 +346,29 @@
   border: none !important;
   box-shadow: none !important;
   position: static !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+  pointer-events: auto !important;
+  padding: 20px !important;
 }
 
 /* NavigationMenu Root 컨테이너 */
 .navActions nav[data-radix-navigation-menu-root] {
-  position: static !important;
-  z-index: 40 !important;
+  position: relative !important;
+  z-index: 100 !important;
 }
 
 /* NavigationMenu List */
 .navActions ul[data-radix-navigation-menu-list] {
   position: relative !important;
-  z-index: 50 !important;
+  z-index: 101 !important;
 }
 
-/* Trigger 호버 시 Content가 표시되도록 강제 */
-.navActions [data-radix-navigation-menu-trigger]:hover + [data-radix-navigation-menu-content],
-.navActions
-  [data-radix-navigation-menu-trigger][data-state="open"]
-  + [data-radix-navigation-menu-content],
-.navActions [data-radix-navigation-menu-content]:hover {
-  visibility: visible !important;
-  opacity: 1 !important;
+/* 안정적인 상호작용을 위한 추가 스타일 */
+.navActions [data-radix-navigation-menu-trigger] {
+  position: relative !important;
+  z-index: 102 !important;
+}
+
+.navActions [data-radix-navigation-menu-content] * {
   pointer-events: auto !important;
 }
 
@@ -498,15 +494,17 @@
 
 .profileDropdown {
   @apply w-64;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(30px);
-  border: 2px solid rgba(139, 92, 246, 0.15);
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(30px) !important;
+  border: 2px solid rgba(249, 115, 22, 0.15) !important;
   box-shadow:
-    0 20px 60px rgba(139, 92, 246, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.4) inset;
-  border-radius: 20px;
-  padding: 6px;
-  animation: float 5s ease-in-out infinite;
+    0 20px 60px rgba(249, 115, 22, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.4) inset !important;
+  border-radius: 20px !important;
+  padding: 6px !important;
+  z-index: 1000 !important;
+  pointer-events: auto !important;
+  position: relative !important;
 }
 
 .profileHeader {
@@ -537,8 +535,11 @@
 
 .profileMenuItem {
   @apply rounded-xl m-1 transition-all duration-200;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(10px) !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1001 !important;
 }
 
 .profileMenuItem:hover {
@@ -549,6 +550,9 @@
 
 .profileMenuLink {
   @apply flex items-center gap-3 px-3 py-2 text-gray-700; /* 텍스트 가시성 개선 */
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1002 !important;
 }
 
 .profileMenuIcon {
@@ -569,7 +573,10 @@
 
 .logoutMenuItem {
   @apply rounded-xl m-1 transition-all duration-200;
-  background: rgba(239, 68, 68, 0.05);
+  background: rgba(239, 68, 68, 0.05) !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1001 !important;
 }
 
 .logoutMenuItem:hover {
