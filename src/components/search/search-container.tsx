@@ -10,10 +10,15 @@ import SearchStats from "./search-stats";
 
 interface SearchContainerProps {
   query: string;
-  posts: any[];
-  loading: boolean;
+  posts?: any[];
+  loading?: boolean;
   hasNextPage?: boolean;
   totalResults?: number;
+  // ISR에서 사용할 초기 데이터
+  initialPosts?: any[];
+  initialLoading?: boolean;
+  initialHasNextPage?: boolean;
+  initialTotalResults?: number;
 }
 
 export default function SearchContainer({
@@ -22,8 +27,18 @@ export default function SearchContainer({
   loading,
   hasNextPage = false,
   totalResults = 0,
+  initialPosts = [],
+  initialLoading = false,
+  initialHasNextPage = false,
+  initialTotalResults = 0,
 }: SearchContainerProps) {
   const [isFromCache, setIsFromCache] = useState(false);
+
+  // ISR 데이터와 클라이언트 데이터 통합
+  const currentPosts = posts ?? initialPosts;
+  const currentLoading = loading ?? initialLoading;
+  const currentHasNextPage = hasNextPage || initialHasNextPage;
+  const currentTotalResults = totalResults || initialTotalResults;
 
   return (
     <motion.div
@@ -102,13 +117,13 @@ export default function SearchContainer({
         <SearchHeader query={query} />
 
         {/* Search Stats */}
-        <SearchStats query={query} totalResults={totalResults} loading={loading} />
+        <SearchStats query={query} totalResults={currentTotalResults} loading={currentLoading} />
 
         {/* Search Results */}
         <div className={styles.resultsContainer}>
           {query ? (
             <>
-              {posts.length > 0 || loading ? (
+              {currentPosts.length > 0 || currentLoading ? (
                 <motion.div
                   className={styles.resultsGrid}
                   initial={{ y: 30, opacity: 0 }}
@@ -116,9 +131,9 @@ export default function SearchContainer({
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
                   <PostsGrid
-                    posts={posts}
-                    loading={loading}
-                    hasNextPage={hasNextPage}
+                    posts={currentPosts}
+                    loading={currentLoading}
+                    hasNextPage={currentHasNextPage}
                     columns={4}
                     layout="grid"
                     showAuthor={true}
