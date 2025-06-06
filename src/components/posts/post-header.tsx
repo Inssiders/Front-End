@@ -1,10 +1,38 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Flame, Heart, Sparkles, Star, TrendingUp, Zap } from "lucide-react";
+import { Sparkles, Star, TrendingUp, Zap } from "lucide-react";
 import { useMemo } from "react";
 
-export default function PostsHeader() {
+interface PostsHeaderProps {
+  title?: string;
+  subtitle?: string;
+  badge?: string;
+  emojis?: string[];
+  stats?: Array<{
+    icon: any;
+    label: string;
+    value: string;
+    color: string;
+  }>;
+  className?: string;
+}
+
+export default function PostsHeader({
+  title = "밈 월드",
+  subtitle = "🔥 핫한 밈부터 감성 짤까지! 지금 가장 트렌디한 콘텐츠를 만나보세요 💖",
+  badge = "✨ 최신 밈 갤러리 ✨",
+  emojis = ["🤩", "😎", "🔥", "💯", "✨", "🚀"],
+  stats = [
+    {
+      icon: TrendingUp,
+      label: "밈 콘텐츠",
+      value: "50+",
+      color: "from-pink-400 to-pink-600",
+    },
+  ],
+  className = "",
+}: PostsHeaderProps) {
   // Hydration 이슈 해결을 위해 랜덤 값들을 고정
   const particleData = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => ({
@@ -15,7 +43,9 @@ export default function PostsHeader() {
     }));
   }, []);
   return (
-    <div className="relative min-h-[35vh] bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 overflow-hidden">
+    <div
+      className={`relative min-h-[35vh] bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 overflow-hidden ${className}`}
+    >
       {/* Page Background Elements - moved from page.tsx */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Gradient Orbs */}
@@ -85,9 +115,7 @@ export default function PostsHeader() {
             className="inline-flex items-center gap-2 px-6 py-3 mb-6 rounded-full bg-white/80 backdrop-blur-md border border-pink-200/50 shadow-lg"
           >
             <Sparkles className="w-5 h-5 text-pink-500" />
-            <span className="text-sm font-bold text-gray-800 tracking-wide">
-              ✨ 최신 밈 갤러리 ✨
-            </span>
+            <span className="text-sm font-bold text-gray-800 tracking-wide">{badge}</span>
             <Star className="w-4 h-4 text-yellow-500" />
           </motion.div>
 
@@ -99,7 +127,7 @@ export default function PostsHeader() {
             className="text-4xl md:text-6xl lg:text-7xl font-black mb-4 tracking-tight"
           >
             <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent drop-shadow-lg">
-              밈 월드
+              {title}
             </span>
             <br />
             <span className="text-gray-800 text-3xl md:text-4xl lg:text-5xl">갤러리</span>
@@ -112,8 +140,7 @@ export default function PostsHeader() {
             transition={{ delay: 0.7, duration: 0.8 }}
             className="text-base md:text-lg lg:text-xl text-gray-700 max-w-3xl mx-auto mb-6 leading-relaxed font-medium"
           >
-            🔥 핫한 밈부터 감성 짤까지! 지금 가장 트렌디한 콘텐츠를 만나보세요
-            <span className="text-pink-500 font-bold">💖</span>
+            {subtitle}
           </motion.p>
 
           {/* Emoji Animation */}
@@ -123,7 +150,7 @@ export default function PostsHeader() {
             transition={{ delay: 0.9, type: "spring", stiffness: 100 }}
             className="flex justify-center gap-4 text-2xl md:text-3xl mb-8"
           >
-            {["🤩", "😎", "🔥", "💯", "✨", "🚀"].map((emoji, i) => (
+            {emojis.map((emoji, i) => (
               <motion.span
                 key={emoji}
                 animate={{
@@ -147,28 +174,14 @@ export default function PostsHeader() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.1, duration: 0.8 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto"
+            className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-4xl mx-auto"
           >
-            {[
-              {
-                icon: TrendingUp,
-                label: "트렌딩",
-                value: "99+",
-                color: "from-pink-400 to-pink-600",
-              },
-              {
-                icon: Heart,
-                label: "인기짱",
-                value: "1K+",
-                color: "from-purple-400 to-purple-600",
-              },
-              { icon: Flame, label: "핫이슈", value: "24/7", color: "from-cyan-400 to-cyan-600" },
-            ].map((stat, i) => (
+            {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-white/50 shadow-xl hover:shadow-2xl transition-all duration-300"
+                className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-white/50 shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[200px] flex-shrink-0"
               >
                 <div
                   className={`w-12 h-12 rounded-full bg-gradient-to-r ${stat.color} flex items-center justify-center mb-3 mx-auto`}

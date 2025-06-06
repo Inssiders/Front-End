@@ -40,7 +40,7 @@ export async function getPosts(params: {
     url.searchParams.set("size", String(params.size || 12));
 
     if (params.category) {
-      url.searchParams.set("category", params.category);
+      url.searchParams.set("category_id", params.category);
     }
 
     const response = await fetch(url.toString(), {

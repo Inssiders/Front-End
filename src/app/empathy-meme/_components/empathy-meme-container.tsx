@@ -1,8 +1,10 @@
 "use client";
 
 import PostsGrid from "@/components/posts/post-grid";
-import { useInfiniteMemes } from "@/hooks/use-infinite-user-posts";
+import PostsHeader from "@/components/posts/post-header";
+import { CategoryData, Post } from "@/utils/types/posts";
 import { motion } from "framer-motion";
+import { Users } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface FloatingCircle {
@@ -16,14 +18,20 @@ interface FloatingCircle {
 }
 
 interface EmpathyMemeContainerProps {
-  initialPosts: any[];
+  categories: CategoryData[];
+  category: string;
+  initialPosts: Post[];
+  hasNextPage: boolean;
+  headerType?: "default" | "posts" | "none";
 }
 
-export default function EmpathyMemeContainer({ initialPosts }: EmpathyMemeContainerProps) {
-  const { data, isFetchingNextPage, target } = useInfiniteMemes({
-    size: 9,
-  });
-
+export default function EmpathyMemeContainer({
+  categories,
+  category,
+  initialPosts,
+  hasNextPage,
+  headerType = "default",
+}: EmpathyMemeContainerProps) {
   const [circles, setCircles] = useState<FloatingCircle[]>([]);
 
   // Generate random circle properties on client-side only
@@ -42,30 +50,35 @@ export default function EmpathyMemeContainer({ initialPosts }: EmpathyMemeContai
     setCircles(newCircles);
   }, []);
 
-  const allPosts =
-    data?.pages.flatMap((page) =>
-      page.items.map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        category: item.category || "기타",
-        post_media_url: item.youtubeUrl,
-        type: "video",
-        author: {
-          name: item.author.name || "Unknown",
-          avatar: item.author.avatar || "/placeholder.svg",
-        },
-        likes: item.likes || 0,
-        comments: item.comments || 0,
-        shares: 0,
-        views: 0,
-        isLiked: false,
-        isBookmarked: false,
-      }))
-    ) ?? initialPosts;
+  // 전달받은 초기 posts 데이터를 그대로 사용
+  const allPosts = initialPosts;
 
-  return (
-    <div className="space-y-8">
-      {/* Banner Section */}
+  // 공감밈 전용 헤더 설정
+  const empathyMemeHeaderProps = {
+    title: "공감밈",
+    subtitle:
+      "🎬 유튜브 영상으로 공감할 수 있는 밈들을 공유하세요! 재미있고 공감되는 순간들을 함께 나누어보세요 💫",
+    badge: "✨ 공감밈 갤러리 ✨",
+    emojis: ["🎬", "😂", "👍", "💯", "🔥", "🎉"],
+    stats: [
+      {
+        icon: Users,
+        label: "공감밈 콘텐츠",
+        value: "50+",
+        color: "from-pink-400 to-pink-600",
+      },
+    ],
+  };
+
+  const renderHeader = () => {
+    if (headerType === "none") return null;
+
+    if (headerType === "posts") {
+      return <PostsHeader {...empathyMemeHeaderProps} />;
+    }
+
+    // 기본 배너 (headerType === "default")
+    return (
       <div className="relative h-[300px] overflow-hidden rounded-xl">
         {/* Animated background gradients */}
         <motion.div
@@ -139,19 +152,25 @@ export default function EmpathyMemeContainer({ initialPosts }: EmpathyMemeContai
           </motion.p>
         </motion.div>
       </div>
+    );
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Header Section */}
+      {renderHeader()}
 
       {/* Grid Section */}
       <PostsGrid
         posts={allPosts}
-        loading={isFetchingNextPage}
+        loading={false}
+        hasNextPage={hasNextPage}
+        category={category}
         columns={4}
         showAuthor={true}
         showActions={true}
         layout="grid"
       />
-
-      {/* Infinite Scroll Target */}
-      <div ref={target} className="h-1" />
     </div>
   );
 }

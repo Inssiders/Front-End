@@ -60,7 +60,7 @@ export function useInfiniteMemes({
       url.searchParams.set("size", String(size));
 
       if (category) {
-        url.searchParams.set("category", category);
+        url.searchParams.set("category_id", category);
       }
 
       if (isProfileMode) {

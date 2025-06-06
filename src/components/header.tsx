@@ -5,7 +5,7 @@ import { useMobile } from "@/hooks/use-mobile";
 import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { LogOut, Menu, Search, Settings, Sparkles, Star, TrendingUp, User } from "lucide-react";
+import { LogOut, Menu, Search, Settings, Sparkles, Star, User } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -57,13 +57,6 @@ const navItems = [
         icon: <Star className="h-5 w-5" />,
         description: "공감할 수 있는 밈들을 찾아보세요",
         emoji: "💕",
-      },
-      {
-        name: "인기글",
-        href: "/trending",
-        icon: <TrendingUp className="h-5 w-5" />,
-        description: "지금 가장 핫한 콘텐츠",
-        emoji: "🚀",
       },
     ],
   },
