@@ -2,8 +2,8 @@
 .container {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px) saturate(120%);
-  border-bottom: 1px solid rgba(255, 182, 193, 0.3);
-  box-shadow: 0 4px 20px rgba(255, 105, 180, 0.1);
+  border-bottom: 1px solid rgba(249, 115, 22, 0.3);
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.1);
   position: sticky;
   top: 64px;
   z-index: 40;
@@ -12,8 +12,8 @@
 
 .container:hover {
   background: rgba(255, 255, 255, 0.9);
-  border-bottom-color: rgba(255, 105, 180, 0.4);
-  box-shadow: 0 6px 25px rgba(255, 105, 180, 0.15);
+  border-bottom-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 6px 25px rgba(249, 115, 22, 0.15);
 }
 
 .wrapper {
@@ -47,7 +47,7 @@
   padding: 0.5rem 0 1rem 0;
   width: 100%;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 105, 180, 0.3) transparent;
+  scrollbar-color: rgba(249, 115, 22, 0.3) transparent;
 }
 
 .categoriesWrapper::-webkit-scrollbar {
@@ -55,12 +55,12 @@
 }
 
 .categoriesWrapper::-webkit-scrollbar-track {
-  background: rgba(255, 182, 193, 0.2);
+  background: rgba(249, 115, 22, 0.2);
   border-radius: 2px;
 }
 
 .categoriesWrapper::-webkit-scrollbar-thumb {
-  background: linear-gradient(90deg, #ff69b4, #ff1493);
+  background: linear-gradient(90deg, #f97316, #f43f5e);
   border-radius: 2px;
 }
 
@@ -99,7 +99,7 @@
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(45deg, #ff69b4, #ff1493, #9370db, #00bfff, #ff69b4);
+  background: linear-gradient(45deg, #f97316, #f43f5e, #3b82f6, #ffbe0b, #f97316);
   background-size: 300% 300%;
   border-radius: 25px;
   opacity: 0;
@@ -125,22 +125,22 @@
 
 /* 활성 상태 */
 .categoryButton.active {
-  background: linear-gradient(135deg, #ff69b4, #ff1493);
+  background: linear-gradient(135deg, #f97316, #f43f5e);
   color: white;
   font-weight: 700;
   border-color: transparent;
   box-shadow:
-    0 8px 25px rgba(255, 105, 180, 0.4),
-    0 4px 15px rgba(255, 20, 147, 0.3),
+    0 8px 25px rgba(249, 115, 22, 0.4),
+    0 4px 15px rgba(244, 63, 94, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transform: translateY(-2px) scale(1.05);
 }
 
 .categoryButton.active:hover {
-  background: linear-gradient(135deg, #ff1493, #dc143c);
+  background: linear-gradient(135deg, #f43f5e, #dc2626);
   box-shadow:
-    0 12px 35px rgba(255, 105, 180, 0.5),
-    0 6px 20px rgba(255, 20, 147, 0.4),
+    0 12px 35px rgba(249, 115, 22, 0.5),
+    0 6px 20px rgba(244, 63, 94, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateY(-3px) scale(1.08);
 }
@@ -149,18 +149,18 @@
 .categoryButton.inactive {
   color: rgba(107, 114, 128, 0.8);
   background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(255, 182, 193, 0.3);
+  border-color: rgba(249, 115, 22, 0.3);
   backdrop-filter: blur(15px);
 }
 
 .categoryButton.inactive:hover {
-  color: #ff1493;
-  background: rgba(255, 182, 193, 0.2);
-  border-color: rgba(255, 105, 180, 0.5);
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.2);
+  border-color: rgba(244, 63, 94, 0.5);
   transform: translateY(-1px) scale(1.02);
   box-shadow:
-    0 6px 20px rgba(255, 105, 180, 0.2),
-    0 3px 10px rgba(255, 182, 193, 0.3);
+    0 6px 20px rgba(244, 63, 94, 0.2),
+    0 3px 10px rgba(249, 115, 22, 0.3);
 }
 
 /* 활성 버튼 펄스 효과 */

@@ -19,6 +19,11 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      refetchOnMount: false, // 마운트 시 캐시된 데이터 우선 사용
+      staleTime: 5 * 60 * 1000, // 5분 동안 데이터를 fresh로 간주
+      gcTime: 30 * 60 * 1000, // 30분 동안 캐시 유지
+      retry: 1, // 재시도 횟수 줄여서 빠른 응답
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+
 import { PostCategoriesProps } from "@/utils/types/posts";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,6 +11,7 @@ export default function PostCategories({ categories = [] }: PostCategoriesProps)
   const router = useRouter(); // 라우터
   const searchParams = useSearchParams();
   const currentCategory = searchParams.get("category") || "all";
+
   // API 데이터 또는 기본 카테고리 사용
   const displayCategories =
     categories.length > 0
@@ -24,6 +26,9 @@ export default function PostCategories({ categories = [] }: PostCategoriesProps)
       : [{ id: "all", name: "전체", label: "전체" }];
 
   const handleCategoryClick = (categoryId: string) => {
+    // 현재 스크롤 위치 저장
+    const currentScrollY = window.pageYOffset;
+
     const params = new URLSearchParams(searchParams.toString());
 
     params.delete("category_id");
@@ -35,7 +40,26 @@ export default function PostCategories({ categories = [] }: PostCategoriesProps)
     }
 
     const queryString = params.toString();
+
+    // URL 변경 후 스크롤 위치 복원
     router.push(queryString ? `?${queryString}` : "/posts");
+
+    // 스크롤 위치 복원 (여러 시점에서 시도)
+    requestAnimationFrame(() => {
+      window.scrollTo(0, currentScrollY);
+    });
+
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollY);
+    }, 50);
+
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollY);
+    }, 200);
+
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollY);
+    }, 500);
   };
 
   return (

@@ -142,6 +142,7 @@ export interface PostsGridProps {
   // 제어 모드 - 외부에서 posts를 직접 제공
   posts?: Post[];
   loading?: boolean;
+  hasNextPage?: boolean; // SSR에서 무한스크롤 여부 전달
 
   // 비제어 모드 - 내부에서 데이터 fetch
   category?: string;
@@ -156,6 +157,7 @@ export interface PostsGridProps {
   enableHoverPlay?: boolean;
   feedMode?: boolean;
   className?: string;
+  disableAnimation?: boolean; // 애니메이션 비활성화 옵션
   onLike?: (postId: number | string) => void;
   onComment?: (postId: number | string) => void;
   onView?: (postId: number | string) => void;
@@ -168,6 +170,7 @@ export interface PostCardProps {
   feedMode: boolean;
   showAuthor: boolean;
   showActions: boolean;
+  disableAnimation?: boolean; // 애니메이션 비활성화 옵션
   onLike: (id: number | string) => void;
   onComment: (id: number | string) => void;
   onView: (id: number | string) => void;

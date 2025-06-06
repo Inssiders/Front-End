@@ -1,4 +1,79 @@
-import { CategoriesResponse } from "@/utils/types/posts";
+import { CategoriesResponse, Post } from "@/utils/types/posts";
+
+// posts 데이터를 UI Post 타입으로 변환하는 함수
+function convertApiMemeToPost(row: any): Post {
+  return {
+    id: row.id?.toString() || Date.now().toString(),
+    title: row.title,
+    content: row.content,
+    category_id: row.category_id,
+    media_url: row.media_url,
+    media_upload_time: row.media_upload_time,
+    account_id: row.user_id,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    is_deleted: false,
+
+    // UI를 위한 추가 정보
+    author: {
+      account_id: row.user_id,
+      account_name: `User ${row.user_id}`,
+      profile_image: "/placeholder.svg",
+    },
+    likes: row.like_count || 0,
+    comment_count: row.comment_count || 0,
+    is_liked: row.is_liked || false,
+  };
+}
+
+// SSR용 posts 데이터 가져오기 함수
+export async function getPosts(params: {
+  category?: string;
+  page?: number;
+  size?: number;
+}): Promise<{ posts: Post[]; hasNextPage: boolean; total: number }> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    const url = new URL(`${baseUrl}/server/posts`);
+
+    url.searchParams.set("page", String(params.page || 1));
+    url.searchParams.set("size", String(params.size || 12));
+
+    if (params.category) {
+      url.searchParams.set("category", params.category);
+    }
+
+    const response = await fetch(url.toString(), {
+      cache: "no-store", // 항상 최신 데이터
+    });
+
+    if (!response.ok) {
+      console.error("Posts 조회 실패:", response.status);
+      return {
+        posts: [],
+        hasNextPage: false,
+        total: 0,
+      };
+    }
+
+    const json = await response.json();
+
+    const posts: Post[] = json.data.memes.map(convertApiMemeToPost);
+
+    return {
+      posts,
+      hasNextPage: json.data.pageInfo.page < json.data.pageInfo.totalPages,
+      total: json.data.pageInfo.totalElements,
+    };
+  } catch (error) {
+    console.error("Posts 조회 중 오류:", error);
+    return {
+      posts: [],
+      hasNextPage: false,
+      total: 0,
+    };
+  }
+}
 
 // 카테고리 데이터 가져오기 함수
 export async function getCategories(): Promise<CategoriesResponse> {

@@ -9,8 +9,8 @@
     0 8px 32px rgba(255, 105, 180, 0.15),
     0 4px 16px rgba(138, 43, 226, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
 }
@@ -340,6 +340,73 @@
     padding: 0.375rem 0.75rem;
     font-size: 0.7rem;
   }
+}
+
+/* 애니메이션 비활성화 클래스 */
+.noAnimation,
+.noAnimation *,
+.noAnimation::before,
+.noAnimation::after {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.noAnimation:hover {
+  transform: none !important;
+  box-shadow:
+    0 8px 32px rgba(255, 105, 180, 0.15),
+    0 4px 16px rgba(138, 43, 226, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.noAnimation::before {
+  opacity: 0 !important;
+}
+
+.noAnimation:hover::before {
+  opacity: 0 !important;
+}
+
+.noAnimation .image {
+  transform: none !important;
+  filter: brightness(1.05) saturate(1.1) !important;
+}
+
+.noAnimation:hover .image {
+  transform: none !important;
+  filter: brightness(1.05) saturate(1.1) !important;
+}
+
+.noAnimation .title:hover {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+  background-clip: unset !important;
+  transform: none !important;
+  filter: none !important;
+  color: rgba(55, 65, 81, 0.9) !important;
+}
+
+.noAnimation .badge:hover {
+  background: linear-gradient(135deg, #ff69b4, #ff1493) !important;
+  transform: none !important;
+  box-shadow:
+    0 4px 15px rgba(255, 105, 180, 0.4),
+    0 2px 8px rgba(255, 20, 147, 0.3) !important;
+}
+
+.noAnimation .actionButton:hover {
+  transform: none !important;
+  background: rgba(59, 130, 246, 0.1) !important;
+}
+
+.noAnimation .actionButton:hover .actionIcon {
+  transform: none !important;
+}
+
+.noAnimation .avatar:hover {
+  transform: none !important;
 }
 
 @media (hover: none) {

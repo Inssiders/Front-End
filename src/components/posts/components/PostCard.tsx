@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { CATEGORY_LABELS, Category, PostCardProps } from "@/utils/types/posts";
+import { Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import HoverVideo from "./HoverVideo";
@@ -14,6 +15,7 @@ export default function PostCard({
   feedMode,
   showAuthor,
   showActions,
+  disableAnimation = false,
   onLike,
   onComment,
   onView,
@@ -21,7 +23,7 @@ export default function PostCard({
   const [isCardHovered, setIsCardHovered] = useState(false);
   return (
     <Card
-      className={`${styles.card} ${feedMode ? styles.feedMode : ""}`}
+      className={`${styles.card} ${feedMode ? styles.feedMode : ""} ${disableAnimation ? styles.noAnimation : ""}`}
       onMouseEnter={() => setIsCardHovered(true)}
       onMouseLeave={() => setIsCardHovered(false)}
     >
@@ -58,7 +60,6 @@ export default function PostCard({
             {post.title}
           </Link>
         </div>
-
         {/* 중간: 설명 및 작성자 정보 */}
         <div>
           {/* 설명 (피드 모드에서만 표시) */}
@@ -87,8 +88,6 @@ export default function PostCard({
             </Link>
           )}
         </div>
-
-        {/* 하단: 액션 버튼들
         {showActions && (
           <div className={styles.actions}>
             <button
@@ -98,18 +97,17 @@ export default function PostCard({
               onClick={() => onLike(post.id)}
             >
               <Heart className={`${styles.actionIcon} ${post.is_liked ? styles.likedIcon : ""}`} />
-              {post.likes.toLocaleString()}
+              {post?.likes?.toLocaleString()}
             </button>
             <button
               className={`${styles.actionButton} ${styles.commentButton}`}
               onClick={() => onComment(post.id)}
             >
               <MessageCircle className={styles.actionIcon} />
-              {post.comment_count.toLocaleString()}
+              {post?.comment_count?.toLocaleString()}
             </button>
-
           </div>
-        )} */}
+        )}
       </CardContent>
     </Card>
   );
