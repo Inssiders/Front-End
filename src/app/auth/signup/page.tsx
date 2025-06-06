@@ -1,6 +1,16 @@
 import { Metadata } from "next";
-import SignUpClient from "./_components/SignUpClient";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import styles from "./page.module.css";
+
+// 동적 import로 큰 컴포넌트를 로드
+const SignUpClient = dynamic(() => import("./_components/SignUpClient"), {
+  loading: () => (
+    <div className="w-full max-w-md mx-auto">
+      <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 animate-pulse rounded-2xl shadow-lg" />
+    </div>
+  ),
+});
 
 export const metadata: Metadata = {
   title: "Inssider 회원가입",
@@ -26,18 +36,8 @@ export default function SignUpPage() {
         <div className={styles.headerSection}>
           {/* 브랜드 아이콘 */}
           <div className={styles.brandIcon}>
-            <svg
-              className={styles.brandIconSvg}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
+            <svg className={styles.brandIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
 
@@ -52,7 +52,15 @@ export default function SignUpPage() {
         </div>
 
         {/* 회원가입 폼 */}
-        <SignUpClient />
+        <Suspense
+          fallback={
+            <div className="w-full max-w-md mx-auto">
+              <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 animate-pulse rounded-2xl shadow-lg" />
+            </div>
+          }
+        >
+          <SignUpClient />
+        </Suspense>
 
         {/* 로그인 링크 */}
         <div className={styles.loginSection}>

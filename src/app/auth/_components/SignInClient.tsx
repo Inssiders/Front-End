@@ -9,11 +9,16 @@ import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import MemeCard from "./MemeCard";
+
+// 동적 import로 MemeCard를 로드 (데스크탑에서만 필요)
+const MemeCard = dynamic(() => import("./MemeCard"), {
+  loading: () => <div className="w-80 h-96 bg-gradient-to-br from-purple-100 to-pink-100 animate-pulse rounded-2xl" />,
+});
 
 const MEMES = [
   {

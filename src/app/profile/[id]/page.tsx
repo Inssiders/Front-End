@@ -1,8 +1,16 @@
-import { ProfileDetail } from "@/app/profile/_components/profile-detail";
 import { ProfileDetailLoading } from "@/app/profile/_components/profile-detail-loading";
 import { fetchProfilePosts } from "@/utils/fetch/profile";
 import { ProfileData } from "@/utils/types/profile";
+import dynamic from "next/dynamic";
 import { Suspense } from "react";
+
+// 동적 import로 ProfileDetail 컴포넌트를 로드
+const ProfileDetail = dynamic(
+  () => import("@/app/profile/_components/profile-detail").then((mod) => ({ default: mod.ProfileDetail })),
+  {
+    loading: () => <ProfileDetailLoading />,
+  }
+);
 
 // MSW 서버 초기화
 if (process.env.NODE_ENV === "development") {
@@ -23,8 +31,7 @@ function transformMemeToProfileData(meme: any, userId: string): ProfileData {
   return {
     user_id: userId,
     user_detail_username: meme.user?.nickname || `사용자${userId}`,
-    user_detail_profile_url:
-      meme.user?.profileUrl || "/placeholder.svg?height=150&width=150&text=U",
+    user_detail_profile_url: meme.user?.profileUrl || "/placeholder.svg?height=150&width=150&text=U",
     user_detail_introduction: meme.user?.bio || "안녕하세요! 인싸이더에서 활동중입니다.",
     user_created_at: meme.created_at,
     posts: 0, // 실제 게시물 수는 별도로 계산 필요
@@ -76,12 +83,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Profil
     return (
       <main className="flex min-h-screen flex-col bg-gray-50">
         <Suspense fallback={<ProfileDetailLoading />}>
-          <ProfileDetail
-            profile={profile}
-            initialTab={tab}
-            initialPostsData={postsData}
-            initialLikesData={likesData}
-          />
+          <ProfileDetail profile={profile} initialTab={tab} initialPostsData={postsData} initialLikesData={likesData} />
         </Suspense>
       </main>
     );
