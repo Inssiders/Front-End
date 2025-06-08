@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MEME_CATEGORIES } from "@/utils/constant";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal } from "lucide-react";
+import {  Search, SlidersHorizontal } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function PostCategories() {
+export default function PostCategories({id = "1"}:{id?:string}) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [showSearch, setShowSearch] = useState(false);
 
@@ -24,11 +26,10 @@ export default function PostCategories() {
               >
                 <Button
                   variant={activeCategory === category.id ? "default" : "ghost"}
-                  className={`rounded-full mr-2 ${
-                    activeCategory === category.id
+                  className={`rounded-full mr-2 ${activeCategory === category.id
                       ? "bg-purple-600 hover:bg-purple-700 text-white"
                       : "text-gray-700 dark:text-gray-300"
-                  }`}
+                    }`}
                   onClick={() => setActiveCategory(category.id)}
                 >
                   {category.name}
@@ -72,6 +73,11 @@ export default function PostCategories() {
             >
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
+            <Link href={`/create/${id}`}>
+              <h3 className="">
+                밈 생성하기
+              </h3>
+            </Link>
           </div>
         </div>
       </div>
