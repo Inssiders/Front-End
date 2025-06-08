@@ -1,10 +1,12 @@
 "use client";
 
+import { createAccount } from "@/lib/auth-actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import styles from "./SignUpClient.module.css";
 
 // 유효성 검증 스키마
 const signUpSchema = z
@@ -26,12 +28,16 @@ const signUpSchema = z
 
 type SignUpFormData = z.infer<typeof signUpSchema>;
 
+const steps = [
+  { id: "email", title: "이메일 인증", icon: "📧" },
+  { id: "code", title: "코드 확인", icon: "🔢" },
+  { id: "signup", title: "정보 입력", icon: "👤" },
+];
+
 export default function SignUpClient() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [verificationStep, setVerificationStep] = useState<
-    "email" | "code" | "signup"
-  >("email");
+  const [verificationStep, setVerificationStep] = useState<"email" | "code" | "signup">("email");
   const [verificationCode, setVerificationCode] = useState("");
   const [authorizationCode, setAuthorizationCode] = useState("");
   const [error, setError] = useState("");
@@ -46,6 +52,10 @@ export default function SignUpClient() {
     resolver: zodResolver(signUpSchema),
   });
 
+  // 현재 스텝의 인덱스
+  const currentStepIndex = steps.findIndex((step) => step.id === verificationStep);
+  const progressPercentage = ((currentStepIndex + 1) / steps.length) * 100;
+
   // 이메일 인증 코드 요청
   const handleEmailVerification = async () => {
     const email = getValues("email");
@@ -56,30 +66,23 @@ export default function SignUpClient() {
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL || ""}/api/auth/email/challenge`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const response = await fetch(`/server/auth/email/challenge`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(
-          error.detail || "이메일 인증 코드 발송에 실패했습니다."
-        );
+        throw new Error(error.detail || "이메일 인증 코드 발송에 실패했습니다.");
       }
 
       setVerificationStep("code");
       setError("");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
+      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -94,19 +97,16 @@ export default function SignUpClient() {
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL || ""}/api/auth/email/verify`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: getValues("email"),
-            otp: verificationCode,
-          }),
-        }
-      );
+      const response = await fetch(`/server/auth/email/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: getValues("email"),
+          otp: verificationCode,
+        }),
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -118,9 +118,7 @@ export default function SignUpClient() {
       setVerificationStep("signup");
       setError("");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
+      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -130,108 +128,145 @@ export default function SignUpClient() {
   const onSubmit = async (data: SignUpFormData) => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL || ""}/api/accounts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authorizationCode}`,
-          },
-          body: JSON.stringify({
-            register_type: "password",
-            email: data.email,
-            password: data.password,
-          }),
-        }
-      );
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "회원가입에 실패했습니다.");
-      }
+      await createAccount({
+        email: data.email,
+        password: data.password,
+        authorizationCode,
+      });
 
       router.push("/auth/signin");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
+      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const getStepStatus = (stepId: string) => {
+    const stepIndex = steps.findIndex((step) => step.id === stepId);
+    if (stepIndex < currentStepIndex) return "completed";
+    if (stepIndex === currentStepIndex) return "active";
+    return "pending";
+  };
+
   return (
-    <div className="w-full max-w-md space-y-8 p-6 bg-white rounded-xl shadow-md">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold">회원가입</h2>
-        <p className="mt-2 text-gray-600">
-          {verificationStep === "email"
-            ? "이메일 인증이 필요합니다."
-            : verificationStep === "code"
-            ? "인증 코드를 입력해주세요."
-            : "회원 정보를 입력해주세요."}
+    <div className={styles.container}>
+      {/* 진행 상태 표시기 */}
+      <div className={styles.progressSection}>
+        {/* 진행 바 */}
+        <div className={styles.progressBarContainer}>
+          <div className={styles.progressBar} style={{ width: `${progressPercentage}%` }}></div>
+        </div>
+
+        {/* 스텝 인디케이터 */}
+        <div className={styles.stepIndicatorsContainer}>
+          {steps.map((step, index) => {
+            const status = getStepStatus(step.id);
+            return (
+              <div key={step.id} className={styles.stepIndicatorItem}>
+                <div
+                  className={`${styles.stepIcon} ${
+                    status === "active" ? styles.stepActive : ""
+                  } ${status === "completed" ? styles.stepCompleted : ""} ${
+                    status === "pending" ? styles.stepPending : ""
+                  }`}
+                >
+                  {status === "completed" ? (
+                    <svg
+                      className={`${styles.checkmarkIcon} ${styles.checkmark}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  ) : (
+                    <span className={styles.stepIconContent}>{step.icon}</span>
+                  )}
+                </div>
+                <span className={styles.stepTitle}>{step.title}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 헤더 */}
+      <div className={styles.headerSection}>
+        <h2 className={styles.headerTitle}>
+          {verificationStep === "email" && "🚀 이메일 인증"}
+          {verificationStep === "code" && "🔐 코드 확인"}
+          {verificationStep === "signup" && "⚡ 계정 생성"}
+        </h2>
+        <p className={styles.headerDescription}>
+          {verificationStep === "email" && "✨ 마법같은 여정의 시작을 위해 이메일을 입력하세요"}
+          {verificationStep === "code" && "🎯 받으신 6자리 코드로 신원을 확인해주세요"}
+          {verificationStep === "signup" && "🔑 안전한 비밀번호로 당신의 공간을 보호하세요"}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className={styles.formContainer}>
         {/* 이메일 입력 */}
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            이메일
+        <div className={styles.inputGroup}>
+          <label htmlFor="email" className={styles.labelEmail}>
+            ✉️ 이메일 주소
           </label>
-          <div className="mt-1 flex gap-2">
-            <input
-              id="email"
-              type="email"
-              disabled={verificationStep !== "email"}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100"
-              {...register("email")}
-            />
+          <div className={styles.inputContainer}>
+            <div className={styles.inputWrapper}>
+              <input
+                id="email"
+                type="email"
+                disabled={verificationStep !== "email"}
+                placeholder="your@email.com"
+                className={styles.emailInput}
+                {...register("email")}
+              />
+              {errors.email && <p className={styles.errorMessage}>⚠️ {errors.email.message}</p>}
+            </div>
             {verificationStep === "email" && (
               <button
                 type="button"
                 onClick={handleEmailVerification}
                 disabled={isLoading}
-                className="flex-shrink-0 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400"
+                className={styles.actionButton}
               >
-                인증 요청
+                {isLoading ? <div className={styles.spinnerSmall}></div> : "🚀 발송"}
               </button>
             )}
           </div>
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-          )}
         </div>
 
         {/* 인증 코드 입력 */}
         {verificationStep === "code" && (
-          <div>
-            <label
-              htmlFor="verificationCode"
-              className="block text-sm font-medium text-gray-700"
-            >
-              인증 코드
+          <div className={styles.inputGroup}>
+            <label htmlFor="verificationCode" className={styles.labelCode}>
+              🔢 인증 코드
             </label>
-            <div className="mt-1 flex gap-2">
-              <input
-                id="verificationCode"
-                type="text"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="6자리 인증 코드"
-              />
+            <div className={styles.inputContainer}>
+              <div className={styles.inputWrapper}>
+                <input
+                  id="verificationCode"
+                  type="text"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  placeholder="000000"
+                  maxLength={6}
+                  className={styles.codeInput}
+                />
+              </div>
               <button
                 type="button"
                 onClick={handleCodeVerification}
                 disabled={isLoading}
-                className="flex-shrink-0 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400"
+                className={styles.actionButton}
               >
-                확인
+                {isLoading ? <div className={styles.spinnerSmall}></div> : "🔍 확인"}
               </button>
             </div>
           </div>
@@ -239,59 +274,62 @@ export default function SignUpClient() {
 
         {/* 비밀번호 입력 */}
         {verificationStep === "signup" && (
-          <>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                비밀번호
+          <div className={styles.passwordSection}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="password" className={styles.labelPassword}>
+                🔐 비밀번호
               </label>
               <input
                 id="password"
                 type="password"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="8자 이상, 영문+숫자+특수문자"
+                className={styles.passwordInput}
                 {...register("password")}
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.password.message}
-                </p>
+                <p className={styles.errorMessage}>⚠️ {errors.password.message}</p>
               )}
             </div>
 
-            <div>
-              <label
-                htmlFor="passwordConfirm"
-                className="block text-sm font-medium text-gray-700"
-              >
-                비밀번호 확인
+            <div className={styles.inputGroup}>
+              <label htmlFor="passwordConfirm" className={styles.labelConfirm}>
+                🔒 비밀번호 확인
               </label>
               <input
                 id="passwordConfirm"
                 type="password"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="비밀번호를 다시 입력하세요"
+                className={styles.passwordInput}
                 {...register("passwordConfirm")}
               />
               {errors.passwordConfirm && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.passwordConfirm.message}
-                </p>
+                <p className={styles.errorMessage}>⚠️ {errors.passwordConfirm.message}</p>
               )}
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full rounded-md bg-blue-600 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400"
-            >
-              {isLoading ? "처리 중..." : "회원가입"}
+            <button type="submit" disabled={isLoading} className={styles.submitButton}>
+              {isLoading ? (
+                <>
+                  <div className={styles.spinnerLarge}></div>
+                  🔄 생성중...
+                </>
+              ) : (
+                "🎉 계정 만들기"
+              )}
             </button>
-          </>
+          </div>
         )}
 
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {/* 에러 메시지 */}
+        {error && (
+          <div className={styles.errorContainer}>
+            <p className={styles.errorText}>💥 {error}</p>
+          </div>
+        )}
       </form>
+
+      {/* 하단 장식 */}
+      <div className={styles.footerDecoration}>✨ Powered by Inssider ✨</div>
     </div>
   );
 }

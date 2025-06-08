@@ -1,14 +1,19 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Search } from "lucide-react"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
 // FAQ 데이터 (실제로는 API에서 가져올 것)
 const faqData = {
@@ -100,11 +105,11 @@ const faqData = {
         "기본적으로 인싸 포인트는 만료되지 않습니다. 다만, 이벤트나 프로모션을 통해 획득한 특별 포인트는 기간 제한이 있을 수 있으니 포인트 획득 시 안내 사항을 확인해주세요.",
     },
   ],
-}
+};
 
 export default function FaqContent() {
-  const [activeTab, setActiveTab] = useState("general")
-  const [searchQuery, setSearchQuery] = useState("")
+  const [activeTab, setActiveTab] = useState("general");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // 검색 기능 구현 (실제로는 더 복잡한 검색 로직이 필요할 수 있음)
   const filteredFaqs = Object.entries(faqData).reduce(
@@ -112,23 +117,23 @@ export default function FaqContent() {
       const filtered = items.filter(
         (item) =>
           item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.answer.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
+          item.answer.toLowerCase().includes(searchQuery.toLowerCase())
+      );
       if (filtered.length > 0) {
-        acc[category] = filtered
+        acc[category] = filtered;
       }
-      return acc
+      return acc;
     },
-    {} as Record<string, typeof faqData.general>,
-  )
+    {} as Record<string, typeof faqData.general>
+  );
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // 검색 로직 (이미 위에서 필터링됨)
-  }
+  };
 
   return (
-    <div className="py-20 bg-white dark:bg-gray-950">
+    <div className="bg-white py-20 dark:bg-gray-950">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -136,19 +141,19 @@ export default function FaqContent() {
           transition={{ duration: 0.5 }}
           className="mb-12"
         >
-          <form onSubmit={handleSearch} className="max-w-xl mx-auto mb-12">
+          <form onSubmit={handleSearch} className="mx-auto mb-12 max-w-xl">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
               <Input
                 type="search"
                 placeholder="질문 검색하기..."
-                className="pl-10 py-6 text-lg rounded-full bg-gray-100 border-0 focus-visible:ring-purple-500 dark:bg-gray-800"
+                className="rounded-full border-0 bg-gray-100 py-6 pl-10 text-lg focus-visible:ring-purple-500 dark:bg-gray-800"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <Button
                 type="submit"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 rounded-full bg-purple-600 hover:bg-purple-700"
+                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full bg-purple-600 hover:bg-purple-700"
               >
                 검색
               </Button>
@@ -159,9 +164,9 @@ export default function FaqContent() {
             defaultValue="general"
             value={activeTab}
             onValueChange={setActiveTab}
-            className="w-full max-w-3xl mx-auto"
+            className="mx-auto w-full max-w-3xl"
           >
-            <TabsList className="grid grid-cols-4 mb-8">
+            <TabsList className="mb-8 grid grid-cols-4">
               <TabsTrigger value="general">일반</TabsTrigger>
               <TabsTrigger value="account">계정</TabsTrigger>
               <TabsTrigger value="content">콘텐츠</TabsTrigger>
@@ -171,28 +176,29 @@ export default function FaqContent() {
             {Object.keys(faqData).map((category) => (
               <TabsContent key={category} value={category} className="mt-6">
                 <Accordion type="single" collapsible className="w-full">
-                  {(searchQuery ? filteredFaqs[category] || [] : faqData[category as keyof typeof faqData]).map(
-                    (faq, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                  {(searchQuery
+                    ? filteredFaqs[category] || []
+                    : faqData[category as keyof typeof faqData]
+                  ).map((faq, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                    >
+                      <AccordionItem
+                        value={`item-${index}`}
+                        className="border-b border-gray-200 dark:border-gray-800"
                       >
-                        <AccordionItem
-                          value={`item-${index}`}
-                          className="border-b border-gray-200 dark:border-gray-800"
-                        >
-                          <AccordionTrigger className="text-left font-medium text-gray-900 dark:text-white py-4">
-                            {faq.question}
-                          </AccordionTrigger>
-                          <AccordionContent className="text-gray-600 dark:text-gray-400 pb-4">
-                            {faq.answer}
-                          </AccordionContent>
-                        </AccordionItem>
-                      </motion.div>
-                    ),
-                  )}
+                        <AccordionTrigger className="py-4 text-left font-medium text-gray-900 dark:text-white">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-4 text-gray-600 dark:text-gray-400">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    </motion.div>
+                  ))}
                 </Accordion>
               </TabsContent>
             ))}
@@ -200,5 +206,5 @@ export default function FaqContent() {
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

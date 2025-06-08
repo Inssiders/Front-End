@@ -1,9 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "./resizable";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./resizable";
 
 const meta: Meta<typeof ResizablePanelGroup> = {
   title: "UI/Resizable",
@@ -16,7 +12,7 @@ type Story = StoryObj<typeof ResizablePanelGroup>;
 
 export const Default: Story = {
   render: () => (
-    <ResizablePanelGroup direction="horizontal" className="h-full w-full">
+    <ResizablePanelGroup direction="horizontal" className="size-full">
       <ResizablePanel>
         <div style={{ padding: 16 }}>Resizable Content</div>
       </ResizablePanel>

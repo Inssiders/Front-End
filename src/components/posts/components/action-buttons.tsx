@@ -27,11 +27,11 @@ export function ActionButtons({ onCommentClick }: ActionButtonsProps) {
   }, []);
 
   return (
-    <div className="flex items-center gap-3 mb-6">
+    <div className="mb-6 flex items-center gap-3">
       <Button
         onClick={handleLike}
         variant={isLiked ? "default" : "outline"}
-        className={`text-2xl transition relative ${
+        className={`relative text-2xl transition ${
           isLiked ? "text-pink-500" : "text-gray-700 hover:text-pink-500"
         } ${likeAnimating ? "scale-125" : "scale-100"}`}
         style={{ transition: "transform 0.2s, color 0.2s" }}
@@ -43,7 +43,7 @@ export function ActionButtons({ onCommentClick }: ActionButtonsProps) {
       <Button
         onClick={onCommentClick}
         variant="outline"
-        className="text-2xl text-gray-700 hover:text-blue-500 transition"
+        className="text-2xl text-gray-700 transition hover:text-blue-500"
       >
         <span role="img" aria-label="댓글">
           💬
@@ -52,7 +52,7 @@ export function ActionButtons({ onCommentClick }: ActionButtonsProps) {
       <Button
         onClick={handleShare}
         variant="outline"
-        className="text-2xl text-gray-700 hover:text-green-500 transition"
+        className="text-2xl text-gray-700 transition hover:text-green-500"
       >
         <span role="img" aria-label="공유">
           🔗

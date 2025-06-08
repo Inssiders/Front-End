@@ -31,8 +31,6 @@ export interface Follow {
   is_deleted: boolean;
 }
 
-
-
 export interface Post {
   id: number;
   title: string;
@@ -41,6 +39,7 @@ export interface Post {
   media_upload_time: string;
   account_id: number;
   category_id: number;
+  category: string;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -152,7 +151,6 @@ export interface AccountCreateResponse {
   };
 }
 
-
 // 댓글 타입
 export interface DetailComment {
   comment_id: string;
@@ -187,7 +185,6 @@ export interface DetailPost {
 
   // 댓글 목록
   comments_list: DetailComment[];
-  
 }
 export interface DetailResponse {
   message: string;

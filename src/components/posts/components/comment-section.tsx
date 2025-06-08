@@ -84,143 +84,149 @@ export function CommentSection({
   }, [editingCommentId, editingReplyId]);
 
   return (
-    <div className="overflow-y-auto max-h-80 pr-2">
-      {comments.slice().reverse().map((comment) => (
-        <div key={comment.comment_id} className="mb-4 relative">
-          {/* 댓글 삭제 버튼 */}
-          <button
-            className="absolute top-0 right-0 p-1 text-gray-400 hover:text-red-500"
-            onClick={() => onDeleteComment(comment.comment_id)}
-            aria-label="댓글 삭제"
-          >
-            <X size={16} />
-          </button>
-          
-          <div className="flex items-center gap-2">
-            <span className="font-bold">{comment.user_username}</span>
-            <span className="text-xs text-gray-400">
-              {new Date(comment.comment_created_at).toLocaleString()}
-            </span>
-          </div>
-          
-          {/* 댓글 내용 - 에딧 모드/뷰 모드 */}
-          <div className="ml-2 mt-1">
-            {editingCommentId === comment.comment_id ? (
-              <div className="space-y-2">
-                <textarea
-                  ref={editInputRef}
-                  value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
-                  onBlur={handleBlur}
-                  className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={3}
-                />
-                <div className="flex gap-2">
+    <div className="max-h-80 overflow-y-auto pr-2">
+      {comments
+        .slice()
+        .reverse()
+        .map((comment) => (
+          <div key={comment.comment_id} className="relative mb-4">
+            {/* 댓글 삭제 버튼 */}
+            <button
+              className="absolute right-0 top-0 p-1 text-gray-400 hover:text-red-500"
+              onClick={() => onDeleteComment(comment.comment_id)}
+              aria-label="댓글 삭제"
+            >
+              <X size={16} />
+            </button>
+
+            <div className="flex items-center gap-2">
+              <span className="font-bold">{comment.user_username}</span>
+              <span className="text-xs text-gray-400">
+                {new Date(comment.comment_created_at).toLocaleString()}
+              </span>
+            </div>
+
+            {/* 댓글 내용 - 에딧 모드/뷰 모드 */}
+            <div className="ml-2 mt-1">
+              {editingCommentId === comment.comment_id ? (
+                <div className="space-y-2">
+                  <textarea
+                    ref={editInputRef}
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    onBlur={handleBlur}
+                    className="w-full resize-none rounded border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      className="flex items-center gap-1 rounded bg-blue-500 px-3 py-1 text-xs text-white hover:bg-blue-600"
+                      onClick={submitCommentEdit}
+                    >
+                      <Check size={12} />
+                      수정하기
+                    </button>
+                    <button
+                      className="flex items-center gap-1 rounded bg-gray-500 px-3 py-1 text-xs text-white hover:bg-gray-600"
+                      onClick={cancelEdit}
+                    >
+                      <XIcon size={12} />
+                      취소
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start justify-between">
+                  <span>{comment.comment_content}</span>
                   <button
-                    className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
-                    onClick={submitCommentEdit}
+                    className="ml-2 p-1 text-gray-400 hover:text-blue-500"
+                    onClick={() => startEditComment(comment.comment_id, comment.comment_content)}
+                    aria-label="댓글 수정"
                   >
-                    <Check size={12} />
-                    수정하기
-                  </button>
-                  <button
-                    className="flex items-center gap-1 px-3 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
-                    onClick={cancelEdit}
-                  >
-                    <XIcon size={12} />
-                    취소
+                    <Edit2 size={14} />
                   </button>
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-start justify-between">
-                <span>{comment.comment_content}</span>
-                <button
-                  className="ml-2 p-1 text-gray-400 hover:text-blue-500"
-                  onClick={() => startEditComment(comment.comment_id, comment.comment_content)}
-                  aria-label="댓글 수정"
-                >
-                  <Edit2 size={14} />
-                </button>
+              )}
+            </div>
+
+            <button
+              className="ml-2 mt-1 text-xs text-blue-500"
+              onClick={() => onReply(comment.comment_id, comment.user_username)}
+            >
+              답글
+            </button>
+
+            {/* 대댓글 리스트 */}
+            {comment.replies && comment.replies.length > 0 && (
+              <div className="ml-6 mt-2 space-y-2">
+                {comment.replies
+                  .slice()
+                  .reverse()
+                  .map((reply: any) => (
+                    <div key={reply.reply_id} className="relative">
+                      <div className="flex w-full items-center gap-2">
+                        <div className="font-bold">{reply.user_username}</div>
+                        <div className="text-xs text-gray-400">
+                          {new Date(reply.reply_created_at).toLocaleString()}
+                        </div>
+                        {/* 대댓글 삭제 버튼 */}
+                        <button
+                          className="ml-auto p-1 text-gray-400 hover:text-red-500"
+                          onClick={() => onDeleteReply(comment.comment_id, reply.reply_id)}
+                          aria-label="대댓글 삭제"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+
+                      {/* 대댓글 내용 - 에딧 모드/뷰 모드 */}
+                      <div className="ml-2 mt-1">
+                        {editingReplyId === reply.reply_id ? (
+                          <div className="space-y-2">
+                            <textarea
+                              ref={editInputRef}
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
+                              onBlur={handleBlur}
+                              className="w-full resize-none rounded border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              rows={2}
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                className="flex items-center gap-1 rounded bg-blue-500 px-3 py-1 text-xs text-white hover:bg-blue-600"
+                                onClick={() => submitReplyEdit(comment.comment_id)}
+                              >
+                                <Check size={12} />
+                                수정하기
+                              </button>
+                              <button
+                                className="flex items-center gap-1 rounded bg-gray-500 px-3 py-1 text-xs text-white hover:bg-gray-600"
+                                onClick={cancelEdit}
+                              >
+                                <XIcon size={12} />
+                                취소
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-start justify-between">
+                            <span>{reply.reply_content}</span>
+                            <button
+                              className="ml-2 p-1 text-gray-400 hover:text-blue-500"
+                              onClick={() => startEditReply(reply.reply_id, reply.reply_content)}
+                              aria-label="대댓글 수정"
+                            >
+                              <Edit2 size={14} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
               </div>
             )}
           </div>
-          
-          <button
-            className="text-xs text-blue-500 ml-2 mt-1"
-            onClick={() => onReply(comment.comment_id, comment.user_username)}
-          >
-            답글
-          </button>
-          
-          {/* 대댓글 리스트 */}
-          {comment.replies && comment.replies.length > 0 && (
-            <div className="ml-6 mt-2 space-y-2">
-              {comment.replies.slice().reverse().map((reply: any) => (
-                <div key={reply.reply_id} className="relative">
-                  <div className="flex items-center gap-2 w-full">
-                    <div className="font-bold">{reply.user_username}</div>
-                    <div className="text-xs text-gray-400">
-                      {new Date(reply.reply_created_at).toLocaleString()}
-                    </div>
-                    {/* 대댓글 삭제 버튼 */}
-                    <button
-                      className="ml-auto p-1 text-gray-400 hover:text-red-500"
-                      onClick={() => onDeleteReply(comment.comment_id, reply.reply_id)}
-                      aria-label="대댓글 삭제"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                  
-                  {/* 대댓글 내용 - 에딧 모드/뷰 모드 */}
-                  <div className="ml-2 mt-1">
-                    {editingReplyId === reply.reply_id ? (
-                      <div className="space-y-2">
-                        <textarea
-                          ref={editInputRef}
-                          value={editContent}
-                          onChange={(e) => setEditContent(e.target.value)}
-                          onBlur={handleBlur}
-                          className="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          rows={2}
-                        />
-                        <div className="flex gap-2">
-                          <button
-                            className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
-                            onClick={() => submitReplyEdit(comment.comment_id)}
-                          >
-                            <Check size={12} />
-                            수정하기
-                          </button>
-                          <button
-                            className="flex items-center gap-1 px-3 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
-                            onClick={cancelEdit}
-                          >
-                            <XIcon size={12} />
-                            취소
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-start justify-between">
-                        <span>{reply.reply_content}</span>
-                        <button
-                          className="ml-2 p-1 text-gray-400 hover:text-blue-500"
-                          onClick={() => startEditReply(reply.reply_id, reply.reply_content)}
-                          aria-label="대댓글 수정"
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+        ))}
     </div>
   );
 }

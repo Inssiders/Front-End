@@ -1,0 +1,264 @@
+/* Posts Page Client Styles */
+
+/* 메인 컨테이너 */
+.mainContainer {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  min-height: calc(100vh - 60px);
+}
+
+/* 헤더 영역 */
+.header {
+  background: white;
+  border-bottom: 1px solid rgb(243, 244, 246);
+}
+
+/* 애니메이션 배경 */
+.animatedBackground {
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+}
+
+/* 베이스 그라데이션 */
+.baseGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgb(253, 242, 248),
+    rgb(250, 245, 255),
+    rgb(236, 254, 255)
+  );
+  animation: gradientShift 20s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+
+/* 플로팅 오브들 */
+.floatingOrb1 {
+  position: absolute;
+  top: 5rem;
+  left: 5rem;
+  width: 8rem;
+  height: 8rem;
+  background: linear-gradient(to right, rgb(244, 114, 182, 0.3), rgb(168, 85, 247, 0.3));
+  border-radius: 50%;
+  filter: blur(24px);
+  animation: bounce 2s infinite;
+  opacity: 0.7;
+}
+
+.floatingOrb2 {
+  position: absolute;
+  top: 33.333333%;
+  right: 4rem;
+  width: 6rem;
+  height: 6rem;
+  background: linear-gradient(to right, rgb(103, 232, 249, 0.3), rgb(59, 130, 246, 0.3));
+  border-radius: 50%;
+  filter: blur(24px);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  opacity: 0.6;
+}
+
+.floatingOrb3 {
+  position: absolute;
+  bottom: 25%;
+  left: 33.333333%;
+  width: 10rem;
+  height: 10rem;
+  background: linear-gradient(to right, rgb(253, 224, 71, 0.2), rgb(244, 114, 182, 0.2));
+  border-radius: 50%;
+  filter: blur(24px);
+  opacity: 0.5;
+  animation: float 12s ease-in-out infinite;
+}
+
+.floatingOrb4 {
+  position: absolute;
+  top: 50%;
+  right: 25%;
+  width: 7rem;
+  height: 7rem;
+  background: linear-gradient(to right, rgb(52, 211, 153, 0.25), rgb(20, 184, 166, 0.25));
+  border-radius: 50%;
+  filter: blur(24px);
+  opacity: 0.55;
+  animation: float 15s ease-in-out infinite reverse;
+}
+
+/* 콘텐츠 영역 */
+.contentArea {
+  position: relative;
+  z-index: 10;
+}
+
+.contentContainer {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .contentContainer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .contentContainer {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .contentContainer {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* 글래스 컨테이너 */
+.glassContainer {
+  position: relative;
+  background: rgb(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  border-radius: 1rem;
+  border: 1px solid rgb(229, 231, 235, 0.5);
+  box-shadow:
+    0 10px 15px -3px rgb(0, 0, 0, 0.1),
+    0 4px 6px -2px rgb(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  transition: all 0.5s ease;
+}
+
+@media (min-width: 640px) {
+  .glassContainer {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .glassContainer {
+    padding: 2.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .glassContainer {
+    padding: 3rem;
+  }
+}
+
+.glassContainer:hover {
+  box-shadow:
+    0 25px 25px -5px rgb(0, 0, 0, 0.1),
+    0 10px 10px -5px rgb(0, 0, 0, 0.04),
+    0 0 0 1px rgb(229, 231, 235, 0.5);
+}
+
+/* 탑 액센트 */
+.topAccent {
+  position: absolute;
+  top: 0;
+  left: 2rem;
+  right: 2rem;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgb(168, 85, 247, 0.6), transparent);
+}
+
+/* 플로팅 파티클들 */
+.floatingParticle1 {
+  position: fixed;
+  top: 6rem;
+  right: 3rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: rgb(244, 114, 182);
+  border-radius: 50%;
+  opacity: 0.7;
+  pointer-events: none;
+  animation: bounce 2s infinite;
+  animation-delay: 0.5s;
+}
+
+.floatingParticle2 {
+  position: fixed;
+  bottom: 9rem;
+  left: 5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: rgb(103, 232, 249);
+  border-radius: 50%;
+  opacity: 0.6;
+  pointer-events: none;
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  animation-delay: 1s;
+}
+
+.floatingParticle3 {
+  position: fixed;
+  top: 50%;
+  left: 2rem;
+  width: 1rem;
+  height: 1rem;
+  background-color: rgb(168, 85, 247);
+  border-radius: 50%;
+  opacity: 0.5;
+  pointer-events: none;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation-delay: 1.5s;
+}
+
+/* 플로팅 액션 버튼 */
+.floatingButton {
+  position: fixed;
+  bottom: 6rem;
+  right: 1.5rem;
+  z-index: 50;
+}
+
+@media (min-width: 768px) {
+  .floatingButton {
+    display: none;
+  }
+}
+
+.floatingButtonInner {
+  width: 3.5rem;
+  height: 3.5rem;
+  background: linear-gradient(to right, rgb(236, 72, 153), rgb(147, 51, 234));
+  border-radius: 50%;
+  box-shadow:
+    0 10px 15px -3px rgb(0, 0, 0, 0.1),
+    0 4px 6px -2px rgb(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.floatingButtonInner:hover {
+  transform: scale(1.1);
+}
+
+/* 콘텐츠 래퍼 */
+.contentWrapper {
+  position: relative;
+}
+
+/* 키프레임 애니메이션 */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}

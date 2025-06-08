@@ -1,8 +1,5 @@
 function extractVideoId(url: string): string | null {
-  console.log("Extracting video ID from:", url);
-
   if (!/[\/\.]/.test(url)) {
-    console.log("Direct video ID detected:", url);
     return url;
   }
 
@@ -17,18 +14,14 @@ function extractVideoId(url: string): string | null {
   for (const pattern of patterns) {
     const match = url.match(pattern);
     if (match && match[1]) {
-      console.log("Matched video ID:", match[1]);
       return match[1];
     }
   }
 
-  console.log("No video ID found in URL");
   return null;
 }
 
 export function autoplayYouTubeOnHover(el: HTMLElement, videoIdOrUrl: string) {
-  console.log("Attempting to autoplay video:", videoIdOrUrl);
-
   const videoId = extractVideoId(videoIdOrUrl);
   if (!videoId) {
     console.error("Invalid YouTube URL or video ID:", videoIdOrUrl);
@@ -37,7 +30,6 @@ export function autoplayYouTubeOnHover(el: HTMLElement, videoIdOrUrl: string) {
 
   const iframe = document.createElement("iframe");
   const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1&rel=0&showinfo=0&enablejsapi=1&playlist=${videoId}&loop=1`;
-  console.log("Creating iframe with URL:", embedUrl);
 
   iframe.src = embedUrl;
   iframe.style.width = "100%";
@@ -58,19 +50,13 @@ export function autoplayYouTubeOnHover(el: HTMLElement, videoIdOrUrl: string) {
 }
 
 export function resetYouTubeThumbnail(el: HTMLElement, videoIdOrUrl: string) {
-  console.log("Setting thumbnail for:", videoIdOrUrl);
-
   const videoId = extractVideoId(videoIdOrUrl);
   if (!videoId) {
-    console.error(
-      "Invalid YouTube URL or video ID for thumbnail:",
-      videoIdOrUrl
-    );
+    console.error("Invalid YouTube URL or video ID for thumbnail:", videoIdOrUrl);
     return null;
   }
 
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-  console.log("Using thumbnail URL:", thumbnailUrl);
 
   el.style.position = "relative";
   el.innerHTML = "";

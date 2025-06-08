@@ -27,15 +27,11 @@ export const Hover: Story = {
   render: () => (
     <HoverCard>
       <HoverCardTrigger>
-        <button
-          style={{ padding: 8, border: "1px solid #ddd", borderRadius: 4 }}
-        >
+        <button style={{ padding: 8, border: "1px solid #ddd", borderRadius: 4 }}>
           Hover me (호버카드 예시)
         </button>
       </HoverCardTrigger>
-      <HoverCardContent>
-        HoverCard가 마우스 오버 시 애니메이션과 함께 나타납니다.
-      </HoverCardContent>
+      <HoverCardContent>HoverCard가 마우스 오버 시 애니메이션과 함께 나타납니다.</HoverCardContent>
     </HoverCard>
   ),
   parameters: {

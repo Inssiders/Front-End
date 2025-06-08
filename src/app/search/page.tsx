@@ -1,67 +1,126 @@
-"use client";
+import { getPosts } from "@/utils/fetch/posts";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 
-import MemesGrid from "@/components/posts/post-grid";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+// 동적 import로 SearchContainer 최적화
+const SearchContainer = dynamic(() => import("@/components/search/search-container"), {
+  loading: () => (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-cyan-50 p-4">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Search header skeleton */}
+        <div className="text-center space-y-4">
+          <div className="h-12 bg-gray-200 animate-pulse rounded-lg max-w-md mx-auto" />
+          <div className="h-6 bg-gray-200 animate-pulse rounded max-w-xs mx-auto" />
+        </div>
 
-interface Meme {
-  id: number;
-  title: string;
-  category: string;
-  image: string;
-  author: { name: string; avatar: string };
-  likes: number;
-  comments: number;
-  shares: number;
-  isLiked: boolean;
-  isBookmarked: boolean;
+        {/* Search stats skeleton */}
+        <div className="flex justify-between items-center">
+          <div className="h-6 w-32 bg-gray-200 animate-pulse rounded" />
+          <div className="h-6 w-24 bg-gray-200 animate-pulse rounded" />
+        </div>
+
+        {/* Search results skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(9)].map((_, i) => (
+            <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-xl" />
+          ))}
+        </div>
+      </div>
+    </div>
+  ),
+});
+
+interface SearchPageProps {
+  searchParams: Promise<{ q?: string; page?: string }>;
 }
 
-export default function SearchPage() {
-  const searchParams = useSearchParams();
-  const q = searchParams?.get("q")?.toLowerCase() || "";
-  const [memes, setMemes] = useState<Meme[]>([]);
-  const [loading, setLoading] = useState(false);
+// ISR 설정: 10분마다 재생성 (검색 결과는 자주 변경될 수 있음)
+export const revalidate = 600; // 10분 (600초)
 
-  useEffect(() => {
-    setLoading(true);
-    fetch("/memes-data.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setMemes(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => {
-        setMemes([]);
-        setLoading(false);
+export default async function SearchPage({ searchParams }: SearchPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const query = resolvedSearchParams.q?.trim() || "";
+  const page = parseInt(resolvedSearchParams.page || "1");
+
+  let initialData: {
+    posts: any[];
+    loading: boolean;
+    hasNextPage: boolean;
+    totalResults: number;
+  } = {
+    posts: [],
+    loading: false,
+    hasNextPage: false,
+    totalResults: 0,
+  };
+
+  // 검색어가 있을 때만 초기 데이터 로드
+  if (query) {
+    try {
+      const response = await getPosts({
+        keyword: query,
+        page: page,
+        size: 20,
       });
-  }, []);
 
-  const filteredMemes = useMemo(() => {
-    if (!q) return [];
-    return memes.filter((meme) => meme.title.toLowerCase().includes(q));
-  }, [q, memes]);
+      initialData = {
+        posts: response.posts || [],
+        loading: false,
+        hasNextPage: response.hasNextPage || false,
+        totalResults: response.total || 0,
+      };
+    } catch (error) {
+      console.error("Search 페이지 초기 로딩 에러:", error);
+      // 에러 시 빈 결과로 폴백
+    }
+  }
 
   return (
-    <div className="max-w-7xl mx-auto py-12 px-4">
-      <h1 className="text-2xl font-bold mb-4">트렌드 검색 결과</h1>
-      {q ? (
-        <>
-          <div className="mb-6 text-lg">
-            <span className="font-semibold text-purple-600">"{q}"</span>에 대한
-            검색 결과
-          </div>
-          {filteredMemes.length > 0 || loading ? (
-            <MemesGrid posts={filteredMemes} loading={loading} />
-          ) : (
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-8 text-center text-gray-500 dark:text-gray-400">
-              <span className="text-lg">검색 결과가 없습니다.</span>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-cyan-50 p-4">
+          <div className="max-w-6xl mx-auto space-y-6">
+            <div className="text-center space-y-4">
+              <div className="h-12 bg-gray-200 animate-pulse rounded-lg max-w-md mx-auto" />
+              <div className="h-6 bg-gray-200 animate-pulse rounded max-w-xs mx-auto" />
             </div>
-          )}
-        </>
-      ) : (
-        <div className="text-gray-400">검색어를 입력해 주세요.</div>
-      )}
-    </div>
+            <div className="flex justify-between items-center">
+              <div className="h-6 w-32 bg-gray-200 animate-pulse rounded" />
+              <div className="h-6 w-24 bg-gray-200 animate-pulse rounded" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(9)].map((_, i) => (
+                <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-xl" />
+              ))}
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <SearchContainer
+        query={query}
+        initialPosts={initialData.posts}
+        initialLoading={initialData.loading}
+        initialHasNextPage={initialData.hasNextPage}
+        initialTotalResults={initialData.totalResults}
+      />
+    </Suspense>
   );
+}
+
+export async function generateMetadata({ searchParams }: SearchPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const query = resolvedSearchParams.q?.trim() || "";
+
+  if (query) {
+    return {
+      title: `"${query}" 검색 결과 | 인싸이더`,
+      description: `인싸이더에서 "${query}"에 대한 검색 결과를 확인해보세요. 최신 밈과 트렌드를 찾아보세요.`,
+    };
+  }
+
+  return {
+    title: "검색 | 인싸이더",
+    description: "인싸이더에서 원하는 밈과 트렌드를 검색해보세요. 실시간 인기 콘텐츠를 확인하세요.",
+  };
 }

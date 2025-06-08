@@ -1,4 +1,4 @@
-import type { AuthResponse, DeleteAccountResponse } from "@/utils/type/auth";
+import type { AuthResponse, DeleteAccountResponse } from "@/utils/types/auth";
 import { http, HttpResponse } from "msw";
 import { db } from "../db";
 import { mockErrors, mockUsers } from "../seed-data";
@@ -49,11 +49,41 @@ interface ProfileResponse {
   };
 }
 
+// 비밀번호 변경 요청 타입
+interface PasswordChangeRequest {
+  password: string;
+}
+
+interface PasswordChangeResponse {
+  message: string;
+  data: {
+    updated_at: string;
+  };
+}
+
+// 프로필 수정 요청 타입
+interface ProfileUpdateRequest {
+  nickname?: string;
+  introduction?: string;
+  profile_url?: string;
+  account_visibility?: boolean;
+  follower_visibility?: boolean;
+}
+
+interface ProfileUpdateResponse {
+  message: string;
+  data: {
+    nickname?: string;
+    bio?: string;
+    profileUrl?: string;
+    accountVisible?: boolean;
+    followerVisible?: boolean;
+    updated_at: string;
+  };
+}
+
 // 이메일 인증 코드 저장을 위한 임시 저장소
-const emailVerificationStore = new Map<
-  string,
-  { code: string; expiresAt: number }
->();
+const emailVerificationStore = new Map<string, { code: string; expiresAt: number }>();
 
 // 이메일 인증 요청 제한을 위한 저장소
 const emailRateLimitStore = new Map<string, number>();
@@ -63,8 +93,7 @@ const handlers = [
   // 토큰 발급/갱신
   http.post(`${BASE_URL}/api/auth/token`, async ({ request }) => {
     const body = (await request.json()) as TokenRequest;
-    const { email, password, grant_type, uuid, refresh_token, client_id } =
-      body;
+    const { email, password, grant_type, uuid, refresh_token, client_id } = body;
 
     // authorization_code 방식
     if (grant_type === "authorization_code" && uuid) {
@@ -73,7 +102,7 @@ const handlers = [
         data: {
           grant_type: "authorization_code",
           token: {
-            access_token: "",
+            access_token: "ba6c81d0-6f98-4707-b2c0-f83585527026",
             token_type: "Bearer",
             expires_in: 300, // 5분
           },
@@ -107,11 +136,7 @@ const handlers = [
     }
 
     // refresh_token 방식
-    if (
-      grant_type === "refresh_token" &&
-      refresh_token &&
-      client_id === "inssider-app"
-    ) {
+    if (grant_type === "refresh_token" && refresh_token && client_id === "inssider-app") {
       return HttpResponse.json({
         message: "토큰 발급에 성공했습니다.",
         data: {
@@ -222,8 +247,7 @@ const handlers = [
           type: "https://api.inssider.com/problems/rate-limit-exceeded",
           title: "너무 많은 요청",
           status: 429,
-          detail:
-            "최근 1분 내 재요청은 허용되지 않습니다. 잠시 뒤에 다시 시도하세요.",
+          detail: "최근 1분 내 재요청은 허용되지 않습니다. 잠시 뒤에 다시 시도하세요.",
           instance: "/api/auth/email/challenge",
         },
         {
@@ -262,11 +286,7 @@ const handlers = [
 
     const verification = emailVerificationStore.get(email);
 
-    if (
-      !verification ||
-      verification.expiresAt < Date.now() ||
-      verification.code !== otp
-    ) {
+    if (!verification || verification.expiresAt < Date.now() || verification.code !== otp) {
       return HttpResponse.json(
         {
           type: "https://api.example.com/problems/invalid-request",
@@ -293,8 +313,7 @@ const handlers = [
 
   // 회원가입
   http.post(`${BASE_URL}/api/accounts`, async ({ request }) => {
-    const { register_type, email, password } =
-      (await request.json()) as AccountCreateRequest;
+    const { register_type, email, password } = (await request.json()) as AccountCreateRequest;
 
     // Authorization 헤더 확인
     const authHeader = request.headers.get("Authorization");
@@ -304,8 +323,7 @@ const handlers = [
           type: "https://api.example.com/problems/invalid-requests",
           title: "인가되지 않은 접근입니다.",
           status: 401,
-          detail:
-            "인가 토큰이 제공되지 않았거나, 이미 삭제되어 유효하지 않은 상태입니다.",
+          detail: "인가 토큰이 제공되지 않았거나, 이미 삭제되어 유효하지 않은 상태입니다.",
           instance: "/api/accounts",
         },
         { status: 401 }
@@ -362,6 +380,114 @@ const handlers = [
         deleted_at: new Date().toISOString(),
       },
     } as DeleteAccountResponse);
+  }),
+
+  // 비밀번호 변경
+  http.patch(`${BASE_URL}/api/accounts/me/password`, async ({ request }) => {
+    const authHeader = request.headers.get("Authorization");
+
+    if (!authHeader?.includes(mockTokens.access_token)) {
+      return HttpResponse.json(
+        {
+          type: "https://api.inssider.com/problems/authentication-failed",
+          title: "유효하지 않은 인증 정보",
+          status: 401,
+          detail: "인증 정보가 누락되었거나 유효하지 않습니다.",
+          instance: "/api/accounts/me/password",
+        },
+        { status: 401 }
+      );
+    }
+
+    const { password } = (await request.json()) as PasswordChangeRequest;
+
+    // 비밀번호 유효성 검사 (예시: 최소 8자, 영문+숫자+특수문자)
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return HttpResponse.json(
+        {
+          type: "https://api.inssider.com/problems/invalid-format",
+          title: "유효하지 않은 암호",
+          status: 422,
+          detail: "유효하지 않은 암호입니다. 정규식 검증을 통과해야합니다.",
+          instance: "/api/accounts/me/password",
+        },
+        { status: 422 }
+      );
+    }
+
+    // 실제로는 데이터베이스에서 사용자를 찾아서 비밀번호를 업데이트해야 합니다
+    return HttpResponse.json({
+      message: "암호가 재설정되었습니다.",
+      data: {
+        updated_at: new Date().toISOString(),
+      },
+    } as PasswordChangeResponse);
+  }),
+
+  // 프로필 수정
+  http.patch(`${BASE_URL}/api/profiles/me`, async ({ request }) => {
+    const authHeader = request.headers.get("Authorization");
+
+    if (!authHeader?.includes(mockTokens.access_token)) {
+      return HttpResponse.json(
+        {
+          type: "https://api.inssider.com/problems/authentication-failed",
+          title: "유효하지 않은 인증 정보",
+          status: 401,
+          detail: "인증 정보가 누락되었거나 유효하지 않습니다.",
+          instance: "/api/profiles/me",
+        },
+        { status: 401 }
+      );
+    }
+
+    const updateData = (await request.json()) as ProfileUpdateRequest;
+
+    // 닉네임 중복 검사 (만약 닉네임이 제공된 경우)
+    if (updateData.nickname) {
+      const existingUser = mockUsers.find(
+        (u) => u.nickname === updateData.nickname && u.id !== "1" // 현재 사용자는 제외
+      );
+      if (existingUser) {
+        return HttpResponse.json(
+          {
+            type: "https://api.inssider.com/problems/unique-constraint-failed",
+            title: "닉네임 중복",
+            status: 409,
+            detail: "닉네임이 중복되었습니다.",
+            instance: "/api/profiles/me",
+          },
+          { status: 409 }
+        );
+      }
+    }
+
+    // 응답 데이터 구성 (수정된 필드만 반환)
+    const responseData: any = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (updateData.nickname) {
+      responseData.nickname = updateData.nickname;
+    }
+    if (updateData.introduction !== undefined) {
+      responseData.bio = updateData.introduction;
+    }
+    if (updateData.profile_url) {
+      responseData.profileUrl = updateData.profile_url;
+    }
+    if (updateData.account_visibility !== undefined) {
+      responseData.accountVisible = updateData.account_visibility;
+    }
+    if (updateData.follower_visibility !== undefined) {
+      responseData.followerVisible = updateData.follower_visibility;
+    }
+
+    return HttpResponse.json({
+      message: "프로필이 수정되었습니다.",
+      data: responseData,
+    } as ProfileUpdateResponse);
   }),
 ];
 

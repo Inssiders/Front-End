@@ -44,6 +44,7 @@ export const db = factory({
     media_upload_time: () => new Date().toISOString(),
     account_id: Number,
     category_id: Number,
+    category: String,
     created_at: () => new Date().toISOString(),
     updated_at: () => new Date().toISOString(),
     deleted_at: String,
@@ -95,7 +96,7 @@ export const db = factory({
     registerType: String,
     createdAt: () => new Date().toISOString(),
     updatedAt: () => new Date().toISOString(),
-  }
+  },
 });
 
 export type Database = typeof db;

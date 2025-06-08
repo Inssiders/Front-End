@@ -5,22 +5,16 @@ import { useMobile } from "@/hooks/use-mobile";
 import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Menu, Search, Sparkles } from "lucide-react";
+import { LogOut, Menu, Search, Settings, Sparkles, Star, User } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import styles from "./header.module.css";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "./ui/command";
+import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,60 +27,46 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "./ui/navigation-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { TooltipProvider } from "./ui/tooltip";
 
 const navItems = [
   {
-    category: "트렌드",
+    category: "🔥 트렌드",
     items: [
       {
         name: "밈",
         href: "/posts",
-        icon: <Sparkles className="h-4 w-4" />,
+        icon: <Sparkles className="h-5 w-5" />,
         description: "최신 트렌드와 밈을 발견하세요",
+        emoji: "🎭",
       },
       {
         name: "공감밈",
         href: "/empathy-meme",
-        icon: <Sparkles className="h-4 w-4" />,
+        icon: <Star className="h-5 w-5" />,
         description: "공감할 수 있는 밈들을 찾아보세요",
+        emoji: "💕",
       },
     ],
   },
 ];
 
 const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
+  React.ElementRef<typeof Link>,
+  React.ComponentPropsWithoutRef<typeof Link> & {
+    title?: string;
+  }
+>(({ className, title, children, href, ...props }, ref) => {
   return (
     <li>
-      <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <span className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </span>
-        </a>
-      </NavigationMenuLink>
+      <Link ref={ref} href={href || "#"} className={cn(styles.listItem, "hover:scale-105", className)} {...props}>
+        <div className={styles.listItemTitle}>{title}</div>
+        <span className={styles.listItemDescription}>{children}</span>
+      </Link>
     </li>
   );
 });
@@ -101,101 +81,181 @@ export default function Header() {
   const [search, setSearch] = useState("");
   const [mounted, setMounted] = useState(false);
   const [openMobileMenu, setOpenMobileMenu] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const isScrollingUp = useScrollDirection();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        if (isMobile) {
+          setOpen((open) => !open);
+        } else {
+          searchInputRef.current?.focus();
+        }
       }
-    };
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
+      if (e.key === "Escape") {
+        setOpen(false);
+        setOpenMobileMenu(false);
+        setIsSearchFocused(false);
+      }
+    },
+    [isMobile]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return null;
+  const handleSearchSubmit = useCallback(
+    (e?: React.FormEvent) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
 
-  function handleSearchSubmit(e?: React.FormEvent) {
-    if (e) {
-      e.preventDefault();
-    }
-    if (search.trim()) {
-      router.push(`/search?q=${encodeURIComponent(search.trim())}`);
+      // 이미 검색 중이면 중복 실행 방지
+      if (isSearching) return;
+
+      const trimmedSearch = search.trim();
+      if (!trimmedSearch) return;
+
+      setIsSearching(true);
+
+      router.push(`/search?q=${encodeURIComponent(trimmedSearch)}`);
       setOpen(false);
       setSearch("");
-    }
-  }
+      setIsSearchFocused(false);
+
+      // 검색 상태 리셋
+      setTimeout(() => setIsSearching(false), 1000);
+    },
+    [search, router, isSearching]
+  );
+
+  const handleLogout = useCallback(() => {
+    signOut({ callbackUrl: "/" });
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <TooltipProvider>
       <motion.header
-        initial={{ y: 0 }}
-        animate={{ y: isScrollingUp ? 0 : "-100%" }}
-        transition={{ duration: 0.3 }}
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 border-b rounded-b-xl bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950"
-        )}
+        initial={{ y: -100, opacity: 0 }}
+        animate={{
+          y: isScrollingUp ? 0 : -100,
+          opacity: isScrollingUp ? 1 : 0,
+        }}
+        transition={{
+          duration: 0.4,
+          ease: [0.4, 0, 0.2, 1],
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+        }}
+        className={styles.header}
       >
-        <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between gap-4 w-full">
-            {/* Logo */}
-            <Link
-              href="/"
-              className="flex items-center min-w-[100px] hover:opacity-80 transition-opacity"
+        <div className={styles.headerContainer}>
+          <div className={styles.headerContent}>
+            {/* Logo with Enhanced Animations */}
+            <motion.div
+              whileHover={{ scale: 1.05, rotate: 2 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
-              <Image
-                src="/logo.png"
-                alt="인싸이더"
-                width={40}
-                height={40}
-                className="rounded-xl"
-              />
-            </Link>
+              <Link href="/" className={`${styles.logoContainer} group`}>
+                <div className={styles.logoGlowWrapper}>
+                  <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.6, ease: "easeInOut" }}>
+                    <Image
+                      src="/logo.png"
+                      alt="인싸이더"
+                      width={48}
+                      height={48}
+                      className={styles.logoImage}
+                      priority
+                    />
+                  </motion.div>
+                </div>
+                <motion.span
+                  className={styles.logoText}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  인싸이더
+                </motion.span>
+              </Link>
+            </motion.div>
 
-            {/* Search Command Center */}
-            <div className="flex-1 max-w-2xl mx-auto">
-              <Button
-                variant="outline"
-                className={cn(
-                  "relative w-full justify-start text-sm text-muted-foreground h-10",
-                  "md:px-4",
-                  "px-3 rounded-xl border-gray-200 dark:border-gray-800 hover:bg-accent"
-                )}
-                onClick={() => setOpen(true)}
-              >
-                <Search className="mr-2 h-4 w-4" />
-                <span className="hidden md:inline">트렌드 검색...</span>
-                <span className="inline md:hidden">검색...</span>
-                <kbd className="pointer-events-none absolute right-2 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium opacity-100 md:flex">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
-              </Button>
+            {/* Enhanced Search Command Center */}
+            <div className={styles.searchContainer}>
+              {/* PC 검색창 - Enhanced with animations */}
+              <div className={styles.searchDesktop}>
+                <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
+                  {/* 검색 입력 그룹 - 아이콘과 버튼 개선 */}
+                  <motion.div
+                    className={`${styles.searchGroup} group`}
+                    whileHover={{ scale: 1.02 }}
+                    whileFocus={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  >
+                    <motion.div transition={{ duration: 0.5 }}>
+                      <Search className={styles.searchIcon} />
+                    </motion.div>
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="트렌드 검색... ✨"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      onFocus={() => setIsSearchFocused(true)}
+                      onBlur={() => setIsSearchFocused(false)}
+                      className={styles.searchInput}
+                    />
+                    <button type="submit" className={styles.searchButton}>
+                      검색
+                    </button>
+                  </motion.div>
+                </form>
+              </div>
+
+              {/* 모바일 검색 버튼 with enhanced animations */}
+              {isMobile && (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button variant="outline" className={styles.searchMobile} onClick={() => setOpen(true)}>
+                    <Search className="mr-3 h-4 w-4" />
+                    <span>검색... ✨</span>
+                  </Button>
+                </motion.div>
+              )}
             </div>
 
-            {/* Desktop Nav & Actions */}
-            <div className="flex items-center gap-2">
+            {/* 데스크톱 네비게이션 - 안정적인 레이아웃 */}
+            <div className={styles.navActions}>
               {!isMobile && (
                 <NavigationMenu>
                   <NavigationMenuList>
                     {navItems.map((category) => (
                       <NavigationMenuItem key={category.category}>
-                        <NavigationMenuTrigger className="h-9">
-                          {category.category}
-                        </NavigationMenuTrigger>
-                        <NavigationMenuContent className="w-full flex flex-col items-start">
-                          <ul className="grid w-[400px] gap-3 grid-1 p-4 md:w-[300px]">
+                        <NavigationMenuTrigger className={styles.navTrigger}>{category.category}</NavigationMenuTrigger>
+                        <NavigationMenuContent className={styles.navContent}>
+                          <ul className={styles.navItemsList}>
                             {category.items.map((item) => (
-                              <ListItem
-                                key={item.name}
-                                title={item.name}
-                                href={item.href}
-                              >
-                                <div className="flex items-center gap-2">
-                                  {item.icon}
-                                  <span>{item.description}</span>
+                              <ListItem key={item.name} title={`${item.name} ${item.emoji}`} href={item.href}>
+                                <div className={styles.navItemContent}>
+                                  <div className={styles.navItemIcon}>{item.icon}</div>
+                                  <div className="flex flex-col">
+                                    <span className={styles.navItemDescription}>{item.description}</span>
+                                  </div>
                                 </div>
                               </ListItem>
                             ))}
@@ -207,108 +267,170 @@ export default function Header() {
                 </NavigationMenu>
               )}
 
-              {/* Profile Menu */}
+              {/* Enhanced Profile Menu */}
               {status === "authenticated" ? (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="relative h-10 w-10 rounded-full p-0 overflow-hidden"
-                    >
-                      <Avatar className="h-10 w-10 block">
+                    <Button variant="ghost" className={`${styles.profileTrigger} group`}>
+                      <div className={styles.profileGlow} />
+                      <Avatar className={styles.profileAvatar}>
                         <AvatarImage
                           src={session.user?.profileImage || "/placeholder.svg"}
                           alt={session.user?.nickname || "프로필"}
                           className="object-cover"
                         />
-                        <AvatarFallback className="text-xs">
+                        <AvatarFallback className={styles.profileFallback}>
                           {session.user?.nickname?.substring(0, 2) || "사용자"}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-56"
-                    align="end"
-                    sideOffset={5}
-                    alignOffset={0}
-                  >
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {session.user?.nickname}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {session.user?.email}
-                        </p>
+                  <DropdownMenuContent className={styles.profileDropdown} align="end" sideOffset={12} alignOffset={0}>
+                    <DropdownMenuLabel className={styles.profileHeader}>
+                      <div className={styles.profileInfo}>
+                        <div className={styles.profileName}>{session.user?.nickname} ✨</div>
+                        <div className={styles.profileEmail}>{session.user?.email}</div>
                       </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href={`/profile/${session.user?.id}`}>프로필</Link>
+                    <DropdownMenuSeparator className={styles.profileSeparator} />
+
+                    <DropdownMenuItem asChild className={styles.profileMenuItem}>
+                      <Link href={`/profile/${session.user?.id}`} className={styles.profileMenuLink}>
+                        <div className={`${styles.profileMenuIcon} ${styles.profileMenuIconProfile}`}>
+                          <User className="w-4 h-4 text-purple-600" />
+                        </div>
+                        <span className="font-semibold">프로필 🙋‍♂️</span>
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings">설정</Link>
+
+                    <DropdownMenuItem asChild className={styles.profileMenuItem}>
+                      <Link href="/settings" className={styles.profileMenuLink}>
+                        <div className={`${styles.profileMenuIcon} ${styles.profileMenuIconSettings}`}>
+                          <Settings className="w-4 h-4 text-cyan-600" />
+                        </div>
+                        <span className="font-semibold">설정 ⚙️</span>
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="text-red-500 focus:text-red-500"
-                      onClick={() => signOut({ callbackUrl: "/" })}
-                    >
-                      로그아웃
+
+                    <DropdownMenuSeparator className={styles.profileSeparator} />
+
+                    <DropdownMenuItem className={styles.logoutMenuItem} onClick={handleLogout}>
+                      <div className={styles.logoutContent}>
+                        <div className={`${styles.profileMenuIcon} ${styles.profileMenuIconLogout}`}>
+                          <LogOut className="w-4 h-4 text-red-500" />
+                        </div>
+                        <span className={styles.logoutText}>로그아웃 👋</span>
+                      </div>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button asChild variant="default">
-                  <Link href="/auth/signin">로그인</Link>
-                </Button>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button asChild className={styles.loginButton}>
+                    <Link href="/auth/signin">
+                      <span className="font-bold">로그인 ✨</span>
+                    </Link>
+                  </Button>
+                </motion.div>
               )}
 
-              {/* Mobile Menu */}
+              {/* Enhanced Mobile Menu */}
               {isMobile && (
                 <Sheet open={openMobileMenu} onOpenChange={setOpenMobileMenu}>
                   <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <Menu className="h-5 w-5" />
-                    </Button>
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Button variant="ghost" size="icon" className={styles.mobileMenuTrigger}>
+                        <motion.div
+                          animate={openMobileMenu ? { rotate: 90 } : { rotate: 0 }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                        >
+                          <Menu className={styles.mobileMenuIcon} />
+                        </motion.div>
+                      </Button>
+                    </motion.div>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-80">
-                    <SheetHeader>
-                      <SheetTitle>메뉴</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-4">
-                      {navItems.map((category) => (
-                        <div key={category.category} className="mb-4">
-                          <h3 className="text-sm font-medium text-muted-foreground mb-2">
-                            {category.category}
-                          </h3>
-                          <div className="space-y-1">
-                            {category.items.map((item) => (
-                              <Link
-                                key={item.name}
-                                href={item.href}
-                                className={cn(
-                                  "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors",
-                                  pathname === item.href
-                                    ? "bg-primary text-primary-foreground"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                                )}
-                                onClick={() => setOpenMobileMenu(false)}
-                              >
-                                {item.icon}
-                                <div>
-                                  <p>{item.name}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {item.description}
-                                  </p>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <SheetContent side="right" className={styles.mobileMenuContent} asChild>
+                    <motion.div
+                      initial={{ x: 320, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: 320, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    >
+                      <SheetHeader>
+                        <SheetTitle className={styles.mobileMenuTitle}>메뉴 ✨</SheetTitle>
+                      </SheetHeader>
+                      <div className={styles.mobileMenuSection}>
+                        {navItems.map((category, categoryIndex) => (
+                          <motion.div
+                            key={category.category}
+                            className={styles.mobileMenuCategory}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: categoryIndex * 0.1 }}
+                          >
+                            <h3 className={styles.mobileMenuCategoryTitle}>{category.category}</h3>
+                            <div className={styles.mobileMenuItems}>
+                              {category.items.map((item, itemIndex) => (
+                                <motion.div
+                                  key={item.name}
+                                  initial={{ opacity: 0, x: -20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: categoryIndex * 0.1 + itemIndex * 0.05 }}
+                                  whileHover={{ x: 6, scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  <Link
+                                    href={item.href}
+                                    className={cn(
+                                      styles.mobileMenuItem,
+                                      pathname === item.href
+                                        ? styles.mobileMenuItemActive
+                                        : styles.mobileMenuItemInactive
+                                    )}
+                                    onClick={() => setOpenMobileMenu(false)}
+                                  >
+                                    <motion.div
+                                      className={cn(
+                                        styles.mobileMenuItemIcon,
+                                        pathname === item.href
+                                          ? styles.mobileMenuItemIconActive
+                                          : styles.mobileMenuItemIconInactive
+                                      )}
+                                      whileHover={{ rotate: 5, scale: 1.1 }}
+                                    >
+                                      {item.icon}
+                                    </motion.div>
+                                    <div>
+                                      <div className={styles.mobileMenuItemText}>
+                                        {item.name} {item.emoji}
+                                      </div>
+                                      <div
+                                        className={cn(
+                                          styles.mobileMenuItemDesc,
+                                          pathname === item.href
+                                            ? styles.mobileMenuItemDescActive
+                                            : styles.mobileMenuItemDescInactive
+                                        )}
+                                      >
+                                        {item.description}
+                                      </div>
+                                    </div>
+                                  </Link>
+                                </motion.div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
                   </SheetContent>
                 </Sheet>
               )}
@@ -317,45 +439,92 @@ export default function Header() {
         </div>
       </motion.header>
 
-      {/* Command Menu */}
+      {/* Enhanced Search Modal */}
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <form onSubmit={handleSearchSubmit}>
-          <CommandInput
-            placeholder="트렌드 검색..."
-            value={search}
-            onValueChange={setSearch}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSearchSubmit();
-              }
-            }}
-            className="border-none focus:ring-0 md:rounded-none rounded-xl px-4"
-          />
-        </form>
-        <CommandList className="md:rounded-none rounded-xl">
-          <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
-          <CommandGroup heading="추천 검색어">
-            <CommandItem
-              onSelect={() => {
-                setSearch("최신 트렌드");
-                handleSearchSubmit();
-              }}
-            >
-              <Search className="mr-2 h-4 w-4" />
-              <span>최신 트렌드</span>
-            </CommandItem>
-            <CommandItem
-              onSelect={() => {
-                setSearch("인기 밈");
-                handleSearchSubmit();
-              }}
-            >
-              <Sparkles className="mr-2 h-4 w-4" />
-              <span>인기 밈</span>
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
+        <motion.div
+          className={styles.searchModalContainer}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          <form onSubmit={handleSearchSubmit}>
+            <CommandInput
+              placeholder="트렌드 검색... ✨"
+              value={search}
+              onValueChange={setSearch}
+              className={styles.searchModalInput}
+            />
+          </form>
+          <CommandList className={styles.searchModalList}>
+            <CommandEmpty className={styles.searchModalEmpty}>
+              <motion.div
+                className={styles.searchModalEmptyContent}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <motion.div
+                  className={styles.searchModalEmptyIcon}
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                >
+                  <Search className="h-8 w-8 text-purple-500" />
+                </motion.div>
+                <span className={styles.searchModalEmptyText}>검색 결과가 없습니다 😢</span>
+              </motion.div>
+            </CommandEmpty>
+            <CommandGroup heading="✨ 추천 검색어">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+                <CommandItem
+                  onSelect={() => {
+                    setSearch("최신 트렌드");
+                    handleSearchSubmit();
+                  }}
+                  className={styles.searchModalItem}
+                >
+                  <motion.div
+                    className={styles.searchModalItemContent}
+                    whileHover={{ x: 4 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  >
+                    <motion.div
+                      className={`${styles.searchModalItemIcon} ${styles.searchModalItemIconSearch}`}
+                      whileHover={{ rotate: 5, scale: 1.1 }}
+                    >
+                      <Search className="h-4 w-4 text-purple-600" />
+                    </motion.div>
+                    <span className={styles.searchModalItemText}>최신 트렌드 🔥</span>
+                  </motion.div>
+                </CommandItem>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+                <CommandItem
+                  onSelect={() => {
+                    setSearch("인기 밈");
+                    handleSearchSubmit();
+                  }}
+                  className={styles.searchModalItem}
+                >
+                  <motion.div
+                    className={styles.searchModalItemContent}
+                    whileHover={{ x: 4 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  >
+                    <motion.div
+                      className={`${styles.searchModalItemIcon} ${styles.searchModalItemIconSparkles}`}
+                      whileHover={{ rotate: 5, scale: 1.1 }}
+                    >
+                      <Sparkles className="h-4 w-4 text-cyan-600" />
+                    </motion.div>
+                    <span className={styles.searchModalItemText}>인기 밈 🎭</span>
+                  </motion.div>
+                </CommandItem>
+              </motion.div>
+            </CommandGroup>
+          </CommandList>
+        </motion.div>
       </CommandDialog>
     </TooltipProvider>
   );

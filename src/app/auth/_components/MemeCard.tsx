@@ -22,12 +22,12 @@ export default function MemeCard({ img, text, source }: MemeCardProps) {
           scale: 1.03,
           boxShadow: "0 8px 32px 0 rgba(128,0,255,0.18)",
         }}
-        className="w-full h-full flex flex-col justify-center items-center"
+        className="flex size-full flex-col items-center justify-center"
       >
-        <Card className="w-full h-full flex flex-col items-center justify-center bg-white/60 dark:bg-gray-900/70 rounded-3xl shadow-2xl p-6 md:p-10 backdrop-blur-md border-0 relative overflow-visible">
+        <Card className="relative flex size-full flex-col items-center justify-center overflow-visible rounded-3xl border-0 bg-white/60 p-6 shadow-2xl backdrop-blur-md dark:bg-gray-900/70 md:p-10">
           {/* floating emoji */}
           <motion.div
-            className="absolute -top-8 left-1/2 -translate-x-1/2 text-4xl md:text-5xl drop-shadow-lg"
+            className="absolute -top-8 left-1/2 -translate-x-1/2 text-4xl drop-shadow-lg md:text-5xl"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, type: "spring" }}
@@ -39,19 +39,19 @@ export default function MemeCard({ img, text, source }: MemeCardProps) {
             alt="밈 이미지"
             width={180}
             height={180}
-            className="w-32 md:w-40 h-32 md:h-40 mb-4 border-4 border-purple-300 dark:border-purple-700 rounded-2xl object-cover shadow-lg"
+            className="mb-4 size-32 rounded-2xl border-4 border-purple-300 object-cover shadow-lg dark:border-purple-700 md:size-40"
             style={{ background: "rgba(255,255,255,0.3)" }}
           />
-          <Badge className="mb-3 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-400 text-white text-xs font-bold rounded-full shadow border-0">
+          <Badge className="mb-3 rounded-full border-0 bg-gradient-to-r from-purple-500 to-pink-400 px-4 py-2 text-xs font-bold text-white shadow">
             {source}
           </Badge>
           <div
-            className="text-xl md:text-2xl font-extrabold text-center text-purple-700 dark:text-purple-200 mb-3 leading-tight drop-shadow flex items-center justify-center"
+            className="mb-3 flex items-center justify-center text-center text-xl font-extrabold leading-tight text-purple-700 drop-shadow dark:text-purple-200 md:text-2xl"
             style={{ minHeight: 56 }}
           >
             {text}
           </div>
-          <div className="text-sm text-center font-medium text-purple-600 dark:text-purple-300">
+          <div className="text-center text-sm font-medium text-purple-600 dark:text-purple-300">
             로그인 후 더 많은 밈 보기! 👀
             <br />
             <span className="text-xs text-gray-500 dark:text-gray-400">

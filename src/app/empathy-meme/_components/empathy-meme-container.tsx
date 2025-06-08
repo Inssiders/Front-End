@@ -1,9 +1,12 @@
 "use client";
 
 import PostsGrid from "@/components/posts/post-grid";
-import { useInfiniteEmpathyMemes } from "@/hooks/use-infinite-user-posts";
+import PostsHeader from "@/components/posts/post-header";
+import { CategoryData, Post } from "@/utils/types/posts";
 import { motion } from "framer-motion";
+import { Users } from "lucide-react";
 import { useEffect, useState } from "react";
+import styles from "./empathy-meme-container.module.css";
 
 interface FloatingCircle {
   width: number;
@@ -16,16 +19,20 @@ interface FloatingCircle {
 }
 
 interface EmpathyMemeContainerProps {
-  initialPosts: any[];
+  categories: CategoryData[];
+  category: string;
+  initialPosts: Post[];
+  hasNextPage: boolean;
+  headerType?: "default" | "posts" | "none";
 }
 
 export default function EmpathyMemeContainer({
+  categories,
+  category,
   initialPosts,
+  hasNextPage,
+  headerType = "default",
 }: EmpathyMemeContainerProps) {
-  const { data, isFetchingNextPage, target } = useInfiniteEmpathyMemes({
-    pageSize: 9,
-  });
-
   const [circles, setCircles] = useState<FloatingCircle[]>([]);
 
   // Generate random circle properties on client-side only
@@ -44,116 +51,160 @@ export default function EmpathyMemeContainer({
     setCircles(newCircles);
   }, []);
 
-  const allPosts =
-    data?.pages.flatMap((page) =>
-      page.items.map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        category: item.category || "기타",
-        post_media_url: item.youtubeUrl,
-        type: "video",
-        author: {
-          name: item.author.name || "Unknown",
-          avatar: item.author.avatar || "/placeholder.svg",
-        },
-        likes: item.likes || 0,
-        comments: item.comments || 0,
-        shares: 0,
-        views: 0,
-        isLiked: false,
-        isBookmarked: false,
-      }))
-    ) ?? initialPosts;
+  // 전달받은 초기 posts 데이터를 그대로 사용
+  const allPosts = initialPosts;
+
+  // 공감밈 전용 헤더 설정
+  const empathyMemeHeaderProps = {
+    title: "공감밈",
+    subtitle: "🎬 유튜브 영상으로 공감할 수 있는 밈들을 공유하세요! 재미있고 공감되는 순간들을 함께 나누어보세요 💫",
+    badge: "✨ 공감밈 갤러리 ✨",
+    emojis: ["🎬", "😂", "👍", "💯", "🔥", "🎉"],
+    stats: [
+      {
+        icon: Users,
+        label: "공감밈 콘텐츠",
+        value: "50+",
+        color: "from-pink-400 to-pink-600",
+      },
+    ],
+  };
 
   return (
-    <div className="space-y-8">
-      {/* Banner Section */}
-      <div className="relative h-[300px] rounded-xl overflow-hidden">
-        {/* Animated background gradients */}
+    <motion.div
+      className={styles.mainContainer}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+    >
+      {/* Animated Background */}
+      <div className={styles.animatedBackground}>
+        {/* Base gradient */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600"
+          className={styles.baseGradient}
           animate={{
-            backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+            backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
           }}
           transition={{
-            duration: 15,
+            duration: 20,
             ease: "linear",
             repeat: Infinity,
           }}
-          style={{
-            backgroundSize: "200% 200%",
+        />
+
+        {/* Floating orbs */}
+        <motion.div
+          className={styles.floatingOrb1}
+          animate={{
+            x: [0, 100, 0],
+            y: [0, -50, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 8,
+            ease: "easeInOut",
+            repeat: Infinity,
           }}
         />
-        {/* Floating circles */}
         <motion.div
-          className="absolute inset-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {circles.map((circle, i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full bg-white/10 backdrop-blur-sm"
-              style={{
-                width: circle.width,
-                height: circle.height,
-                left: circle.left,
-                top: circle.top,
-              }}
-              animate={{
-                y: [0, -20, 0],
-                x: [0, circle.xMove, 0],
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: circle.duration,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: circle.delay,
-              }}
-            />
-          ))}
-        </motion.div>
-        {/* Content overlay */}
+          className={styles.floatingOrb2}
+          animate={{
+            x: [0, -80, 0],
+            y: [0, 60, 0],
+            scale: [1, 1.3, 1],
+          }}
+          transition={{
+            duration: 10,
+            ease: "easeInOut",
+            repeat: Infinity,
+            delay: 2,
+          }}
+        />
         <motion.div
-          className="relative h-full flex flex-col items-center justify-center text-white p-6 text-center z-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <motion.h1
-            className="text-4xl font-bold mb-4"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            공감밈
-          </motion.h1>
-          <motion.p
-            className="text-xl max-w-2xl"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-          >
-            유튜브 영상으로 공감할 수 있는 밈들을 공유하세요.
-            <br />
-            재미있고 공감되는 순간들을 함께 나누어보세요.
-          </motion.p>
-        </motion.div>
+          className={styles.floatingOrb3}
+          animate={{
+            x: [0, 120, 0],
+            y: [0, -80, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 12,
+            ease: "easeInOut",
+            repeat: Infinity,
+            delay: 4,
+          }}
+        />
       </div>
 
-      {/* Grid Section */}
-      <PostsGrid
-        posts={allPosts}
-        loading={isFetchingNextPage}
-        columns={4}
-        showAuthor={true}
-        showActions={true}
-        layout="grid"
-      />
+      {/* Main Content */}
+      <motion.div
+        className={styles.mainContent}
+        initial={{ y: 20 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        {/* Header Section */}
+        <motion.div className={styles.headerSection} transition={{ type: "spring", stiffness: 300 }}>
+          <PostsHeader {...empathyMemeHeaderProps} />
+        </motion.div>
 
-      {/* Infinite Scroll Target */}
-      <div ref={target} className="h-1" />
-    </div>
+        {/* Clean & Modern Content Area */}
+        <div className={styles.contentContainer}>
+          <motion.div
+            className={styles.glassContainer}
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            whileHover={{
+              boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.15)",
+            }}
+          >
+            {/* Simple Top Accent */}
+            <div className={styles.topAccent} />
+
+            {/* Clean Content Area */}
+            <div className={styles.contentWrapper}>
+              <PostsGrid
+                posts={allPosts}
+                loading={false}
+                hasNextPage={hasNextPage}
+                category={category}
+                columns={4}
+                showAuthor={true}
+                showActions={true}
+                layout="grid"
+              />
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Additional floating elements */}
+      <motion.div
+        className={styles.floatingParticle1}
+        animate={{
+          y: [0, -20, 0],
+          opacity: [0.7, 1, 0.7],
+        }}
+        transition={{
+          duration: 3,
+          ease: "easeInOut",
+          repeat: Infinity,
+        }}
+      />
+      <motion.div
+        className={styles.floatingParticle2}
+        animate={{
+          x: [0, 15, 0],
+          opacity: [0.6, 1, 0.6],
+        }}
+        transition={{
+          duration: 4,
+          ease: "easeInOut",
+          repeat: Infinity,
+          delay: 1,
+        }}
+      />
+    </motion.div>
   );
 }

@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Heart, MessageCircle, Share2, TrendingUp, Flame, Clock } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Heart, MessageCircle, Share2, TrendingUp, Flame, Clock } from "lucide-react";
+import Link from "next/link";
 
 // 트렌딩 콘텐츠 데이터
 const trendingData = {
@@ -134,10 +134,10 @@ const trendingData = {
       shares: 245,
     },
   ],
-}
+};
 
 export default function TrendingSection() {
-  const [activeTab, setActiveTab] = useState("hot")
+  const [activeTab, setActiveTab] = useState("hot");
 
   const container = {
     hidden: { opacity: 0 },
@@ -147,50 +147,54 @@ export default function TrendingSection() {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
+  };
 
   return (
-    <section className="py-20 bg-white dark:bg-gray-950">
+    <section className="bg-white py-20 dark:bg-gray-950">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
+        <div className="mb-10 flex flex-col items-start justify-between md:flex-row md:items-center">
           <div>
-            <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">지금 뜨는 트렌드</h2>
-            <p className="text-gray-600 dark:text-gray-400">인싸이더가 엄선한 최신 트렌드를 확인하세요</p>
+            <h2 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
+              지금 뜨는 트렌드
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              인싸이더가 엄선한 최신 트렌드를 확인하세요
+            </p>
           </div>
 
           <Link href="/trending">
-            <Button variant="outline" className="mt-4 md:mt-0 rounded-full">
+            <Button variant="outline" className="mt-4 rounded-full md:mt-0">
               모든 트렌드 보기
             </Button>
           </Link>
         </div>
 
         <Tabs defaultValue="hot" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-8 bg-gray-100 dark:bg-gray-800 p-1 rounded-full w-full max-w-md mx-auto">
+          <TabsList className="mx-auto mb-8 w-full max-w-md rounded-full bg-gray-100 p-1 dark:bg-gray-800">
             <TabsTrigger
               value="hot"
-              className="rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 flex-1"
+              className="flex-1 rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
             >
-              <Flame className="h-4 w-4 mr-2" />
+              <Flame className="mr-2 size-4" />
               인기
             </TabsTrigger>
             <TabsTrigger
               value="new"
-              className="rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 flex-1"
+              className="flex-1 rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
             >
-              <Clock className="h-4 w-4 mr-2" />
+              <Clock className="mr-2 size-4" />
               최신
             </TabsTrigger>
             <TabsTrigger
               value="rising"
-              className="rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 flex-1"
+              className="flex-1 rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
             >
-              <TrendingUp className="h-4 w-4 mr-2" />
+              <TrendingUp className="mr-2 size-4" />
               급상승
             </TabsTrigger>
           </TabsList>
@@ -201,7 +205,7 @@ export default function TrendingSection() {
                 variants={container}
                 initial="hidden"
                 animate={activeTab === tab ? "show" : "hidden"}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
               >
                 {trendingData[tab as keyof typeof trendingData].map((item) => (
                   <TrendingCard key={item.id} item={item} />
@@ -212,53 +216,62 @@ export default function TrendingSection() {
         </Tabs>
       </div>
     </section>
-  )
+  );
 }
 
 function TrendingCard({ item }: { item: any }) {
   return (
     <motion.div variants={item}>
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900">
+      <Card className="overflow-hidden border-0 bg-gray-50 transition-shadow duration-300 hover:shadow-lg dark:bg-gray-900">
         <div className="relative">
-          <img src={item.image || "/placeholder.svg"} alt={item.title} className="w-full aspect-video object-cover" />
-          <div className="absolute top-3 left-3">
-            <span className="px-3 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">{item.category}</span>
+          <img
+            src={item.image || "/placeholder.svg"}
+            alt={item.title}
+            className="aspect-video w-full object-cover"
+          />
+          <div className="absolute left-3 top-3">
+            <span className="rounded-full bg-purple-600 px-3 py-1 text-xs font-medium text-white">
+              {item.category}
+            </span>
           </div>
         </div>
 
         <CardContent className="p-5">
           <Link href={`/trending/${item.id}`}>
-            <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+            <h3 className="mb-3 text-xl font-bold text-gray-900 transition-colors hover:text-purple-600 dark:text-white dark:hover:text-purple-400">
               {item.title}
             </h3>
           </Link>
 
-          <div className="flex justify-between items-center mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center">
-              <Avatar className="h-8 w-8 mr-2">
-                <AvatarImage src={item.author.avatar || "/placeholder.svg"} alt={item.author.name} />
+              <Avatar className="mr-2 size-8">
+                <AvatarImage
+                  src={item.author.avatar || "/placeholder.svg"}
+                  alt={item.author.name}
+                />
                 <AvatarFallback>{item.author.name.substring(0, 2)}</AvatarFallback>
               </Avatar>
               <span className="text-sm text-gray-700 dark:text-gray-300">{item.author.name}</span>
             </div>
           </div>
 
-          <div className="flex justify-between text-gray-500 dark:text-gray-400 text-sm">
-            <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-              <Heart className="h-4 w-4 mr-1" />
+          <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+            <button className="flex items-center transition-colors hover:text-purple-600 dark:hover:text-purple-400">
+              <Heart className="mr-1 size-4" />
               {item.likes.toLocaleString()}
             </button>
-            <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-              <MessageCircle className="h-4 w-4 mr-1" />
+            <button className="flex items-center transition-colors hover:text-purple-600 dark:hover:text-purple-400">
+              <MessageCircle className="mr-1 size-4" />
               {item.comments.toLocaleString()}
             </button>
-            <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-              <Share2 className="h-4 w-4 mr-1" />
+            <button className="flex items-center transition-colors hover:text-purple-600 dark:hover:text-purple-400">
+              <Share2 className="mr-1 size-4" />
               {item.shares.toLocaleString()}
             </button>
           </div>
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }

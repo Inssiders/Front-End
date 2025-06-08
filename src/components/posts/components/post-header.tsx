@@ -12,7 +12,7 @@ interface PostHeaderProps {
 
 export function PostHeader({ userId, username, profileUrl, createdAt }: PostHeaderProps) {
   return (
-    <div className="flex items-center gap-4 mb-4">
+    <div className="mb-4 flex items-center gap-4">
       <Link href={`/profile/${userId}`}>
         <Avatar>
           <AvatarImage src={profileUrl || "/placeholder.svg?height=50&width=50"} alt={username} />
@@ -20,14 +20,14 @@ export function PostHeader({ userId, username, profileUrl, createdAt }: PostHead
         </Avatar>
       </Link>
       <div className="flex flex-col">
-        <Link href={`/profile/${userId}`} className="font-medium text-base">
+        <Link href={`/profile/${userId}`} className="text-base font-medium">
           {username}
         </Link>
-        <span className="text-gray-400 text-xs">
+        <span className="text-xs text-gray-400">
           {new Date(createdAt).toLocaleDateString("ko-KR")}
         </span>
       </div>
-      <div className="flex-1 flex justify-end gap-2">
+      <div className="flex flex-1 justify-end gap-2">
         <Badge variant="secondary">ID: {userId}</Badge>
       </div>
     </div>

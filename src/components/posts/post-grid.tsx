@@ -1,389 +1,190 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { useInfiniteMemes } from "@/hooks/use-infinite-user-posts";
+import { PAGE_SIZE } from "@/utils/constant";
+import { PostsGridProps } from "@/utils/types/posts";
 import { motion } from "framer-motion";
-import { Bookmark, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import PostsLoading from "./post-loading";
-
-// 밈 데이터 (실제로는 API에서 가져올 것)
-export const postsData = [
-  {
-    id: 1,
-    title: "아무말 대잔치 밈 시리즈",
-    category: "유머",
-    image: "/placeholder.svg?height=400&width=400&text=아무말 대잔치",
-    author: {
-      name: "밈지니어스",
-      avatar: "/placeholder.svg?height=40&width=40&text=MG",
-    },
-    likes: 2453,
-    comments: 342,
-    shares: 128,
-    isLiked: false,
-    isBookmarked: false,
-  },
-  {
-    id: 2,
-    title: "BTS 정국 리액션 모음",
-    category: "K-POP",
-    image: "/placeholder.svg?height=400&width=400&text=정국 리액션",
-    author: {
-      name: "K-팝인사이더",
-      avatar: "/placeholder.svg?height=40&width=40&text=KP",
-    },
-    likes: 5621,
-    comments: 873,
-    shares: 1204,
-    isLiked: true,
-    isBookmarked: false,
-  },
-  {
-    id: 3,
-    title: "드라마 '더 글로리' 명장면 밈",
-    category: "드라마",
-    image: "/placeholder.svg?height=400&width=400&text=더 글로리 밈",
-    author: {
-      name: "드라마퀸",
-      avatar: "/placeholder.svg?height=40&width=40&text=DQ",
-    },
-    likes: 1832,
-    comments: 421,
-    shares: 367,
-    isLiked: false,
-    isBookmarked: true,
-  },
-  {
-    id: 4,
-    title: "귀여운 고양이 리액션 모음",
-    category: "동물",
-    image: "/placeholder.svg?height=400&width=400&text=고양이 리액션",
-    author: {
-      name: "애니멀러버",
-      avatar: "/placeholder.svg?height=40&width=40&text=AL",
-    },
-    likes: 3245,
-    comments: 231,
-    shares: 542,
-    isLiked: false,
-    isBookmarked: false,
-  },
-  {
-    id: 5,
-    title: "에스파 카리나 표정 모음",
-    category: "K-POP",
-    image: "/placeholder.svg?height=400&width=400&text=카리나 표정",
-    author: {
-      name: "뮤직러버",
-      avatar: "/placeholder.svg?height=40&width=40&text=ML",
-    },
-    likes: 4521,
-    comments: 562,
-    shares: 721,
-    isLiked: true,
-    isBookmarked: false,
-  },
-  {
-    id: 6,
-    title: "직장인 공감 밈 시리즈",
-    category: "텍스트",
-    image: "/placeholder.svg?height=400&width=400&text=직장인 밈",
-    author: {
-      name: "오피스워커",
-      avatar: "/placeholder.svg?height=40&width=40&text=OW",
-    },
-    likes: 2187,
-    comments: 318,
-    shares: 452,
-    isLiked: false,
-    isBookmarked: false,
-  },
-  {
-    id: 7,
-    title: "유재석 표정 모음집",
-    category: "연예인",
-    image: "/placeholder.svg?height=400&width=400&text=유재석 표정",
-    author: {
-      name: "예능매니아",
-      avatar: "/placeholder.svg?height=40&width=40&text=EM",
-    },
-    likes: 3876,
-    comments: 456,
-    shares: 678,
-    isLiked: false,
-    isBookmarked: false,
-  },
-  {
-    id: 8,
-    title: "영화 '범죄도시' 명대사 밈",
-    category: "유머",
-    image: "/placeholder.svg?height=400&width=400&text=범죄도시 밈",
-    author: {
-      name: "무비버프",
-      avatar: "/placeholder.svg?height=40&width=40&text=MB",
-    },
-    likes: 2654,
-    comments: 387,
-    shares: 521,
-    isLiked: false,
-    isBookmarked: true,
-  },
-];
-
-interface Post {
-  id: number | string;
-  title: string;
-  category: string;
-  image?: string;
-  post_media_url?: string;
-  type?: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  likes: number;
-  comments: number;
-  shares: number;
-  views?: number;
-  isLiked?: boolean;
-  isBookmarked?: boolean;
-  likedAt?: string;
-}
-
-interface PostsGridProps {
-  posts?: Post[];
-  loading?: boolean;
-  layout?: "grid" | "list" | "masonry";
-  columns?: number;
-  showAuthor?: boolean;
-  showActions?: boolean;
-  onPostClick?: (post: Post) => void;
-  className?: string;
-  ref?: React.RefObject<HTMLDivElement>;
-}
+import { useMemo } from "react";
+import EmptyState from "./components/EmptyState";
+import InfiniteScrollTrigger from "./components/InfiniteScrollTrigger";
+import PostCard from "./components/PostCard";
+import { ANIMATION_VARIANTS, DEFAULT_GRID_COLS, GRID_COLUMNS } from "./constants";
 
 export default function PostsGrid({
-  posts,
-  loading,
+  posts: controlledPosts,
+  loading: controlledLoading = false,
+  hasNextPage: controlledHasNextPage,
+  category,
+  userId,
+  profileFilter,
   layout = "grid",
   columns = 4,
   showAuthor = true,
   showActions = true,
-  onPostClick,
+  enableHoverPlay = true,
+  feedMode = false,
   className = "",
-  ref,
+  disableAnimation = false,
+  onLike,
+  onComment,
+  onView,
 }: PostsGridProps) {
-  const [internalPosts, setInternalPosts] = useState(posts ?? postsData);
-  const [internalLoading, setInternalLoading] = useState(loading ?? true);
+  const isControlled = controlledPosts !== undefined;
 
-  useEffect(() => {
-    if (typeof loading === "boolean") {
-      setInternalLoading(loading);
-    } else {
-      // 데이터 로딩 시뮬레이션
-      setInternalLoading(true);
-      const timer = setTimeout(() => {
-        setInternalLoading(false);
-      }, 1000);
-      return () => clearTimeout(timer);
+  // 제어 모드에서는 초기 데이터가 있는지 확인
+  const hasInitialData = isControlled && controlledPosts && controlledPosts.length > 0;
+
+  // 무한스크롤 활성화 조건: 비제어 모드이거나, 초기 데이터가 있거나, 제어 모드에서 hasNextPage가 true인 경우
+  const shouldEnableInfiniteScroll =
+    !isControlled || hasInitialData || (isControlled && controlledHasNextPage);
+
+  const infiniteQuery = useInfiniteMemes({
+    category,
+    userId,
+    profileFilter,
+    size: PAGE_SIZE.POSTS,
+    enabled: shouldEnableInfiniteScroll,
+    initialData: hasInitialData ? controlledPosts : undefined, // 초기 데이터 전달
+  });
+
+  const {
+    data: infiniteData,
+    isLoading: infiniteLoading,
+    isFetchingNextPage,
+    hasNextPage: infiniteHasNextPage,
+    target,
+    isLoadingNext, // 추가된 로딩 상태
+  } = infiniteQuery;
+
+  // 최종 hasNextPage 결정 (제어 모드에서는 controlledHasNextPage 사용)
+  const hasNextPage =
+    isControlled && !hasInitialData
+      ? (controlledHasNextPage ?? false)
+      : (infiniteHasNextPage ?? false);
+
+  // 최종 게시물 데이터 결정 - 스크롤 자연스럽게 밀리도록 최적화
+  const posts = useMemo(() => {
+    if (isControlled && !hasInitialData) {
+      // 제어 모드이지만 초기 데이터가 없는 경우
+      return controlledPosts || [];
     }
-  }, [loading]);
 
-  useEffect(() => {
-    if (posts) setInternalPosts(posts);
-  }, [posts]);
+    // 무한스크롤 데이터 사용 (초기 데이터 포함)
+    const allPosts = infiniteData?.pages.flatMap((page) => page.items) ?? [];
 
-  const toggleLike = (id: number) => {
-    setInternalPosts((prevPosts: Post[]) =>
-      prevPosts.map((post: Post) => {
-        if (post.id === id) {
-          return {
-            ...post,
-            isLiked: !post.isLiked,
-            likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-          };
-        }
-        return post;
-      })
-    );
+    return allPosts;
+  }, [isControlled, hasInitialData, controlledPosts, infiniteData]);
+
+  // 캐시된 데이터가 있으면 로딩으로 간주하지 않음
+  const isLoading =
+    isControlled && !hasInitialData ? controlledLoading : infiniteLoading && !posts.length;
+
+  // 이벤트 핸들러
+  const handleLike = (id: number | string) => {
+    if (onLike) {
+      onLike(id);
+    }
   };
 
-  const toggleBookmark = (id: number) => {
-    setInternalPosts((prevPosts: Post[]) =>
-      prevPosts.map((post: Post) => {
-        if (post.id === id) {
-          return {
-            ...post,
-            isBookmarked: !post.isBookmarked,
-          };
-        }
-        return post;
-      })
-    );
+  const handleComment = (id: number | string) => {
+    if (onComment) {
+      onComment(id);
+    }
   };
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
+  const handleView = (id: number | string) => {
+    if (onView) {
+      onView(id);
+    }
   };
 
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  // 그리드 열 계산
+  const getGridCols = () => {
+    if (feedMode) return "grid-cols-1";
+    return GRID_COLUMNS[columns] || DEFAULT_GRID_COLS;
   };
 
-  if (internalLoading) {
-    return <PostsLoading />;
+  if (isLoading && posts.length === 0) {
+    return <EmptyState isLoading={true} />;
+  }
+
+  if (!posts || posts.length === 0) {
+    return <EmptyState isLoading={false} />;
   }
 
   return (
-    <div className={`container mx-auto px-4 py-8 ${className}`} ref={ref}>
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className={`grid grid-cols-1 ${
-          layout === "grid"
-            ? `sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-${columns}`
-            : layout === "list"
-            ? "grid-cols-1"
-            : "sm:grid-cols-2 md:grid-cols-3"
-        } gap-6`}
-      >
-        {internalPosts.map((post: Post) => (
-          <motion.div
-            key={post.id}
-            variants={item}
-            onClick={() => onPostClick?.(post)}
-          >
-            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 bg-gray-50 dark:bg-gray-900 h-full">
-              <div className="relative">
-                {post.post_media_url ? (
-                  <iframe
-                    src={post.post_media_url}
-                    title={post.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full aspect-square object-cover"
-                  />
-                ) : (
-                  <img
-                    src={post.image || "/placeholder.svg"}
-                    alt={post.title}
-                    className="w-full aspect-square object-cover"
-                  />
-                )}
-                <div className="absolute top-3 left-3">
-                  <Badge className="bg-purple-600 hover:bg-purple-700">
-                    {post.category}
-                  </Badge>
-                </div>
-                {showActions && (
-                  <button
-                    className="absolute top-3 right-3 bg-black/30 hover:bg-black/50 text-white p-1.5 rounded-full transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleBookmark(
-                        typeof post.id === "string"
-                          ? parseInt(post.id)
-                          : post.id
-                      );
-                    }}
-                    aria-label="북마크"
-                  >
-                    <Bookmark
-                      className={`h-4 w-4 ${
-                        post.isBookmarked ? "fill-current text-yellow-400" : ""
-                      }`}
-                    />
-                  </button>
-                )}
+    <div className={`w-full ${className}`}>
+      {/* 자연스러운 무한스크롤을 위한 단순화된 그리드 */}
+      {disableAnimation ? (
+        // 애니메이션 비활성화 시 일반 div 사용 (캐시된 컨텐츠)
+        <div className={`grid ${getGridCols()} gap-6`}>
+          {posts.map((post, index) => (
+            <div key={`${post.id}-${index}`} className="">
+              {/* 자연스러운 스크롤을 위한 안정적인 키 */}
+              <PostCard
+                post={post}
+                enableHoverPlay={enableHoverPlay}
+                feedMode={feedMode}
+                showAuthor={showAuthor}
+                showActions={showActions}
+                disableAnimation={disableAnimation}
+                onLike={handleLike}
+                onComment={handleComment}
+                onView={handleView}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        // 애니메이션 활성화 시에도 자연스러운 스크롤 우선
+        <motion.div
+          variants={ANIMATION_VARIANTS.container}
+          initial="hidden"
+          animate="show"
+          className={`grid ${getGridCols()} gap-6`}
+        >
+          {posts.map((post, index) => (
+            <motion.div
+              key={`${post.id}-${index}`} // 자연스러운 스크롤을 위한 안정적인 키
+              variants={ANIMATION_VARIANTS.item}
+              className="" // will-change 제거로 스크롤 최적화
+              // layout 속성 제거 - 스크롤 방해 요소
+            >
+              <PostCard
+                post={post}
+                enableHoverPlay={enableHoverPlay}
+                feedMode={feedMode}
+                showAuthor={showAuthor}
+                showActions={showActions}
+                disableAnimation={disableAnimation}
+                onLike={handleLike}
+                onComment={handleComment}
+                onView={handleView}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+
+      {/* 무한스크롤 표시 */}
+      {shouldEnableInfiniteScroll && (
+        <>
+          {hasNextPage || isFetchingNextPage || isLoadingNext ? (
+            <InfiniteScrollTrigger
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage || isLoadingNext} // 통합된 로딩 상태
+              target={target}
+            />
+          ) : (
+            /* 인스타그램 스타일: 간단한 완료 표시 */
+            posts.length > 0 && (
+              <div className="py-8 text-center">
+                <div className="text-xs text-gray-400 dark:text-gray-500">•••</div>
               </div>
-
-              <CardContent className="p-4">
-                <Link href={`/posts/${post.id}`}>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                    {post.title}
-                  </h3>
-                </Link>
-
-                {showAuthor && (
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center">
-                      <Avatar className="h-6 w-6 mr-2">
-                        <AvatarImage
-                          src={post.author.avatar || "/placeholder.svg"}
-                          alt={post.author.name}
-                        />
-                        <AvatarFallback>
-                          {post.author.name.substring(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-xs text-gray-700 dark:text-gray-300">
-                        {post.author.name}
-                      </span>
-                      {post.likedAt && (
-                        <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">
-                          {post.likedAt}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {showActions && (
-                  <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs">
-                    <button
-                      className={`flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors ${
-                        post.isLiked
-                          ? "text-purple-600 dark:text-purple-400"
-                          : ""
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleLike(
-                          typeof post.id === "string"
-                            ? parseInt(post.id)
-                            : post.id
-                        );
-                      }}
-                    >
-                      <Heart
-                        className={`h-3 w-3 mr-1 ${
-                          post.isLiked ? "fill-current" : ""
-                        }`}
-                      />
-                      {post.likes.toLocaleString()}
-                    </button>
-                    <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                      <MessageCircle className="h-3 w-3 mr-1" />
-                      {post.comments.toLocaleString()}
-                    </button>
-                    <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                      <Share2 className="h-3 w-3 mr-1" />
-                      {post.shares.toLocaleString()}
-                    </button>
-                    {post.views !== undefined && (
-                      <button className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                        <Eye className="h-3 w-3 mr-1" />
-                        {post.views.toLocaleString()}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </motion.div>
+            )
+          )}
+        </>
+      )}
     </div>
   );
 }

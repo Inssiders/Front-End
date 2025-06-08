@@ -19,9 +19,7 @@ export const Default: Story = {
   render: () => (
     <ContextMenu>
       <ContextMenuTrigger>
-        <div
-          style={{ padding: 20, background: "#eee", display: "inline-block" }}
-        >
+        <div style={{ padding: 20, background: "#eee", display: "inline-block" }}>
           Right click me
         </div>
       </ContextMenuTrigger>

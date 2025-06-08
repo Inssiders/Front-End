@@ -1,212 +1,216 @@
 "use client";
 
+import { DEFAULT_PAGE_SIZE, INFINITE_SCROLL } from "@/utils/constant";
+import { debounceThrottle } from "@/utils/debounce-throttle";
+import { Post } from "@/utils/types/posts";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-interface Post {
-  id: string | number;
-  post_user_id: string | number;
-  post_title: string;
-  post_media_url: string;
-  category: string;
-  likes: number;
-  comments: number;
-  views: number;
-  [key: string]: any;
-}
-
-interface Like {
-  id: string | number;
-  like_user_id: string | number;
-  like_target_id: string | number;
-  like_target_type: string;
-  title: string;
-  image: string;
-  category: string;
-  author: any;
-  likedAt: string;
-  likes: number;
-  comments: number;
-  shares: number;
-  [key: string]: any;
-}
-
-const PAGE_SIZE_DEFAULT = 12;
-
-export function useInfiniteUserData({
-  userId,
-  type,
-  pageSize = PAGE_SIZE_DEFAULT,
-}: {
-  userId: string | number;
-  type: "posts" | "likes";
-  pageSize?: number;
-}) {
-  const queryResult = useInfiniteQuery({
-    queryKey: ["user", userId, type],
-    queryFn: async ({ pageParam = 0 }) => {
-      const res = await fetch("/mock-data/all-mock-data.json");
-      const allData = await res.json();
-      let items: any[] = [];
-      if (type === "posts") {
-        items = allData.filter(
-          (row: any) => String(row.post_user_id) === String(userId)
-        );
-        // Map to post shape
-        items = items.map((row: any) => ({
-          id: row.post_id,
-          post_user_id: row.post_user_id,
-          post_title: row.post_title,
-          post_media_url: row.post_media_url,
-          category: row.category_name,
-          likes: row.likes || 0,
-          comments: row.comments || 0,
-          views: row.video_views || 0,
-          type: "video",
-        }));
-      } else if (type === "likes") {
-        items = allData.filter(
-          (row: any) =>
-            String(row.like_user_id) === String(userId) &&
-            row.like_target_type === "post"
-        );
-        // Map to like shape
-        items = items.map((row: any) => ({
-          id: row.like_id,
-          like_user_id: row.like_user_id,
-          like_target_id: row.like_target_id,
-          like_target_type: row.like_target_type,
-          title: row.post_title,
-          image: row.video_thumbnail_url,
-          category: row.category_name,
-          author: {
-            name: row.user_detail_username,
-            avatar: row.user_detail_profile_url,
-          },
-          likedAt: row.like_created_at,
-          likes: row.likes || 0,
-          comments: row.comments || 0,
-          shares: row.shares || 0,
-        }));
-      }
-      const start = pageParam * pageSize;
-      const end = start + pageSize;
-      const page = items.slice(start, end);
-      return {
-        items: page,
-        nextPage: end < items.length ? pageParam + 1 : undefined,
-        total: items.length,
-      };
-    },
-    getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: 0,
-  });
-
-  // Infinite scroll target ref
-  const target = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!target.current) return;
-    const el = target.current;
-    if (!el) return;
-    const observer = new window.IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          queryResult.hasNextPage &&
-          !queryResult.isFetchingNextPage
-        ) {
-          queryResult.fetchNextPage();
-        }
-      },
-      { threshold: 0.5 }
-    );
-    observer.observe(el);
-    return () => {
-      observer.unobserve(el);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target.current, queryResult.hasNextPage, queryResult.isFetchingNextPage]);
-
-  return { ...queryResult, target };
-}
-
-export function useInfiniteEmpathyMemes({
+export function useInfiniteMemes({
   category,
-  pageSize = PAGE_SIZE_DEFAULT,
+  userId,
+  profileFilter,
+  size = DEFAULT_PAGE_SIZE,
+  enabled = true,
+  initialData,
 }: {
   category?: string;
-  pageSize?: number;
+  userId?: string;
+  profileFilter?: "posts" | "likes";
+  size?: number;
+  enabled?: boolean;
+  initialData?: any[]; // 초기 데이터
 }) {
+  const hasInitialData = initialData && initialData.length > 0;
+
+  // 중복 호출 방지를 위한 상태 관리
+  const [isLoadingNext, setIsLoadingNext] = useState(false);
+  const lastFetchTime = useRef<number>(0);
+
   const queryResult = useInfiniteQuery({
-    queryKey: ["empathy-memes", category],
-    queryFn: async ({ pageParam = 0 }) => {
-      const res = await fetch("/mock-data/all-mock-data.json");
-      const allData = await res.json();
+    queryKey: ["memes", category, userId, profileFilter],
+    enabled: enabled, // 항상 활성화 (무한스크롤 가능하도록)
+    staleTime: 10 * 60 * 1000, // 10분 동안 데이터를 fresh로 간주 (인스타그램 스타일)
+    gcTime: 30 * 60 * 1000, // 30분 동안 캐시 유지
+    refetchOnWindowFocus: false, // 창 포커스 시 자동 리페치 비활성화
+    refetchOnMount: !hasInitialData, // 초기 데이터가 있으면 마운트 시 리페치 하지 않음
+    retry: INFINITE_SCROLL.RETRY_COUNT, // 실패 시 재시도
+    retryDelay: INFINITE_SCROLL.RETRY_DELAY, // 재시도 지연시간
+    ...(hasInitialData && {
+      initialData: {
+        pages: [
+          {
+            items: initialData,
+            nextPage: 2,
+            total: initialData.length,
+          },
+        ],
+        pageParams: [1],
+      },
+    }),
+    queryFn: async ({ pageParam = hasInitialData ? 2 : 1 }) => {
+      // 프로필 모드일 때는 다른 엔드포인트 사용
+      const isProfileMode = userId && profileFilter;
+      const url = new URL(
+        isProfileMode ? `/server/users/${userId}/posts` : "/server/posts",
+        window.location.origin
+      );
 
-      // Filter and transform data
-      let items = allData.filter((row: any) => {
-        if (category) {
-          return row.category_name === category;
-        }
-        return true;
-      });
+      url.searchParams.set("page", String(pageParam));
+      url.searchParams.set("size", String(size));
 
-      // Map to meme shape
-      items = items.map((row: any) => ({
-        id: row.post_id,
-        title: row.post_title,
-        description: row.post_content,
-        youtubeUrl: row.post_media_url,
-        tags: row.tag_name ? [row.tag_name] : [],
+      if (category) {
+        url.searchParams.set("category_id", category);
+      }
+
+      if (isProfileMode) {
+        url.searchParams.set("filter", profileFilter);
+      }
+
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error("Failed to fetch posts");
+      const json = await res.json();
+
+      const items: Post[] = json.data.memes.map((row: any) => ({
+        id: row.id?.toString() || Date.now().toString(),
+        title: row.title,
+        content: row.content,
+        category_id: row.category_id,
+        media_url: row.media_url,
+        media_upload_time: row.media_upload_time,
+        account_id: row.user_id,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        is_deleted: false,
+
+        // UI를 위한 추가 정보
         author: {
-          id: row.post_user_id,
-          name: row.user_detail_username,
-          avatar: row.user_detail_profile_url,
+          account_id: row.user_id,
+          account_name: `User ${row.user_id}`,
+          profile_image: "/placeholder.svg",
         },
-        likes: row.likes || 0,
-        comments: row.comments || 0,
-        createdAt: row.post_created_at,
+        likes: row.like_count || 0,
+        comment_count: row.comment_count || 0,
+        is_liked: row.is_liked || false,
       }));
 
-      const start = pageParam * pageSize;
-      const end = start + pageSize;
-      const page = items.slice(start, end);
-
       return {
-        items: page,
-        nextPage: end < items.length ? pageParam + 1 : undefined,
-        total: items.length,
+        items,
+        nextPage:
+          json.data.pageInfo.page < json.data.pageInfo.totalPages
+            ? json.data.pageInfo.page + 1
+            : undefined,
+        total: json.data.pageInfo.totalElements,
       };
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: 0,
+    initialPageParam: hasInitialData ? 2 : 1, // 초기 데이터가 있으면 2부터 시작
   });
+
+  // 쿨다운 시간 체크 함수
+  const canFetchNext = useCallback(() => {
+    const now = Date.now();
+    const timeSinceLastFetch = now - lastFetchTime.current;
+    return timeSinceLastFetch >= INFINITE_SCROLL.COOLDOWN_TIME;
+  }, []);
+
+  // 실제 fetchNextPage 실행 함수 (중복 호출 방지 로직 포함)
+  const executeFetchNextPage = useCallback(async () => {
+    // 중복 호출 방지 조건들
+    if (isLoadingNext) {
+      return;
+    }
+
+    if (!queryResult.hasNextPage) {
+      return;
+    }
+
+    if (queryResult.isFetchingNextPage) {
+      return;
+    }
+
+    if (!canFetchNext()) {
+      return;
+    }
+
+    try {
+      setIsLoadingNext(true);
+      lastFetchTime.current = Date.now();
+
+      await queryResult.fetchNextPage();
+    } catch (error) {
+      console.error("❌ 무한스크롤 실패:", error);
+    } finally {
+      // 로딩 상태 해제 (약간의 지연으로 중복 방지)
+      setTimeout(() => {
+        setIsLoadingNext(false);
+      }, 200);
+    }
+  }, [
+    isLoadingNext,
+    queryResult.hasNextPage,
+    queryResult.isFetchingNextPage,
+    queryResult.fetchNextPage,
+    canFetchNext,
+  ]);
+
+  // 디바운싱 + 쓰로틀링이 적용된 fetchNextPage 함수
+  const debouncedThrottledFetchNextPage = useCallback(
+    debounceThrottle(
+      executeFetchNextPage,
+      INFINITE_SCROLL.DEBOUNCE_DELAY, // 100ms 디바운싱
+      INFINITE_SCROLL.THROTTLE_DELAY // 300ms 쓰로틀링
+    ),
+    [executeFetchNextPage]
+  );
 
   const target = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!target.current) return;
-    const el = target.current;
-    if (!el) return;
+    if (!target.current || !enabled) return;
+    if (!queryResult.hasNextPage || queryResult.isFetchingNextPage) return;
 
-    const observer = new window.IntersectionObserver(
+    const observer = new IntersectionObserver(
       (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          queryResult.hasNextPage &&
-          !queryResult.isFetchingNextPage
-        ) {
-          queryResult.fetchNextPage();
+        if (entries[0].isIntersecting) {
+          // 디바운싱 + 쓰로틀링이 적용된 함수 호출
+          debouncedThrottledFetchNextPage();
         }
       },
-      { threshold: 0.5 }
+      {
+        threshold: INFINITE_SCROLL.THRESHOLD, // 트리거 감도
+        rootMargin: INFINITE_SCROLL.ROOT_MARGIN, // 미리 로드할 거리 (인스타그램 스타일)
+      }
     );
 
-    observer.observe(el);
-    return () => {
-      observer.unobserve(el);
-    };
-  }, [target.current, queryResult.hasNextPage, queryResult.isFetchingNextPage]);
+    observer.observe(target.current);
 
-  return { ...queryResult, target };
+    return () => {
+      if (target.current) observer.unobserve(target.current);
+      observer.disconnect();
+    };
+  }, [
+    enabled,
+    queryResult.hasNextPage,
+    queryResult.isFetchingNextPage,
+    debouncedThrottledFetchNextPage,
+  ]);
+
+  // 로딩 상태 업데이트
+  useEffect(() => {
+    if (!queryResult.isFetchingNextPage && isLoadingNext) {
+      const timer = setTimeout(() => {
+        setIsLoadingNext(false);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [queryResult.isFetchingNextPage, isLoadingNext]);
+
+  return {
+    ...queryResult,
+    target,
+    // 추가 상태 노출
+    isLoadingNext: isLoadingNext || queryResult.isFetchingNextPage,
+  };
 }
