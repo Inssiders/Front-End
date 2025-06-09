@@ -1,0 +1,160 @@
+/* Search Header Styles */
+
+.headerContainer {
+  position: relative;
+  padding: 2rem 0;
+  margin-bottom: 1rem;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  background: linear-gradient(135deg, rgb(168, 85, 247, 0.15), rgb(236, 72, 153, 0.15));
+  border: 1px solid rgb(168, 85, 247, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.iconWrapper:hover {
+  background: linear-gradient(135deg, rgb(168, 85, 247, 0.25), rgb(236, 72, 153, 0.25));
+  border-color: rgb(168, 85, 247, 0.4);
+  box-shadow: 0 10px 20px -5px rgb(168, 85, 247, 0.3);
+}
+
+.searchIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: rgb(168, 85, 247);
+}
+
+.titleSection {
+  flex: 1;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, rgb(168, 85, 247), rgb(236, 72, 153), rgb(59, 130, 246));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.queryDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: rgb(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgb(229, 231, 235, 0.6);
+  border-radius: 2rem;
+  box-shadow:
+    0 4px 6px -1px rgb(0, 0, 0, 0.1),
+    0 2px 4px -1px rgb(0, 0, 0, 0.06);
+  width: fit-content;
+}
+
+.queryLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(107, 114, 128);
+}
+
+.queryText {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(168, 85, 247);
+  background: linear-gradient(135deg, rgb(168, 85, 247), rgb(236, 72, 153));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.queryText:hover {
+  transform: scale(1.02);
+}
+
+.sparkleIcon {
+  color: rgb(245, 158, 11);
+  display: flex;
+  align-items: center;
+}
+
+.headerAccent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgb(168, 85, 247, 0.6), rgb(236, 72, 153, 0.6), transparent);
+  border-radius: 1px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .headerContainer {
+    padding: 1.5rem 0;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .iconWrapper {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .searchIcon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .queryDisplay {
+    justify-content: center;
+    padding: 0.625rem 1rem;
+  }
+
+  .queryLabel {
+    font-size: 0.8rem;
+  }
+
+  .queryText {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .queryDisplay {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}

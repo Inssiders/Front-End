@@ -1,9 +1,9 @@
 import { setupWorker } from "msw/browser";
+import { getMSWSetupDelay, logBundlerInfo } from "../lib/turbopack-compat";
 import { handlers } from "./handlers";
 
 // 환경변수에서 baseUrl 가져오기
-const baseUrl =
-  process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL || "";
+const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL || "";
 
 // MSW 워커 인스턴스 생성
 export const worker = setupWorker(...handlers);
@@ -41,8 +41,9 @@ const waitForServiceWorkerReady = async () => {
   // 기존 모든 서비스 워커 제거
   await clearExistingServiceWorkers();
 
-  // 잠시 대기하여 완전한 정리 보장
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  // Turbopack 호환성을 위한 지연시간 적용
+  const delay = getMSWSetupDelay();
+  await new Promise((resolve) => setTimeout(resolve, delay));
 
   // MSW 워커 시작
   await worker.start({
@@ -79,8 +80,7 @@ const waitForServiceWorkerReady = async () => {
   }
 
   // 서비스 워커 활성화 대기
-  const serviceWorker =
-    registration.installing || registration.waiting || registration.active;
+  const serviceWorker = registration.installing || registration.waiting || registration.active;
   if (serviceWorker && serviceWorker.state !== "activated") {
     await new Promise<void>((resolve) => {
       serviceWorker.addEventListener("statechange", () => {
@@ -94,53 +94,16 @@ const waitForServiceWorkerReady = async () => {
   return registration;
 };
 
-// 네트워크 차단 테스트
-const testNetworkInterception = async () => {
-  try {
-    const testResponse = await fetch(
-      "/server/posts?profile_filter=posts&size=10&user_id=1",
-      {
-        signal: AbortSignal.timeout(3000),
-      }
-    );
-
-    if (testResponse.ok) {
-      console.log("[MSW] ✅ Ready - intercepting requests");
-      return true;
-    }
-    return false;
-  } catch (error) {
-    const errorMessage = (error as Error).message;
-
-    if (
-      errorMessage.includes("ENOTFOUND") ||
-      errorMessage.includes("ERR_NAME_NOT_RESOLVED") ||
-      errorMessage.includes("NetworkError")
-    ) {
-      console.error("[MSW] ❌ Not intercepting - DNS error occurred");
-      return false;
-    }
-
-    if (errorMessage.includes("CORS")) {
-      console.error("[MSW] ❌ CORS error - MSW should prevent this");
-      return false;
-    }
-
-    // 다른 에러는 MSW가 작동할 수 있음을 의미
-    console.log("[MSW] ✅ Ready - intercepting requests");
-    return true;
-  }
-};
-
 // 워커 시작
 export const startWorker = async () => {
   if (typeof window === "undefined") {
     return;
   }
 
-  try {
-    console.log("[MSW] Starting worker...");
+  // 번들러 정보 로그
+  logBundlerInfo();
 
+  try {
     // 기존 MSW 워커 정지
     try {
       await worker.stop();
@@ -151,17 +114,12 @@ export const startWorker = async () => {
     // 서비스 워커 완전 초기화
     await waitForServiceWorkerReady();
 
-    // 추가 대기 시간으로 완전한 초기화 보장
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Turbopack 호환성을 위한 추가 대기시간
+    const finalDelay = getMSWSetupDelay() * 2;
+    await new Promise((resolve) => setTimeout(resolve, finalDelay));
 
-    // 네트워크 차단 테스트
-    const isWorking = await testNetworkInterception();
-
-    if (!isWorking) {
-      console.error("[MSW] 💡 Try: Hard refresh (Ctrl+Shift+R)");
-    }
-
-    return isWorking;
+    console.log("✅ MSW initialized with Turbopack compatibility");
+    return true;
   } catch (error) {
     console.error("[MSW] Failed to start:", error);
     throw error;

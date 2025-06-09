@@ -9,11 +9,16 @@ import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import MemeCard from "./MemeCard";
+
+// 동적 import로 MemeCard를 로드 (데스크탑에서만 필요)
+const MemeCard = dynamic(() => import("./MemeCard"), {
+  loading: () => <div className="w-80 h-96 bg-gradient-to-br from-purple-100 to-pink-100 animate-pulse rounded-2xl" />,
+});
 
 const MEMES = [
   {
@@ -105,18 +110,14 @@ export default function SignInClient() {
         toast.error("이메일 또는 비밀번호를 확인해주세요.");
       }
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "이메일 또는 비밀번호를 확인해주세요."
-      );
+      toast.error(error instanceof Error ? error.message : "이메일 또는 비밀번호를 확인해주세요.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen h-screen flex items-center justify-center relative overflow-hidden">
+    <div className="relative flex h-screen min-h-screen items-center justify-center overflow-hidden">
       {/* 움직이는 배경 + floating shapes (only desktop) */}
       {!isMobile && (
         <>
@@ -125,33 +126,33 @@ export default function SignInClient() {
             transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
           />
           <motion.div
-            className="absolute top-10 left-10 w-24 h-24 rounded-full bg-pink-300/30 z-0"
+            className="absolute left-10 top-10 z-0 size-24 rounded-full bg-pink-300/30"
             animate={{ y: [0, 30, 0], x: [0, 20, 0] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute bottom-20 right-20 w-32 h-32 rounded-full bg-purple-300/30 z-0"
+            className="absolute bottom-20 right-20 z-0 size-32 rounded-full bg-purple-300/30"
             animate={{ y: [0, -40, 0], x: [0, -30, 0] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           />
         </>
       )}
-      <div className="flex w-full h-3/5 max-w-5xl mx-auto flex-row items-center justify-center gap-0 z-10">
+      <div className="z-10 mx-auto flex h-3/5 w-full max-w-5xl flex-row items-center justify-center gap-0">
         {/* 밈 카드 - 데스크탑에서만 보임 */}
         {!isMobile && (
-          <div className="hidden md:flex flex-1 h-full w-full items-center justify-center">
+          <div className="hidden size-full flex-1 items-center justify-center md:flex">
             <MemeCard {...meme} />
           </div>
         )}
         {/* 로그인 폼 - 모바일/데스크탑 모두 보임 */}
-        <div className="flex-1 h-full w-full flex items-center justify-center">
+        <div className="flex size-full flex-1 items-center justify-center">
           <motion.div
-            className="w-full h-full mx-4 p-8 rounded-3xl shadow-2xl flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 border-0"
+            className="mx-4 flex size-full flex-col items-center justify-center rounded-3xl border-0 bg-white/90 p-8 shadow-2xl dark:bg-gray-900/90"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, type: "spring" }}
           >
-            <h1 className="text-4xl font-extrabold mb-8 text-center text-purple-700 dark:text-purple-200 tracking-tight drop-shadow">
+            <h1 className="mb-8 text-center text-4xl font-extrabold tracking-tight text-purple-700 drop-shadow dark:text-purple-200">
               Inssider Login
             </h1>
             <motion.div
@@ -160,10 +161,10 @@ export default function SignInClient() {
               transition={{ duration: 0.5 }}
               className="w-full max-w-md"
             >
-              <Card className="shadow-xl rounded-2xl border-0">
+              <Card className="rounded-2xl border-0 shadow-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs px-2 py-1">
+                    <Badge variant="outline" className="px-2 py-1 text-xs">
                       INSSIDER
                     </Badge>
                     로그인
@@ -180,7 +181,7 @@ export default function SignInClient() {
                         placeholder="이메일"
                         value={form.email}
                         onChange={handleChange}
-                        className="mt-1 focus:ring-2 focus:ring-pink-400 transition"
+                        className="mt-1 transition focus:ring-2 focus:ring-pink-400"
                       />
                     </div>
                     <div>
@@ -192,19 +193,19 @@ export default function SignInClient() {
                         placeholder="비밀번호"
                         value={form.password}
                         onChange={handleChange}
-                        className="mt-1 focus:ring-2 focus:ring-yellow-400 transition"
+                        className="mt-1 transition focus:ring-2 focus:ring-yellow-400"
                       />
                     </div>
                     <motion.div whileTap={{ scale: 0.97 }}>
                       <Button
                         type="submit"
-                        className="w-full text-base font-semibold tracking-wide bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 hover:from-purple-500 hover:to-yellow-500 transition"
+                        className="w-full bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 text-base font-semibold tracking-wide transition hover:from-purple-500 hover:to-yellow-500"
                         size="lg"
                         disabled={loading}
                       >
                         {loading ? (
                           <>
-                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            <Loader2 className="mr-2 size-4 animate-spin" />
                             로그인 중...
                           </>
                         ) : (
@@ -218,19 +219,13 @@ export default function SignInClient() {
             </motion.div>
             <div className="mt-8 text-center text-xs text-gray-400">
               아직 회원이 아니신가요?{" "}
-              <Link
-                href="/auth/signup"
-                className="underline text-purple-500 font-bold"
-              >
+              <Link href="/auth/signup" className="font-bold text-purple-500 underline">
                 회원가입
               </Link>
             </div>
             <div className="mt-5 text-center text-xs text-gray-400">
               비밀번호를 잊으셨나요?{" "}
-              <Link
-                href="/auth/find-pwd"
-                className="underline text-purple-500 font-bold"
-              >
+              <Link href="/auth/find-pwd" className="font-bold text-purple-500 underline">
                 비밀번호 찾기
               </Link>
             </div>

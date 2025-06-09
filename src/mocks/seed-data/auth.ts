@@ -1,4 +1,4 @@
-import type { RegisterError } from "@/utils/type/auth";
+import type { RegisterError } from "@/utils/types/auth";
 
 interface User {
   id: string;

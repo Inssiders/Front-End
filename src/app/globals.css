@@ -2,123 +2,157 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 30 100% 85%;
-    --primary-foreground: 240 10% 3.9%;
-    --secondary: 210 100% 92%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 30 100% 85%;
-    --radius: 0.5rem;
-  }
+:root {
+  /* Gen-Z 밝은 네온/파스텔 색상 팔레트 */
+  --neon-pink: #ff4081;
+  --neon-cyan: #00e5ff;
+  --neon-purple: #9c3aff;
+  --neon-green: #4caf50;
+  --neon-yellow: #ffeb3b;
+  --neon-orange: #ff9800;
 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 30 100% 85%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 210 100% 92%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 30 100% 85%;
-  }
+  --pastel-pink: #ffb3d9;
+  --pastel-blue: #b3e5fc;
+  --pastel-purple: #d1c4e9;
+  --pastel-mint: #c8e6c9;
+  --pastel-yellow: #fff9c4;
+  --pastel-lavender: #f3e5f5;
+
+  /* 밝은 그라데이션 */
+  --gradient-primary: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  --gradient-secondary: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+  --gradient-tertiary: linear-gradient(135deg, var(--pastel-pink), var(--pastel-purple));
+  --gradient-bg: linear-gradient(135deg, #fafafa 0%, #f0f4f8 50%, #e8f4f8 100%);
+
+  /* Shadcn/ui 밝은 테마 변수들 */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 263.4 70% 50.4%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 98%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 98%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 98%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 263.4 70% 50.4%;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  --radius: 0.75rem;
+
+  /* Sidebar 밝은 테마 변수들 */
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 263.4 70% 50.4%;
+  --sidebar-accent: 220 14.3% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    background: linear-gradient(
+      135deg,
+      #fafafa 0%,
+      #f0f4f8 25%,
+      #e8f4f8 50%,
+      #f3f9ff 75%,
+      #fafafa 100%
+    );
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255, 64, 129, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0, 229, 255, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, rgba(156, 58, 255, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: rgba(30, 30, 30, 0.95);
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink), var(--neon-cyan));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-size: 200% 200%;
+    animation: gradientFlow 4s ease infinite;
+  }
+
+  p,
+  span,
+  div {
+    color: rgba(60, 60, 60, 0.85);
+  }
+
+  a {
+    color: rgba(30, 30, 30, 0.9);
+    transition: all 0.3s ease;
+  }
+
+  a:hover {
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px rgba(255, 64, 129, 0.3);
   }
 }
 
-/* 스크롤바 스타일링 */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 4px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #4b5563;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #9333ea;
-}
-
-/* 애니메이션 */
-@keyframes float {
-  0% {
-    transform: translateY(0px);
+/* Gen-Z 애니메이션 키프레임 */
+@keyframes neon-pulse {
+  0%,
+  100% {
+    text-shadow:
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor;
   }
   50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* 폰트 설정 */
-.font-pretendard {
-  font-family: var(--font-pretendard), -apple-system, BlinkMacSystemFont,
-    system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
-    "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", sans-serif;
-}
-
-body {
-  scroll-behavior: smooth;
-}
-
-@layer utilities {
-  .animate-gradient-xy {
-    animation: gradient-xy 3s ease infinite;
-    background-size: 400% 400%;
+    text-shadow:
+      0 0 2px currentColor,
+      0 0 5px currentColor,
+      0 0 8px currentColor;
   }
 }
 
-@keyframes gradient-xy {
+@keyframes gradient-shift {
   0% {
     background-position: 0% 50%;
   }
@@ -127,5 +161,65 @@ body {
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 5px rgba(255, 0, 110, 0.5),
+      0 0 10px rgba(0, 245, 255, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 15px rgba(255, 0, 110, 0.8),
+      0 0 25px rgba(0, 245, 255, 0.6);
+  }
+}
+
+@keyframes bounce-gentle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes gradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 50% 100%;
+  }
+  75% {
+    background-position: 100% 0%;
+  }
+}
+
+@keyframes gradientFlow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
 }

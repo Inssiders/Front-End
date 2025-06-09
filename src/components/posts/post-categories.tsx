@@ -1,52 +1,79 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { MEME_CATEGORIES } from "@/utils/constant";
-import { motion } from "framer-motion";
-import { Search, SlidersHorizontal } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 
-export default function PostCategories() {
+import { PostCategoriesProps } from "@/utils/types/posts";
+import { motion } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
+import styles from "./post-categories.module.css";
+import Link from "next/link";
+
+export default function PostCategories({ categories = [], id = "1" }: PostCategoriesProps) {
   const router = useRouter(); // 라우터
   const searchParams = useSearchParams();
   const currentCategory = searchParams.get("category") || "all";
 
-  const handleCategoryClick = (category: string) => {
+  // API 데이터 또는 기본 카테고리 사용
+  const displayCategories =
+    categories.length > 0
+      ? [
+          { id: "all", name: "전체", label: "전체" },
+          ...categories.map((cat) => ({
+            id: String(cat.id),
+            name: cat.label,
+            label: cat.label,
+          })),
+        ]
+      : [{ id: "all", name: "전체", label: "전체" }];
+
+  const handleCategoryClick = (categoryId: string) => {
+    // 현재 스크롤 위치 저장
+    const currentScrollY = window.pageYOffset;
+
     const params = new URLSearchParams(searchParams.toString());
 
     params.delete("category_id");
 
-    if (category === "all") {
+    if (categoryId === "all") {
       params.delete("category");
     } else {
-      params.set("category", String(category));
+      params.set("category", String(categoryId));
     }
 
     const queryString = params.toString();
+
+    // URL 변경 후 스크롤 위치 복원
     router.push(queryString ? `?${queryString}` : "/posts");
+
+    // 스크롤 위치 복원 (여러 시점에서 시도)
+    requestAnimationFrame(() => {
+      window.scrollTo(0, currentScrollY);
+    });
+
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollY);
+    }, 50);
+
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollY);
+    }, 200);
+
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollY);
+    }, 500);
   };
 
   return (
-    <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center overflow-y-auto overflow-x-auto md:overflow-hidden pb-2 md:pb-0 w-full md:w-auto">
-            {MEME_CATEGORIES.map((category) => (
-              <motion.div
-                key={category.id}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <div className={styles.content}>
+          <div className={styles.categoriesWrapper}>
+            {displayCategories.map((category) => (
+              <motion.div key={category.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
-                  variant={
-                    currentCategory === category.id ? "default" : "ghost"
-                  }
-                  className={`rounded-full mr-2 ${
-                    currentCategory === category.id
-                      ? "bg-main-700 hover:bg-main-700 text-white font-bold"
-                      : "text-gray-700 dark:text-gray-300"
+                  variant="ghost"
+                  className={`${styles.categoryButton} ${
+                    currentCategory === category.id ? styles.active : styles.inactive
                   }`}
                   onClick={() => handleCategoryClick(category.id)}
                 >
@@ -54,6 +81,15 @@ export default function PostCategories() {
                 </Button>
               </motion.div>
             ))}
+          </div>
+
+          <div className="flex items-center gap-2 w-full md:w-auto">
+     
+            <Link href={`/create/${id}`}>
+              <h3 className="">
+                밈 생성하기
+              </h3>
+            </Link>
           </div>
         </div>
       </div>

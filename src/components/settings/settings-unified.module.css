@@ -1,0 +1,283 @@
+/* 메인 컨테이너 */
+.container {
+  @apply space-y-6;
+}
+
+/* 프로필 카드 */
+.profileCard {
+  @apply overflow-hidden border-0 shadow-xl bg-gradient-to-br from-white to-purple-50 dark:from-gray-900 dark:to-purple-900/20;
+}
+
+/* 프로필 카드 헤더 */
+.profileCardHeader {
+  @apply pb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white;
+}
+
+/* 프로필 카드 제목 */
+.profileCardTitle {
+  @apply flex items-center text-lg md:text-xl;
+}
+
+/* 프로필 카드 컨텐츠 */
+.profileCardContent {
+  @apply p-6;
+}
+
+/* 프로필 폼 */
+.profileForm {
+  @apply space-y-6;
+}
+
+/* 프로필 폼 행 */
+.profileFormRow {
+  @apply flex flex-col items-center md:flex-row md:items-start gap-6;
+}
+
+/* 프로필 이미지 컨테이너 */
+.profileImageContainer {
+  @apply relative;
+}
+
+/* 프로필 이미지 */
+.profileImage {
+  @apply h-24 w-24 ring-4 ring-purple-200 dark:ring-purple-800 transition-all duration-300;
+}
+
+.profileImageContainer:hover .profileImage {
+  @apply ring-purple-400;
+}
+
+/* 프로필 이미지 버튼 */
+.profileImageButton {
+  @apply absolute bottom-0 right-0 h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 border-2 border-white shadow-lg;
+}
+
+/* 프로필 폼 열 */
+.profileFormColumn {
+  @apply flex-1 space-y-4 w-full;
+}
+
+/* 프로필 라벨 */
+.profileLabel {
+  @apply flex items-center mb-2 text-sm font-medium;
+}
+
+/* 프로필 입력 */
+.profileInput {
+  @apply border-2 border-purple-200 focus:border-purple-500 transition-colors duration-200;
+}
+
+/* 프로필 텍스트영역 */
+.profileTextarea {
+  @apply border-2 border-purple-200 focus:border-purple-500 transition-colors duration-200 resize-none;
+}
+
+/* 프로필 비활성화 입력 */
+.profileDisabledInput {
+  @apply bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600;
+}
+
+/* 개인정보 섹션 */
+.privacySection {
+  @apply border-t pt-6;
+}
+
+/* 개인정보 섹션 제목 */
+.privacySectionTitle {
+  @apply flex items-center text-lg font-semibold mb-4 text-gray-900 dark:text-white;
+}
+
+/* 개인정보 그리드 */
+.privacyGrid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+/* 개인정보 항목 */
+.privacyItem {
+  @apply flex items-center justify-between p-4 rounded-lg border-2 border-purple-100 hover:border-purple-300 transition-colors duration-200 bg-purple-50/50 dark:bg-purple-900/10;
+}
+
+/* 개인정보 항목 내용 */
+.privacyItemContent {
+  @apply flex-1;
+}
+
+/* 개인정보 라벨 */
+.privacyLabel {
+  @apply font-medium cursor-pointer;
+}
+
+/* 개인정보 설명 */
+.privacyDescription {
+  @apply text-sm text-gray-600 dark:text-gray-400 mt-1;
+}
+
+/* 개인정보 스위치 */
+.privacySwitch {
+  @apply ml-4;
+}
+
+/* 제출 컨테이너 */
+.submitContainer {
+  @apply flex justify-end;
+}
+
+/* 제출 버튼 */
+.submitButton {
+  @apply bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105;
+}
+
+/* 로딩 텍스트 컨테이너 */
+.loadingTextContainer {
+  @apply flex items-center;
+}
+
+/* 로딩 스피너 */
+.loadingSpinner {
+  @apply animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2;
+}
+
+/* 제출 텍스트 컨테이너 */
+.submitTextContainer {
+  @apply flex items-center;
+}
+
+/* 비밀번호 카드 */
+.passwordCard {
+  @apply overflow-hidden border-0 shadow-xl bg-gradient-to-br from-white to-red-50 dark:from-gray-900 dark:to-red-900/20;
+}
+
+/* 비밀번호 카드 헤더 */
+.passwordCardHeader {
+  @apply pb-4 bg-gradient-to-r from-red-600 to-pink-600 text-white;
+}
+
+/* 비밀번호 카드 제목 */
+.passwordCardTitle {
+  @apply flex items-center text-lg md:text-xl;
+}
+
+/* 비밀번호 카드 내용 */
+.passwordCardContent {
+  @apply p-6;
+}
+
+/* 비밀번호 폼 */
+.passwordForm {
+  @apply space-y-4;
+}
+
+/* 비밀번호 라벨 */
+.passwordLabel {
+  @apply flex items-center mb-2 text-sm font-medium;
+}
+
+/* 비밀번호 입력 컨테이너 */
+.passwordInputContainer {
+  @apply relative;
+}
+
+/* 비밀번호 입력 */
+.passwordInput {
+  @apply border-2 border-red-200 focus:border-red-500 transition-colors duration-200 pr-10;
+}
+
+/* 비밀번호 입력 (유효) */
+.passwordInputValid {
+  @apply border-green-300 focus:border-green-500;
+}
+
+/* 비밀번호 입력 (무효) */
+.passwordInputInvalid {
+  @apply border-red-300 focus:border-red-500;
+}
+
+/* 비밀번호 입력 (기본) */
+.passwordInputDefault {
+  @apply border-red-200;
+}
+
+/* 비밀번호 토글 버튼 */
+.passwordToggleButton {
+  @apply absolute right-0 top-0 h-full hover:bg-transparent;
+}
+
+/* 비밀번호 체크 아이콘 */
+.passwordCheckIcon {
+  @apply absolute right-10 top-1/2 transform -translate-y-1/2;
+}
+
+/* 비밀번호 강도 컨테이너 */
+.passwordStrengthContainer {
+  @apply mt-2;
+}
+
+/* 비밀번호 강도 바 */
+.passwordStrengthBar {
+  @apply flex items-center space-x-2;
+}
+
+/* 비밀번호 강도 채우기 */
+.passwordStrengthFill {
+  @apply h-2 rounded-full transition-all duration-300;
+}
+
+/* 비밀번호 강도 텍스트 */
+.passwordStrengthText {
+  @apply text-xs font-medium;
+}
+
+/* 비밀번호 체크 텍스트 */
+.passwordCheckText {
+  @apply mt-2;
+}
+
+/* 비밀번호 체크 텍스트 (유효) */
+.passwordCheckTextValid {
+  @apply text-xs flex items-center text-green-600 dark:text-green-400;
+}
+
+/* 비밀번호 체크 텍스트 (무효) */
+.passwordCheckTextInvalid {
+  @apply text-xs flex items-center text-red-600 dark:text-red-400;
+}
+
+/* 비밀번호 제출 컨테이너 */
+.passwordSubmitContainer {
+  @apply flex justify-end pt-4;
+}
+
+/* 비밀번호 제출 열 */
+.passwordSubmitColumn {
+  @apply flex flex-col items-end space-y-2;
+}
+
+/* 비밀번호 제출 텍스트 */
+.passwordSubmitText {
+  @apply text-xs text-gray-500 dark:text-gray-400;
+}
+
+/* 비밀번호 제출 버튼 */
+.passwordSubmitButton {
+  @apply border-2 px-6 py-2 rounded-lg shadow-lg transition-all duration-200 transform;
+}
+
+/* 비밀번호 제출 버튼 (유효) */
+.passwordSubmitButtonValid {
+  @apply border-red-500 text-red-600 hover:bg-red-500 hover:text-white hover:shadow-xl hover:scale-105;
+}
+
+/* 비밀번호 제출 버튼 (비활성화) */
+.passwordSubmitButtonDisabled {
+  @apply border-gray-300 text-gray-400 cursor-not-allowed opacity-50;
+}
+
+/* 비밀번호 제출 텍스트 컨테이너 */
+.passwordSubmitTextContainer {
+  @apply flex items-center;
+}
+
+/* 비밀번호 제출 스피너 */
+.passwordSubmitSpinner {
+  @apply animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2;
+}

@@ -16,16 +16,12 @@ export default function SettingsNotifications() {
     >
       <Card className="mb-4 p-2 sm:p-4">
         <CardHeader className="pb-2 sm:pb-4">
-          <CardTitle className="text-base sm:text-lg md:text-xl">
-            알림 설정
-          </CardTitle>
+          <CardTitle className="text-base sm:text-lg md:text-xl">알림 설정</CardTitle>
         </CardHeader>
         <CardContent className="p-0 sm:p-2 md:p-4">
           <div className="space-y-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                앱 알림
-              </h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">앱 알림</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="comments" className="flex-1">
@@ -55,9 +51,7 @@ export default function SettingsNotifications() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                이메일 알림
-              </h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">이메일 알림</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="email-news" className="flex-1">
@@ -82,7 +76,7 @@ export default function SettingsNotifications() {
 
             <div className="flex justify-end">
               <Button className="bg-purple-600 hover:bg-purple-700">
-                <Bell className="h-4 w-4 mr-2" />
+                <Bell className="mr-2 size-4" />
                 알림 설정 저장
               </Button>
             </div>

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useMotionValueEvent,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { HeroSection } from "./sections/hero-section";
 import { InfoSection } from "./sections/info-section";
@@ -43,16 +38,8 @@ export default function IntroClient() {
   const firstSectionY = useTransform(smoothProgress, [0, 0.2], [0, -50]);
 
   // Second section transforms
-  const secondSectionOpacity = useTransform(
-    smoothProgress,
-    [0.2, 0.3, 0.55, 0.65],
-    [0, 1, 1, 0]
-  );
-  const secondSectionY = useTransform(
-    smoothProgress,
-    [0.2, 0.3, 0.55, 0.65],
-    [100, 0, 0, -100]
-  );
+  const secondSectionOpacity = useTransform(smoothProgress, [0.2, 0.3, 0.55, 0.65], [0, 1, 1, 0]);
+  const secondSectionY = useTransform(smoothProgress, [0.2, 0.3, 0.55, 0.65], [100, 0, 0, -100]);
 
   // Third section transforms
   const thirdSectionOpacity = useTransform(smoothProgress, [0.6, 0.7], [0, 1]);

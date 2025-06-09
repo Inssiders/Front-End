@@ -1,0 +1,251 @@
+.infoContainer {
+  @apply fixed top-0 left-0 w-full flex flex-col justify-center items-center p-8 md:p-16;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 192, 226, 0.1) 30%,
+    rgba(168, 218, 220, 0.1) 70%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  backdrop-filter: blur(10px);
+}
+
+.contentWrapper {
+  @apply flex flex-col p-4 sm:p-6 overflow-hidden mt-16 sm:mt-0;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 192, 226, 0.3);
+  box-shadow:
+    0 25px 50px rgba(255, 0, 110, 0.1),
+    0 15px 35px rgba(0, 245, 255, 0.05),
+    inset 0 2px 0 rgba(255, 255, 255, 0.7);
+}
+
+.headerContainer {
+  @apply container mx-auto flex items-start gap-4 sm:gap-6 mb-4 sm:mb-6;
+}
+
+.headerSpace {
+  @apply space-y-2;
+}
+
+.trendBadge {
+  @apply inline-block px-3 py-1 ml-5 text-sm font-medium rounded-full transform -rotate-3;
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 0, 110, 0.4);
+  transition: all 0.3s ease;
+}
+
+.trendBadge:hover {
+  transform: rotate(-3deg) scale(1.05);
+  box-shadow: 0 0 25px rgba(255, 0, 110, 0.6);
+}
+
+.titleContainer {
+  @apply flex items-start;
+}
+
+.quoteSymbol {
+  @apply text-5xl;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+}
+
+.mainTitle {
+  @apply text-5xl font-bold;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brandLetters {
+  @apply flex flex-row items-center space-x-2;
+}
+
+.specialLetter {
+  animation: neonPulse 2s ease-in-out infinite;
+  color: var(--neon-orange);
+  text-shadow: 0 0 15px rgba(251, 86, 7, 0.6);
+}
+
+.description {
+  @apply text-sm;
+  color: rgba(251, 86, 7, 0.8);
+  text-shadow: 0 0 5px rgba(251, 86, 7, 0.2);
+}
+
+.tagsContainer {
+  @apply flex flex-wrap gap-2 pt-1;
+}
+
+.tag {
+  @apply px-3 py-1 rounded-full text-sm cursor-pointer transition-all duration-200;
+  background: linear-gradient(135deg, rgba(255, 190, 11, 0.1), rgba(255, 0, 110, 0.1));
+  color: var(--neon-orange);
+  border: 1px solid rgba(255, 190, 11, 0.3);
+}
+
+.tag:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, rgba(255, 190, 11, 0.2), rgba(255, 0, 110, 0.2));
+  box-shadow: 0 5px 15px rgba(255, 190, 11, 0.3);
+}
+
+.mainGrid {
+  @apply flex-1 grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.leftColumn {
+  @apply flex items-start;
+}
+
+.featureCard {
+  @apply max-w-lg size-full p-5 rounded-lg h-full flex flex-col justify-between transition-all duration-300;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 190, 11, 0.1) 0%,
+    rgba(255, 192, 226, 0.1) 50%,
+    rgba(168, 218, 220, 0.1) 100%
+  );
+  border: 1px solid rgba(255, 190, 11, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.featureCard:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 190, 11, 0.15) 0%,
+    rgba(255, 192, 226, 0.15) 50%,
+    rgba(168, 218, 220, 0.15) 100%
+  );
+  box-shadow:
+    0 10px 25px rgba(255, 190, 11, 0.2),
+    0 8px 10px rgba(255, 0, 110, 0.1);
+}
+
+.featureContent {
+  @apply space-y-4;
+}
+
+.featureTitle {
+  @apply font-bold text-lg flex items-center;
+}
+
+.featureEmoji {
+  @apply ml-2 text-sm;
+  color: var(--neon-orange);
+  text-shadow: 0 0 8px rgba(255, 190, 11, 0.5);
+}
+
+.featureText {
+  @apply text-sm mt-1;
+}
+
+.featureList {
+  @apply text-sm space-y-2 mt-1;
+}
+
+.featureItem {
+  @apply flex items-start gap-2;
+}
+
+.featureIcon {
+  @apply text-base;
+  filter: drop-shadow(0 0 3px rgba(255, 190, 11, 0.4));
+}
+
+.rightColumn {
+  @apply flex items-start;
+}
+
+.demoCard {
+  @apply max-w-lg size-full p-5 rounded-lg h-full flex flex-col justify-between transition-all duration-300;
+  background: linear-gradient(
+    135deg,
+    rgba(168, 218, 220, 0.1) 0%,
+    rgba(199, 125, 255, 0.1) 50%,
+    rgba(255, 192, 226, 0.1) 100%
+  );
+  border: 1px solid rgba(0, 245, 255, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.demoCard:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(168, 218, 220, 0.15) 0%,
+    rgba(199, 125, 255, 0.15) 50%,
+    rgba(255, 192, 226, 0.15) 100%
+  );
+  box-shadow:
+    0 10px 25px rgba(0, 245, 255, 0.2),
+    0 8px 10px rgba(131, 56, 236, 0.1);
+}
+
+.demoTitle {
+  @apply font-bold text-lg mb-3 flex items-center;
+}
+
+.demoEmoji {
+  @apply ml-2 text-sm;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
+}
+
+.demoDescription {
+  @apply text-sm text-gray-600 mb-4;
+}
+
+.previewGrid {
+  @apply grid grid-cols-2 gap-2 mb-4;
+}
+
+.previewItem {
+  @apply bg-white/50 rounded-lg p-3 text-center border border-gray-200/50 transition-all duration-200;
+  backdrop-filter: blur(5px);
+}
+
+.previewItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 245, 255, 0.1);
+  border-color: rgba(0, 245, 255, 0.3);
+}
+
+.previewEmoji {
+  @apply text-lg mb-1;
+  filter: drop-shadow(0 0 3px rgba(0, 245, 255, 0.3));
+}
+
+.previewText {
+  @apply text-xs font-medium;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ctaButton {
+  @apply w-full py-3 px-4 rounded-lg font-medium transition-all duration-300;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  color: white;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
+}
+
+.ctaButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 245, 255, 0.4);
+}
+
+/* 키프레임 애니메이션 */
+@keyframes neonPulse {
+  0%,
+  100% {
+    text-shadow: 0 0 15px rgba(251, 86, 7, 0.6);
+  }
+  50% {
+    text-shadow: 0 0 25px rgba(251, 86, 7, 0.9);
+  }
+}

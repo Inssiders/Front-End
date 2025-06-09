@@ -24,9 +24,7 @@ export const Default: Story = {
       <AlertDialogTrigger>Open Dialog</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-        <AlertDialogDescription>
-          This action cannot be undone.
-        </AlertDialogDescription>
+        <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
         <AlertDialogCancel>Cancel</AlertDialogCancel>
         <AlertDialogAction>Continue</AlertDialogAction>
       </AlertDialogContent>

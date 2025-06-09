@@ -24,7 +24,7 @@ export default function NotFound() {
 
   return (
     <motion.div
-      className="flex h-[60vh] flex-col justify-center items-center text-center"
+      className="flex h-[60vh] flex-col items-center justify-center text-center"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -38,44 +38,33 @@ export default function NotFound() {
       >
         {isForbidden ? (
           <>
-            <Lock className="mx-auto mb-2 h-10 w-10 text-cyan-400 drop-shadow-glow" />
+            <Lock className="drop-shadow-glow mx-auto mb-2 size-10 text-cyan-400" />
             <h2 className="text-3xl font-semibold text-cyan-400">접근 불가</h2>
-            <p className="mt-4 text-gray-500">
-              로그인 후 이용 가능한 서비스입니다.
-            </p>
+            <p className="mt-4 text-gray-500">로그인 후 이용 가능한 서비스입니다.</p>
           </>
         ) : (
           <>
-            <h2 className="text-3xl font-semibold text-rose-600">
-              404 Not Found
-            </h2>
-            <p className="mt-4 text-gray-500">
-              해당 경로에 맞는 페이지를 찾을 수 없습니다.
-            </p>
+            <h2 className="text-3xl font-semibold text-rose-600">404 Not Found</h2>
+            <p className="mt-4 text-gray-500">해당 경로에 맞는 페이지를 찾을 수 없습니다.</p>
           </>
         )}
       </motion.div>
-      <motion.div
-        className="mt-8"
-        variants={buttonVariants}
-        whileHover="hover"
-        whileTap="tap"
-      >
+      <motion.div className="mt-8" variants={buttonVariants} whileHover="hover" whileTap="tap">
         <motion.button
           type="button"
           onClick={() => router.back()}
           className={`
-            group relative inline-flex items-center justify-center
-            rounded-xl px-8 py-3 min-w-[180px] min-h-[52px]
-            font-bold text-lg
-            bg-gradient-to-r from-cyan-400 via-purple-500 to-fuchsia-500
+            group relative inline-flex min-h-[52px] min-w-[180px]
+            items-center justify-center overflow-hidden rounded-xl border-none
+            bg-gradient-to-r from-cyan-400
+            via-purple-500 to-fuchsia-500 px-8 py-3
+            text-lg font-bold
             text-white shadow-[0_2px_24px_0_rgba(99,102,241,0.15)]
-            transition-all duration-200
-            border-none outline-none
-            focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2
-            hover:brightness-110 hover:shadow-[0_4px_32px_0_rgba(139,92,246,0.25)]
+            outline-none transition-all
+            duration-200 hover:shadow-[0_4px_32px_0_rgba(139,92,246,0.25)] hover:brightness-110
+            focus:ring-2 focus:ring-cyan-400/60
+            focus:ring-offset-2
             active:scale-95
-            overflow-hidden
           `}
           style={{
             WebkitBackdropFilter: "blur(2px)",
@@ -89,10 +78,9 @@ export default function NotFound() {
         >
           <span className="relative z-10">메인으로 돌아가기</span>
           <span
-            className="absolute inset-0 rounded-xl pointer-events-none"
+            className="pointer-events-none absolute inset-0 rounded-xl"
             style={{
-              boxShadow:
-                "0 0 24px 8px rgba(34,211,238,0.25), 0 0 48px 16px rgba(168,85,247,0.15)",
+              boxShadow: "0 0 24px 8px rgba(34,211,238,0.25), 0 0 48px 16px rgba(168,85,247,0.15)",
               opacity: 0.7,
             }}
           />

@@ -40,12 +40,8 @@ type Story = StoryObj<typeof VideoGrid>;
 const VideoGridWrapper = (args: any) => {
   const [showFrames, setShowFrames] = useState(false);
   return (
-    <div className="w-[800px] h-[600px]">
-      <VideoGrid
-        {...args}
-        showFrames={showFrames}
-        onToggleShowFrames={setShowFrames}
-      />
+    <div className="h-[600px] w-[800px]">
+      <VideoGrid {...args} showFrames={showFrames} onToggleShowFrames={setShowFrames} />
     </div>
   );
 };
@@ -99,19 +95,14 @@ export const CustomGIFs: Story = {
   render: (args) => <VideoGridWrapper {...args} />,
   args: {
     ...Default.args,
-    gifUrls: [
-      "gif/custom1.gif",
-      "gif/custom2.gif",
-      "gif/custom3.gif",
-      "gif/custom4.gif",
-    ],
+    gifUrls: ["gif/custom1.gif", "gif/custom2.gif", "gif/custom3.gif", "gif/custom4.gif"],
   },
 };
 
 // Mobile View story
 export const MobileView: Story = {
   render: (args) => (
-    <div className="w-[320px] h-[480px]">
+    <div className="h-[480px] w-[320px]">
       <VideoGridWrapper {...args} />
     </div>
   ),
@@ -126,7 +117,7 @@ export const MobileView: Story = {
 // Responsive Grid story
 export const ResponsiveGrid: Story = {
   render: (args) => (
-    <div className="w-full h-screen max-w-[1200px] mx-auto">
+    <div className="mx-auto h-screen w-full max-w-[1200px]">
       <VideoGridWrapper {...args} />
     </div>
   ),

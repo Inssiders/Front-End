@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Award, ArrowRight, Play, Users, Clock } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Award, ArrowRight, Play, Users, Clock } from "lucide-react";
+import Link from "next/link";
 
 const challenges = [
   {
@@ -43,10 +43,10 @@ const challenges = [
     difficulty: "어려움",
     tags: ["K-POP", "립싱크", "아이유"],
   },
-]
+];
 
 export default function ChallengesSection() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const container = {
     hidden: { opacity: 0 },
@@ -56,31 +56,32 @@ export default function ChallengesSection() {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
+  };
 
   return (
-    <section className="py-20 bg-white dark:bg-gray-950 overflow-hidden">
+    <section className="overflow-hidden bg-white py-20 dark:bg-gray-950">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+        <div className="mb-12 flex flex-col items-start justify-between md:flex-row md:items-center">
           <div>
-            <div className="flex items-center mb-4">
-              <Award className="h-6 w-6 text-purple-600 mr-2" />
+            <div className="mb-4 flex items-center">
+              <Award className="mr-2 size-6 text-purple-600" />
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">인싸 챌린지</h2>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl">
-              인싸이더의 다양한 챌린지에 참여하고 포인트와 배지를 획득하세요. 당신의 창의력을 보여줄 기회입니다!
+            <p className="max-w-2xl text-gray-600 dark:text-gray-400">
+              인싸이더의 다양한 챌린지에 참여하고 포인트와 배지를 획득하세요. 당신의 창의력을 보여줄
+              기회입니다!
             </p>
           </div>
 
           <Link href="/challenges">
-            <Button className="mt-4 md:mt-0 bg-purple-600 hover:bg-purple-700 rounded-full">
+            <Button className="mt-4 rounded-full bg-purple-600 hover:bg-purple-700 md:mt-0">
               모든 챌린지 보기
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 size-4" />
             </Button>
           </Link>
         </div>
@@ -90,7 +91,7 @@ export default function ChallengesSection() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 gap-8 lg:grid-cols-3"
         >
           {challenges.map((challenge, index) => (
             <motion.div
@@ -99,21 +100,24 @@ export default function ChallengesSection() {
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              <Card className="overflow-hidden border-0 bg-gray-50 dark:bg-gray-900 h-full">
+              <Card className="h-full overflow-hidden border-0 bg-gray-50 dark:bg-gray-900">
                 <div className="relative">
                   <img
                     src={challenge.image || "/placeholder.svg"}
                     alt={challenge.title}
-                    className="w-full aspect-video object-cover"
+                    className="aspect-video w-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-4">
                     <div>
-                      <div className="flex items-center mb-2">
-                        <Badge variant="secondary" className="bg-purple-600 text-white hover:bg-purple-700">
+                      <div className="mb-2 flex items-center">
+                        <Badge
+                          variant="secondary"
+                          className="bg-purple-600 text-white hover:bg-purple-700"
+                        >
                           {challenge.difficulty}
                         </Badge>
-                        <span className="ml-2 text-xs text-white flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
+                        <span className="ml-2 flex items-center text-xs text-white">
+                          <Clock className="mr-1 size-3" />
                           {challenge.deadline}
                         </span>
                       </div>
@@ -122,49 +126,58 @@ export default function ChallengesSection() {
                   </div>
 
                   <motion.div
-                    className="absolute inset-0 bg-purple-600/80 flex items-center justify-center opacity-0"
+                    className="absolute inset-0 flex items-center justify-center bg-purple-600/80 opacity-0"
                     animate={{ opacity: hoveredIndex === index ? 1 : 0 }}
                     transition={{ duration: 0.3 }}
                   >
                     <Button size="lg" variant="secondary" className="rounded-full">
-                      <Play className="h-5 w-5 mr-2" />
+                      <Play className="mr-2 size-5" />
                       참여하기
                     </Button>
                   </motion.div>
                 </div>
 
                 <CardContent className="p-5">
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{challenge.description}</p>
+                  <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                    {challenge.description}
+                  </p>
 
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="mb-4 flex flex-wrap gap-2">
                     {challenge.tags.map((tag) => (
                       <Badge
                         key={tag}
                         variant="outline"
-                        className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                        className="bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                       >
                         #{tag}
                       </Badge>
                     ))}
                   </div>
 
-                  <div className="flex justify-between items-center">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <div className="flex -space-x-2 mr-2">
+                      <div className="mr-2 flex -space-x-2">
                         {[...Array(3)].map((_, i) => (
-                          <Avatar key={i} className="h-6 w-6 border-2 border-white dark:border-gray-900">
-                            <AvatarImage src={`/placeholder.svg?height=24&width=24&text=${i + 1}`} />
+                          <Avatar
+                            key={i}
+                            className="size-6 border-2 border-white dark:border-gray-900"
+                          >
+                            <AvatarImage
+                              src={`/placeholder.svg?height=24&width=24&text=${i + 1}`}
+                            />
                             <AvatarFallback>U{i + 1}</AvatarFallback>
                           </Avatar>
                         ))}
                       </div>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 flex items-center">
-                        <Users className="h-3 w-3 mr-1" />
+                      <span className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                        <Users className="mr-1 size-3" />
                         {challenge.participants.toLocaleString()}명 참여
                       </span>
                     </div>
 
-                    <div className="text-xs font-medium text-purple-600 dark:text-purple-400">{challenge.prize}</div>
+                    <div className="text-xs font-medium text-purple-600 dark:text-purple-400">
+                      {challenge.prize}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -173,5 +186,5 @@ export default function ChallengesSection() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
