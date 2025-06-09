@@ -2,7 +2,6 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-
 const PAGE_SIZE_DEFAULT = 12;
 
 export function useInfiniteMemes({
