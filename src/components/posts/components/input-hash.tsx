@@ -3,14 +3,17 @@ import React, { useState, useRef, useEffect } from 'react';
 
 interface HashTagInputProps {
   onChange: (tags: string[]) => void;
+  propsTags: string[];
 }
 
-const HashTagInput: React.FC<HashTagInputProps> = ({ onChange }) => {
+const HashTagInput: React.FC<HashTagInputProps> = ({ onChange, propsTags }) => {
   const [input, setInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
-
+  useEffect(() => {
+    setTags(propsTags)
+  }, [propsTags])
   // 입력값에 따라 인풋의 width 자동 조절
   useEffect(() => {
     if (spanRef.current && inputRef.current) {

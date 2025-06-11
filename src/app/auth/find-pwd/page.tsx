@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { requestEmailVerification, resetPassword } from "@/utils/fetch/auth";
+import { authApi } from "@/utils/api-client";
+import { requestEmailVerification } from "@/utils/fetch/auth";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -57,10 +58,7 @@ export default function FindPwdPage() {
     e.preventDefault();
     try {
       setLoading(true);
-      await resetPassword({
-        email: form.email,
-        password: form.password,
-      });
+      await authApi.changePassword(form.password);
       setStep("done");
       toast.success("비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.");
       setTimeout(() => {
@@ -213,9 +211,7 @@ export default function FindPwdPage() {
                   <Alert variant="default" className="mb-4">
                     🎉 비밀번호가 성공적으로 변경되었습니다!
                     <br />
-                    <span className="text-xs text-muted-foreground">
-                      이제 새로운 비밀번호로 로그인해 주세요.
-                    </span>
+                    <span className="text-xs text-muted-foreground">이제 새로운 비밀번호로 로그인해 주세요.</span>
                   </Alert>
                 </motion.div>
               )}

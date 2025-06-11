@@ -211,3 +211,12 @@ export interface CategoriesResponse {
 export interface MemeToPostConverter {
   (apiMeme: ApiMeme, id?: number | string): Post;
 }
+
+export type PostData= { 
+  title: string;
+  content: string;
+  media_url: string;
+  media_upload_time: string;
+  category_name: string;
+  tags: string[];
+}

@@ -5,6 +5,7 @@ import React, { useEffect, useState, useRef } from 'react';
 interface VideoSectionProps {
   mediaUrl: string;
   title: string;
+  isEdit?: boolean;
 }
 
 function isValidVideoUrl(url: string) {
@@ -30,36 +31,36 @@ function getEmbedUrl(url: string) {
 }
 
 // Instagram 임베드 컴포넌트
-function InstagramEmbed({ url }: { url: string }) {
-  const ref = useRef<HTMLDivElement>(null);
+// function InstagramEmbed({ url }: { url: string }) {
+//   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // 인스타그램 embed.js 동적 로드
-    if (typeof window !== 'undefined') {
-      if (!(window as any).instgrm) {
-        const script = document.createElement('script');
-        script.src = 'https://www.instagram.com/embed.js';
-        script.async = true;
-        document.body.appendChild(script);
-      } else if ((window as any).instgrm) {
-        (window as any).instgrm.Embeds.process();
-      }
-    }
-  }, [url]);
+//   useEffect(() => {
+//     // 인스타그램 embed.js 동적 로드
+//     if (typeof window !== 'undefined') {
+//       if (!(window as any).instgrm) {
+//         const script = document.createElement('script');
+//         script.src = 'https://www.instagram.com/embed.js';
+//         script.async = true;
+//         document.body.appendChild(script);
+//       } else if ((window as any).instgrm) {
+//         (window as any).instgrm.Embeds.process();
+//       }
+//     }
+//   }, [url]);
 
-  return (
-    <div ref={ref} className="w-full flex justify-center">
-      <blockquote
-        className="instagram-media"
-        data-instgrm-permalink={url}
-        data-instgrm-version="14"
-        style={{ background: '#FFF', border: 0, margin: 0, padding: 0, width: '100%' }}
-      ></blockquote>
-    </div>
-  );
-}
+//   return (
+//     <div ref={ref} className="w-full flex justify-center">
+//       <blockquote
+//         className="instagram-media"
+//         data-instgrm-permalink={url}
+//         data-instgrm-version="14"
+//         style={{ background: '#FFF', border: 0, margin: 0, padding: 0, width: '100%' }}
+//       ></blockquote>
+//     </div>
+//   );
+// }
 
-export function VideoSection({ mediaUrl, title }: VideoSectionProps) {
+export function VideoSection({ mediaUrl, title, isEdit = false }: VideoSectionProps) {
   const [videoUrl, setVideoUrl] = useState('');
   useEffect(() => {
     setVideoUrl(mediaUrl);
@@ -67,41 +68,41 @@ export function VideoSection({ mediaUrl, title }: VideoSectionProps) {
 
   if (!isValidVideoUrl(videoUrl)) {
     return (
-      <div className="w-full aspect-video flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none text-red-500 text-center">
+      <div className="md:w-3/5 aspect-video flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none text-red-500 text-center">
         유효하지 않은 url 입니다
       </div>
     );
   }
 
   // Instagram URL 체크
-  const isInstagram = /instagram\.com\/(reel|p|tv)\//.test(videoUrl);
-  if (isInstagram) {
-    return (
-      <div className="w-full aspect-[4/5] flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none">
-        <InstagramEmbed url={videoUrl.split('?')[0]} />
-      </div>
-    );
-  }
+  // const isInstagram = /instagram\.com\/(reel|p|tv)\//.test(videoUrl);
+  // if (isInstagram) {
+  //   return (
+  //     <div className="aspect-[4/5] flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none">
+  //       <InstagramEmbed url={videoUrl.split('?')[0]} />
+  //     </div>
+  //   );
+  // }
 
   // YouTube면 embed 변환, 아니면 원본 사용
   let src = getEmbedUrl(videoUrl);
   const isYoutube = src.includes('youtube.com/embed');
 
   return (
-    <div className="w-full aspect-video flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none">
+    <div className={`md:w-full aspect-video flex items-center justify-center bg-gray-50 md:rounded-l-lg ${isEdit ? 'md:rounded-r-lg' : 'md:rounded-r-none'} overflow-hidden`}>
       {isYoutube ? (
         <iframe
           src={src}
           title={title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
-          className="w-full h-full rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
+          className="w-full h-full"
         />
       ) : (
         <video
           src={src}
           controls
-          className="w-full h-full rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
+          className={`w-full h-full} `}
         />
       )}
     </div>
