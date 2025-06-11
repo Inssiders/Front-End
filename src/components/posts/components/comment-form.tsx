@@ -1,97 +1,77 @@
 // src/components/posts/post-detail/CommentForm.tsx
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { X } from "lucide-react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { useAuthToken } from "@/contexts/AuthTokenContext";
+import { useState } from "react";
+import styles from "./comment-form.module.css";
 
 interface CommentFormProps {
   postId: string;
-  commentInputRef: React.RefObject<HTMLTextAreaElement>;
-  onCommentSubmit: () => void;
-  replyTo?: { commentId: string; username: string } | null;
-  onCancelReply?: () => void;
+  replyTo?: { commentId: string; username: string };
+  onCommentAdded: () => void;
+  onCancel?: () => void;
 }
 
-export function CommentForm({
-  postId,
-  commentInputRef,
-  onCommentSubmit,
-  replyTo,
-  onCancelReply,
-}: CommentFormProps) {
-  const form = useForm({
-    defaultValues: { comment: "" },
-  });
+export default function CommentForm({ postId, replyTo, onCommentAdded, onCancel }: CommentFormProps) {
+  const [content, setContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { accessToken } = useAuthToken();
 
-  const onSubmit = async (values: { comment: string }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content.trim() || isSubmitting || !accessToken) return;
+
+    setIsSubmitting(true);
     try {
-      if (replyTo) {
-        // 대댓글 등록
-        await fetch(`/api/posts/${postId}/comments/${replyTo.commentId}/replies`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reply: values.comment }),
-        });
+      const url = replyTo
+        ? `/api/posts/${postId}/comments/${replyTo.commentId}/replies`
+        : `/api/posts/${postId}/comments`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({ content: content.trim() }),
+      });
+
+      if (res.ok) {
+        setContent("");
+        onCommentAdded();
       } else {
-        // 일반 댓글 등록
-        await fetch(`/api/posts/${postId}/comments`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ comment: values.comment }),
-        });
+        console.error("Failed to add comment");
       }
-      onCommentSubmit();
-      form.reset();
-      toast.success("댓글이 등록되었습니다.");
-    } catch {
-      toast.error("댓글 등록에 실패했습니다.");
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="border-gray-100 bg-white px-0 dark:border-gray-800 sm:px-0 ">
-      <Form {...form}>
-        {replyTo && onCancelReply && (
-          <div className="mb-2 flex items-center gap-2">
-            <span className="text-sm">{replyTo.username}</span>
-            <Button type="button" variant="ghost" className="size-6 p-1" onClick={onCancelReply}>
-              <X />
-            </Button>
-          </div>
+    <form onSubmit={handleSubmit} className={styles.commentForm}>
+      {replyTo && <div className={styles.replyIndicator}>@{replyTo.username}에게 답글 작성 중</div>}
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder={replyTo ? "답글을 입력하세요..." : "댓글을 입력하세요..."}
+        className={styles.textarea}
+        rows={3}
+      />
+      <div className={styles.buttons}>
+        {onCancel && (
+          <button type="button" onClick={onCancel} className={styles.cancelButton}>
+            취소
+          </button>
         )}
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-2 px-4 sm:flex-row"
+        <button
+          type="submit"
+          disabled={!content.trim() || isSubmitting || !accessToken}
+          className={styles.submitButton}
         >
-          <FormField
-            control={form.control}
-            name="comment"
-            rules={{
-              required: "공백을 입력할 수 없습니다.",
-            }}
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormControl>
-                  <div className="flex items-center">
-                    <Textarea
-                      {...field}
-                      ref={commentInputRef}
-                      placeholder={replyTo ? "답글을 입력하세요..." : "댓글을 입력하세요..."}
-                      className="min-h-[44px] resize-none"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" className="mt-2 h-auto w-full sm:ml-2 sm:mt-0 sm:w-auto">
-            등록
-          </Button>
-        </form>
-      </Form>
-    </div>
+          {isSubmitting ? "등록 중..." : replyTo ? "답글 등록" : "댓글 등록"}
+        </button>
+      </div>
+    </form>
   );
 }

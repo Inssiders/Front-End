@@ -14,7 +14,7 @@ export function useAuth() {
     const result = await signIn("credentials", {
       email,
       password,
-      grant_type: "password",
+      grantType: "password",
       redirect: false,
     });
 
@@ -48,7 +48,7 @@ export function useAuth() {
     const result = await signIn("credentials", {
       email,
       password: "", // 이메일 인증에서는 비밀번호 불필요
-      grant_type: "authorization_code",
+      grantType: "authorization_code",
       redirect: false,
     });
 

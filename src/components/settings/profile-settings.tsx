@@ -7,51 +7,59 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { authApi } from "@/utils/fetch/auth";
-import { UserType } from "@/utils/types/user";
 import { motion } from "framer-motion";
 import { Camera, Save, User } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-interface ProfileSettingsProps {
-  user: UserType;
+interface ProfileData {
+  nickname: string;
+  introduction: string;
+  profileImage?: string;
 }
 
-export default function ProfileSettings({ user }: ProfileSettingsProps) {
-  const { update } = useSession();
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [profileData, setProfileData] = useState({
-    nickname: user.nickname || "",
-    bio: user.bio || "",
-    email: user.email || "",
+export function ProfileSettings() {
+  const { data: session } = useSession();
+  const [profile, setProfile] = useState<ProfileData>({
+    nickname: "",
+    introduction: "",
+    profileImage: "",
   });
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleProfileSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (session?.user) {
+      setProfile({
+        nickname: session.user.nickname || "",
+        introduction: session.user.bio || "",
+        profileImage: session.user.profileImage || "",
+      });
+    }
+  }, [session]);
+
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
-
+    setIsSaving(true);
     try {
-      const data = await authApi.updateProfile({
-        nickname: profileData.nickname,
-        introduction: profileData.bio,
+      await authApi.updateProfile({
+        nickname: profile.nickname,
+        introduction: profile.introduction,
+        profile_url: profile.profileImage || "",
         account_visibility: true,
         follower_visibility: true,
       });
-
-      await update({
-        nickname: data.data?.nickname || profileData.nickname,
-        bio: data.data?.bio || profileData.bio,
-      });
-
-      toast.success("프로필이 성공적으로 업데이트되었습니다.");
+      toast.success("프로필이 수정되었습니다.");
     } catch (error) {
-      console.error("프로필 업데이트 에러:", error);
-      toast.error(error instanceof Error ? error.message : "프로필 업데이트에 실패했습니다.");
+      console.error("Profile update error:", error);
+      toast.error("프로필 수정에 실패했습니다.");
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
+  };
+
+  const handleInputChange = (field: keyof ProfileData, value: string) => {
+    setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -63,7 +71,7 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <form onSubmit={handleProfileSubmit} className="space-y-6">
+        <form onSubmit={handleSave} className="space-y-6">
           <div className="flex flex-col md:flex-row md:space-x-8 space-y-6 md:space-y-0">
             <motion.div
               className="flex flex-col items-center space-y-3"
@@ -72,11 +80,11 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
             >
               <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
                 <AvatarImage
-                  src={user.profileImage || "/placeholder.svg?height=96&width=96&text=MS"}
+                  src={profile.profileImage || "/placeholder.svg?height=96&width=96&text=MS"}
                   alt="프로필 이미지"
                 />
                 <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-400 text-xl font-bold text-white">
-                  {user.nickname?.charAt(0)?.toUpperCase() || "U"}
+                  {profile.nickname?.charAt(0)?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -93,36 +101,36 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                 </Label>
                 <Input
                   id="nickname"
-                  value={profileData.nickname}
-                  onChange={(e) => setProfileData((prev) => ({ ...prev, nickname: e.target.value }))}
+                  value={profile.nickname}
+                  onChange={(e) => handleInputChange("nickname", e.target.value)}
                   className="border-gray-200 focus:border-purple-400 focus:ring-purple-400"
                   placeholder="닉네임을 입력하세요"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                  이메일
+                <Label htmlFor="introduction" className="text-sm font-medium text-gray-700">
+                  자기소개
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={profileData.email}
-                  disabled
-                  className="bg-gray-50 border-gray-200"
+                <Textarea
+                  id="introduction"
+                  value={profile.introduction}
+                  onChange={(e) => handleInputChange("introduction", e.target.value)}
+                  className="border-gray-200 focus:border-purple-400 focus:ring-purple-400 min-h-20"
+                  placeholder="간단한 자기소개를 작성해보세요"
+                  rows={3}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bio" className="text-sm font-medium text-gray-700">
-                  자기소개
+                <Label htmlFor="profileImage" className="text-sm font-medium text-gray-700">
+                  프로필 이미지 URL
                 </Label>
-                <Textarea
-                  id="bio"
-                  value={profileData.bio}
-                  onChange={(e) => setProfileData((prev) => ({ ...prev, bio: e.target.value }))}
-                  className="border-gray-200 focus:border-purple-400 focus:ring-purple-400 min-h-20"
-                  placeholder="간단한 자기소개를 작성해보세요"
+                <Input
+                  id="profileImage"
+                  value={profile.profileImage}
+                  onChange={(e) => handleInputChange("profileImage", e.target.value)}
+                  placeholder="프로필 이미지 URL을 입력하세요"
                 />
               </div>
             </div>
@@ -131,10 +139,10 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
           <div className="flex justify-end pt-4">
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isSaving}
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6"
             >
-              {isLoading ? (
+              {isSaving ? (
                 <div className="flex items-center space-x-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>저장 중...</span>

@@ -1,44 +1,70 @@
 // src/components/posts/components/reply-form.tsx
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import toast from "react-hot-toast";
+import { useAuthToken } from "@/contexts/AuthTokenContext";
+import { useState } from "react";
+import styles from "./reply-form.module.css";
 
 interface ReplyFormProps {
   postId: string;
   commentId: string;
-  onReplySubmit: () => void;
+  onReplyAdded: () => void;
+  onCancel: () => void;
 }
 
-export function ReplyForm({ postId, commentId, onReplySubmit }: ReplyFormProps) {
-  const form = useForm({ defaultValues: { reply: "" } });
+export default function ReplyForm({ postId, commentId, onReplyAdded, onCancel }: ReplyFormProps) {
+  const [content, setContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { accessToken } = useAuthToken();
 
-  const onSubmit = async (values: { reply: string }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content.trim() || isSubmitting || !accessToken) return;
+
+    setIsSubmitting(true);
     try {
       const res = await fetch(`/api/posts/${postId}/comments/${commentId}/replies`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reply: values.reply }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({ content: content.trim() }),
       });
-      if (!res.ok) throw new Error("대댓글 등록에 실패했습니다.");
-      onReplySubmit();
-      form.reset();
-      toast.success("대댓글이 등록되었습니다.");
-    } catch {
-      toast.error("대댓글 등록에 실패했습니다.");
+
+      if (res.ok) {
+        setContent("");
+        onReplyAdded();
+      } else {
+        console.error("Failed to add reply");
+      }
+    } catch (error) {
+      console.error("Error adding reply:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="mt-2 flex gap-2">
-      <Textarea
-        {...form.register("reply")}
-        placeholder="대댓글을 입력하세요..."
-        className="min-h-[32px] resize-none"
+    <form onSubmit={handleSubmit} className={styles.replyForm}>
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="답글을 입력하세요..."
+        className={styles.textarea}
+        rows={3}
       />
-      <Button type="submit" size="sm">
-        등록
-      </Button>
+      <div className={styles.buttons}>
+        <button type="button" onClick={onCancel} className={styles.cancelButton}>
+          취소
+        </button>
+        <button
+          type="submit"
+          disabled={!content.trim() || isSubmitting || !accessToken}
+          className={styles.submitButton}
+        >
+          {isSubmitting ? "등록 중..." : "답글 등록"}
+        </button>
+      </div>
     </form>
   );
 }

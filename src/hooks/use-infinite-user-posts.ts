@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthToken } from "@/contexts/AuthTokenContext";
 import { DEFAULT_PAGE_SIZE, INFINITE_SCROLL } from "@/utils/constant";
 import { debounceThrottle } from "@/utils/debounce-throttle";
 import { Post } from "@/utils/types/posts";
@@ -21,6 +22,7 @@ export function useInfiniteMemes({
   enabled?: boolean;
   initialData?: any[]; // 초기 데이터
 }) {
+  const { accessToken } = useAuthToken();
   const hasInitialData = initialData && initialData.length > 0;
 
   // 중복 호출 방지를 위한 상태 관리
@@ -51,10 +53,7 @@ export function useInfiniteMemes({
     queryFn: async ({ pageParam = hasInitialData ? 2 : 1 }) => {
       // 프로필 모드일 때는 다른 엔드포인트 사용
       const isProfileMode = userId && profileFilter;
-      const url = new URL(
-        isProfileMode ? `/server/users/${userId}/posts` : "/server/posts",
-        window.location.origin
-      );
+      const url = new URL(isProfileMode ? `/server/users/${userId}/posts` : "/server/posts", window.location.origin);
 
       url.searchParams.set("page", String(pageParam));
       url.searchParams.set("size", String(size));
@@ -67,7 +66,19 @@ export function useInfiniteMemes({
         url.searchParams.set("filter", profileFilter);
       }
 
-      const res = await fetch(url.toString());
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
+      }
+
+      const res = await fetch(url.toString(), {
+        headers,
+        credentials: "include",
+      });
+
       if (!res.ok) throw new Error("Failed to fetch posts");
       const json = await res.json();
 
@@ -96,10 +107,7 @@ export function useInfiniteMemes({
 
       return {
         items,
-        nextPage:
-          json.data.pageInfo.page < json.data.pageInfo.totalPages
-            ? json.data.pageInfo.page + 1
-            : undefined,
+        nextPage: json.data.pageInfo.page < json.data.pageInfo.totalPages ? json.data.pageInfo.page + 1 : undefined,
         total: json.data.pageInfo.totalElements,
       };
     },
@@ -146,13 +154,7 @@ export function useInfiniteMemes({
         setIsLoadingNext(false);
       }, 200);
     }
-  }, [
-    isLoadingNext,
-    queryResult.hasNextPage,
-    queryResult.isFetchingNextPage,
-    queryResult.fetchNextPage,
-    canFetchNext,
-  ]);
+  }, [isLoadingNext, queryResult.hasNextPage, queryResult.isFetchingNextPage, queryResult.fetchNextPage, canFetchNext]);
 
   // 디바운싱 + 쓰로틀링이 적용된 fetchNextPage 함수
   const debouncedThrottledFetchNextPage = useCallback(
@@ -189,12 +191,7 @@ export function useInfiniteMemes({
       if (target.current) observer.unobserve(target.current);
       observer.disconnect();
     };
-  }, [
-    enabled,
-    queryResult.hasNextPage,
-    queryResult.isFetchingNextPage,
-    debouncedThrottledFetchNextPage,
-  ]);
+  }, [enabled, queryResult.hasNextPage, queryResult.isFetchingNextPage, debouncedThrottledFetchNextPage]);
 
   // 로딩 상태 업데이트
   useEffect(() => {

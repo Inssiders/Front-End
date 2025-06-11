@@ -1,77 +1,42 @@
 "use client";
 
-import { MSWProvider } from "@/contexts/msw-context";
-import ToasterContext from "@/contexts/toaster-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Analytics } from "@vercel/analytics/react";
 import { SessionProvider } from "next-auth/react";
-import { Suspense } from "react";
-import Footer from "./footer";
-import Header from "./header";
-import { Web3CubeLoader } from "./loader";
-import styles from "./provider.module.css";
+import { ReactNode, useState } from "react";
+import { Toaster } from "react-hot-toast";
 
-interface Props {
-  children?: React.ReactNode;
+interface ProvidersProps {
+  children: ReactNode;
 }
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false, // 마운트 시 캐시된 데이터 우선 사용
-      staleTime: 5 * 60 * 1000, // 5분 동안 데이터를 fresh로 간주
-      gcTime: 30 * 60 * 1000, // 30분 동안 캐시 유지
-      retry: 1, // 재시도 횟수 줄여서 빠른 응답
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    },
-  },
-});
+export function Providers({ children }: ProvidersProps) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000, // 1분
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  );
 
-export const NextProvider = ({ children }: Props) => {
   return (
-    <MSWProvider>
+    <SessionProvider>
       <QueryClientProvider client={queryClient}>
-        <SessionProvider
-          refetchInterval={5 * 60} // 5분마다 세션 체크
-          refetchOnWindowFocus={true} // 윈도우 포커스 시 세션 갱신
-          refetchWhenOffline={false} // 오프라인 상태에서 세션 갱신 방지
-        >
-          <Suspense fallback={<Web3CubeLoader />}>{children}</Suspense>
-        </SessionProvider>
+        {children}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: "#363636",
+              color: "#fff",
+            },
+          }}
+        />
       </QueryClientProvider>
-    </MSWProvider>
+    </SessionProvider>
   );
-};
-
-export const NextLayout = ({ children }: Props) => {
-  return (
-    <div className={styles.layoutContainer}>
-      {/* 떠다니는 네온 파티클들 */}
-      <div className={styles.particlesContainer}>
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className={styles.particle} />
-        ))}
-      </div>
-
-      {/* 글래스모피즘 헤더 */}
-      <div className={styles.headerContainer}>
-        <Header />
-      </div>
-
-      {/* 메인 콘텐츠 영역 */}
-      <main className={styles.mainContent}>{children}</main>
-
-      {/* 토스터 */}
-      <ToasterContext />
-
-      {/* 글래스모피즘 푸터 */}
-      <div className={styles.footerContainer}>
-        <Footer />
-      </div>
-
-      {/* 애널리틱스 */}
-      <Analytics />
-    </div>
-  );
-};
+}

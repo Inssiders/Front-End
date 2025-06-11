@@ -1,5 +1,6 @@
 "use server";
 
+import { api } from "@/utils/fetch/interceptor";
 import bcrypt from "bcryptjs";
 import { clearAuthCookies, setAuthCookies, TokenData } from "./auth-cookies";
 
@@ -14,36 +15,25 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * 회원가입 Server Action
  */
-export async function createAccount(data: {
-  email: string;
-  password: string;
-  authorizationCode: string;
-}) {
+export async function createAccount(data: { email: string; password: string; authorizationCode: string }) {
   try {
     // 비밀번호 해싱
     const hashedPassword = await hashPassword(data.password);
-
     // 서버 API 호출
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/server/accounts`,
+    const response = await api.post(
+      "accounts",
       {
-        method: "POST",
+        register_type: "PASSWORD",
+        email: data.email,
+        password: hashedPassword,
+      },
+      {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${data.authorizationCode}`,
         },
-        body: JSON.stringify({
-          register_type: "password",
-          email: data.email,
-          password: hashedPassword,
-        }),
       }
     );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || "회원가입에 실패했습니다.");
-    }
+    console.log(response);
 
     return { success: true };
   } catch (error) {

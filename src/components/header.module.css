@@ -254,12 +254,13 @@
 
 .searchMobile {
   @apply md:hidden relative w-full justify-start text-sm font-medium h-12;
-  @apply px-6 rounded-2xl border-2 text-gray-700;
+  @apply px-6 rounded-2xl border-2;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-color: rgba(139, 92, 246, 0.2);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1);
+  color: #4b5563 !important; /* 진한 회색으로 가독성 향상 */
 }
 
 .searchMobile:hover {
@@ -267,6 +268,7 @@
   background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 6px 20px rgba(236, 72, 153, 0.15);
   transform: translateY(-1px);
+  color: #374151 !important; /* 호버 시 더 진한 색상 */
 }
 
 /* 로고 컨테이너 - 세련된 효과 */
@@ -373,14 +375,21 @@
 }
 
 .navTrigger {
-  @apply h-11 px-6 rounded-2xl font-semibold text-gray-700 transition-all duration-300;
-  background: rgba(255, 255, 255, 0.8);
-  border: 2px solid rgba(249, 115, 22, 0.2);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(249, 115, 22, 0.1);
+  @apply h-11 px-6 rounded-2xl font-semibold transition-all duration-300;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8));
+  border: 2px solid rgba(249, 115, 22, 0.25);
+  backdrop-filter: blur(12px) saturate(120%);
+  box-shadow:
+    0 2px 10px rgba(249, 115, 22, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
   position: relative;
   overflow: hidden;
-  color: #3b82f6 !important;
+  color: #4b5563 !important;
+}
+
+.navTrigger > * {
+  position: relative;
+  z-index: 2;
 }
 
 .navTrigger::before {
@@ -390,8 +399,9 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+  z-index: 1;
 }
 
 .navTrigger:hover::before {
@@ -399,11 +409,14 @@
 }
 
 .navTrigger:hover {
-  background: rgba(249, 115, 22, 0.1);
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(244, 63, 94, 0.15));
   border-color: #f43f5e;
-  box-shadow: 0 4px 20px rgba(244, 63, 94, 0.2);
-  transform: translateY(-1px) scale(1.02);
-  color: #f97316;
+  box-shadow:
+    0 4px 20px rgba(244, 63, 94, 0.25),
+    0 0 30px rgba(249, 115, 22, 0.15);
+  transform: translateY(-2px) scale(1.03);
+  color: #f97316 !important;
+  backdrop-filter: blur(15px) saturate(150%);
 }
 
 /* 네비게이션 메뉴 - 레이아웃 안정화 */
@@ -778,22 +791,25 @@
 }
 
 .searchModalInput {
-  @apply border-none focus:ring-0 rounded-2xl px-6 py-4 text-lg font-medium text-gray-800; /* 텍스트 가시성 개선 */
-  background: rgba(255, 255, 255, 0.9);
+  @apply border-none focus:ring-0 rounded-2xl px-6 py-4 text-lg font-medium;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   box-shadow: 0 4px 15px rgba(139, 92, 246, 0.08) inset;
+  color: #1f2937 !important;
+  caret-color: #f43f5e;
 }
 
 .searchModalInput:focus {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98);
   box-shadow:
-    0 0 0 2px rgba(236, 72, 153, 0.2),
+    0 0 0 2px rgba(236, 72, 153, 0.3),
     0 4px 15px rgba(139, 92, 246, 0.1) inset;
-  color: #1f2937;
+  color: #1f2937 !important;
+  outline: none;
 }
 
 .searchModalInput::placeholder {
-  color: rgba(107, 114, 128, 0.7); /* placeholder 가시성 개선 */
+  color: rgba(75, 85, 99, 0.8) !important;
   font-weight: 500;
 }
 
@@ -817,7 +833,8 @@
 }
 
 .searchModalEmptyText {
-  @apply text-gray-600 font-semibold text-base; /* 텍스트 가시성 개선 */
+  @apply font-semibold text-base;
+  color: #4b5563 !important; /* 가독성 향상을 위한 진한 회색 */
 }
 
 .searchModalItem {
@@ -851,7 +868,8 @@
 }
 
 .searchModalItemText {
-  @apply font-bold text-gray-700 text-base; /* 텍스트 가시성 개선 */
+  @apply font-bold text-base;
+  color: #374151 !important; /* 더 진한 회색으로 가독성 향상 */
 }
 
 /* 반응형 최적화 - 개선된 브레이크포인트 */
@@ -974,17 +992,42 @@
     border-color: rgba(139, 92, 246, 0.3);
   }
 
+  .searchModalInput {
+    background: rgba(31, 41, 55, 0.9) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    border-color: rgba(139, 92, 246, 0.4);
+  }
+
+  .searchModalInput:focus {
+    background: rgba(31, 41, 55, 0.95) !important;
+    color: rgba(255, 255, 255, 0.98) !important;
+  }
+
+  .searchModalInput::placeholder {
+    color: rgba(156, 163, 175, 0.7) !important;
+  }
+
+  .searchModalItem {
+    background: rgba(55, 65, 81, 0.6);
+    border-color: rgba(139, 92, 246, 0.2);
+  }
+
+  .searchModalItem:hover {
+    background: rgba(75, 85, 99, 0.7);
+    border-color: rgba(236, 72, 153, 0.3);
+  }
+
   .profileName,
   .navItemTitle,
   .mobileMenuTitle,
   .searchModalItemText {
-    color: white;
+    color: white !important;
   }
 
   .profileEmail,
   .navItemDescription,
   .searchModalEmptyText {
-    color: rgba(156, 163, 175, 0.9);
+    color: rgba(156, 163, 175, 0.9) !important;
   }
 }
 

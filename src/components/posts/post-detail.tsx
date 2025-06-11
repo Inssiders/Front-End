@@ -3,14 +3,14 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { useRef, useState } from "react";
-import { VideoSection } from "./components/video-section";
-import { PostHeader } from "./components/post-header";
-import { PostContent } from "./components/post-component";
-import { ActionButtons } from "./components/action-buttons";
-import { CommentSection } from "./components/comment-section";
-import { CommentForm } from "./components/comment-form";
-import { RelatedPosts } from "./related-posts";
 import toast from "react-hot-toast";
+import { ActionButtons } from "./components/action-buttons";
+import { CommentForm } from "./components/comment-form";
+import { CommentSection } from "./components/comment-section";
+import { PostContent } from "./components/post-component";
+import { PostHeader } from "./components/post-header";
+import { VideoSection } from "./components/video-section";
+import { RelatedPosts } from "./related-posts";
 
 interface PostDetailProps {
   post: any; // TODO: 타입 정의 필요
@@ -18,9 +18,7 @@ interface PostDetailProps {
 
 export function PostDetail({ post }: PostDetailProps) {
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
-  const [comments, setComments] = useState(
-    post.comments_list || post.comments || post.comment_list || []
-  );
+  const [comments, setComments] = useState(post.comments_list || post.comments || post.comment_list || []);
   const [replyTo, setReplyTo] = useState<{ commentId: string; username: string } | null>(null);
 
   const fetchComments = async () => {
@@ -70,12 +68,9 @@ export function PostDetail({ post }: PostDetailProps) {
   const handleDeleteReply = async (commentId: string, replyId: string) => {
     if (window.confirm("대댓글을 삭제하시겠습니까?")) {
       try {
-        const response = await fetch(
-          `/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`,
-          {
-            method: "DELETE",
-          }
-        );
+        const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
+          method: "DELETE",
+        });
         if (response.ok) {
           fetchComments();
           toast.success("대댓글이 삭제되었습니다.");
@@ -113,16 +108,13 @@ export function PostDetail({ post }: PostDetailProps) {
   // 대댓글 수정 함수
   const handleEditReply = async (commentId: string, replyId: string, newContent: string) => {
     try {
-      const response = await fetch(
-        `/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ reply_content: newContent }),
-        }
-      );
+      const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reply_content: newContent }),
+      });
 
       if (response.ok) {
         fetchComments();
