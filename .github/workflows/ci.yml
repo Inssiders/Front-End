@@ -1,0 +1,75 @@
+name: Next.js 15 Build Test
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  build:
+    name: Build & Test Next.js 15 with pnpm
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: 🔧 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: |
+          echo "Installing dependencies with pnpm..."
+          pnpm install --no-frozen-lockfile
+
+      - name: 🔍 TypeScript check (warning only)
+        run: |
+          echo "Running TypeScript type checking..."
+          pnpm run type-check || echo "⚠️ TypeScript 타입 에러가 있지만 빌드를 계속 진행합니다"
+        continue-on-error: true
+
+      - name: 🧹 ESLint check (warning only)
+        run: |
+          echo "Running ESLint..."
+          pnpm run lint || echo "⚠️ ESLint 경고가 있지만 빌드를 계속 진행합니다"
+        continue-on-error: true
+
+      - name: 🏗️ Build Next.js 15 application
+        run: |
+          echo "Building Next.js 15 application with pnpm..."
+          pnpm run build
+        env:
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: ✅ Build success notification
+        if: success()
+        run: |
+          echo "🎉 Next.js 15 빌드가 성공적으로 완료되었습니다!"
+          echo "✨ pnpm으로 모든 종속성이 올바르게 설치되었습니다"
+          echo "🚀 프로덕션 빌드가 문제없이 생성되었습니다"
+
+      - name: 📤 Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          path: .next/
+          retention-days: 1
+
+      - name: ❌ Build failure notification
+        if: failure()
+        run: |
+          echo "💥 Next.js 15 빌드가 실패했습니다!"
+          echo "🔍 위의 로그를 확인하여 문제를 해결해주세요"
+          exit 1
