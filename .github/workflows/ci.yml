@@ -51,6 +51,12 @@ jobs:
         env:
           NODE_ENV: production
           NEXT_TELEMETRY_DISABLED: 1
+          SERVER_URL: ${{ secrets.SERVER_URL }}Add commentMore actions
+          NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
+          API_MOCKING: ${{ secrets.API_MOCKING }}
+          NEXT_PUBLIC_API_MOCKING: ${{ secrets.NEXT_PUBLIC_API_MOCKING }}
 
       - name: ✅ Build success notification
         if: success()

@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
             email: credentials?.email,
             grantType: credentials?.grantType,
             is_register: credentials?.is_register,
-            hasPassword: !!credentials?.password,
+            password: credentials?.password,
           });
 
           const { email, password, grantType, is_register } = credentials!;

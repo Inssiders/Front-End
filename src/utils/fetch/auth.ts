@@ -20,8 +20,8 @@ export async function apiServerFetch(endpoint: string, options: ApiFetchOptions 
   if (endpoint.startsWith("http")) {
     url = endpoint;
   } else {
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-    url = `${baseUrl}/server/${endpoint}`;
+    const baseUrl = process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    url = `${baseUrl}/api${endpoint}`;
   }
 
   const defaultHeaders: Record<string, string> = {
@@ -231,7 +231,7 @@ export async function apiDelete<T = any>(endpoint: string, options: ApiFetchOpti
 
 // Auth API 호출 함수 (기존 fetch.ts에서 가져옴)
 async function callAuthAPI(endpoint: string, data: any): Promise<AuthResponse> {
-  const response = await apiFetch(`auth/${endpoint}`, {
+  const response = await apiServerFetch(`/auth/${endpoint}`, {
     ...{ skipAuth: true },
     method: "POST",
     body: JSON.stringify(data),
@@ -247,7 +247,7 @@ async function callAuthAPI(endpoint: string, data: any): Promise<AuthResponse> {
 
 // 이메일 인증 요청
 export async function requestEmailVerification(email: string): Promise<AuthResponse> {
-  const challengeResponse = await apiFetch("/api/auth/email/challenge", {
+  const challengeResponse = await apiFetch("/auth/email/challenge", {
     method: "POST",
     skipAuth: true, // 이메일 인증 요청은 인증 불필요
     body: JSON.stringify({ email }),
@@ -263,16 +263,15 @@ export async function requestEmailVerification(email: string): Promise<AuthRespo
 
 // 비밀번호 로그인
 export async function loginWithPassword(email: string, password: string): Promise<AuthResponse> {
-  const response = await apiFetch("/api/auth/token", {
+  const response = await apiServerFetch("/auth/token", {
     method: "POST",
     skipAuth: true, // 로그인 요청은 인증 불필요
     body: JSON.stringify({
+      grantType: "PASSWORD",
       email,
       password,
-      grantType: "PASSWORD",
     }),
   });
-
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.detail || error.message || "로그인에 실패했습니다.");
@@ -281,14 +280,9 @@ export async function loginWithPassword(email: string, password: string): Promis
   return response.json();
 }
 
-// 일반 로그인 (클라이언트용)
-export async function login({ email, password }: { email: string; password: string }) {
-  return loginWithPassword(email, password);
-}
-
 // 리프레시 토큰으로 새 토큰 발급
 export async function refreshAccessToken(refreshToken: string): Promise<AuthResponse> {
-  const response = await apiFetch("/api/auth/token", {
+  const response = await apiServerFetch("/auth/token", {
     method: "POST",
     skipAuth: true, // 리프레시 토큰 요청은 인증 불필요
     body: JSON.stringify({
@@ -308,7 +302,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<AuthResp
 
 export async function register(data: { email: string; password: string; nickname: string }): Promise<any> {
   // 이메일 인증 토큰이 필요하므로 Authorization 헤더가 있어야 함
-  const response = await apiFetch("/api/accounts", {
+  const response = await apiServerFetch("/accounts", {
     method: "POST",
     skipAuth: true, // 회원가입도 별도 인증 불필요 (이메일 인증 토큰 사용)
     body: JSON.stringify({

@@ -4,13 +4,55 @@ import { authOptions } from "./next-auth";
 
 interface ApiOptions extends RequestInit {
   skipAuth?: boolean;
+  timeout?: number;
+}
+
+interface ApiError extends Error {
+  status?: number;
+  data?: any;
+}
+
+/**
+ * 네트워크 상태 확인
+ */
+export function isOnline(): boolean {
+  if (typeof navigator !== "undefined") {
+    return navigator.onLine;
+  }
+  return true; // Default to true in SSR context
+}
+
+/**
+ * API 서버 연결 상태 확인
+ */
+export async function isApiReachable(timeout = 5000): Promise<boolean> {
+  const baseUrl = typeof window === "undefined" ? process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL : "";
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const response = await fetch(`${baseUrl}/server/health`, {
+      method: "HEAD",
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 
 /**
  * 클라이언트 사이드 API 호출
  */
 async function clientFetch(endpoint: string, options: ApiOptions = {}) {
-  const { skipAuth = false, ...fetchOptions } = options;
+  const { skipAuth = false, timeout = 10000, ...fetchOptions } = options;
+
+  if (!isOnline()) {
+    throw new Error("Network is offline");
+  }
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -24,32 +66,41 @@ async function clientFetch(endpoint: string, options: ApiOptions = {}) {
     }
   }
 
-  // 개발 환경에서는 /server 프록시를 사용, 프로덕션에서는 직접 API URL 사용
-  let url: string;
-  if (endpoint.startsWith("http")) {
-    url = endpoint;
-  } else {
-    if (process.env.NODE_ENV === "development") {
-      url = `/server${endpoint}`;
-    } else {
-      // 프로덕션 환경에서는 환경변수에서 API URL을 가져옴
-      const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8080";
-      url = `${baseUrl}/api${endpoint}`;
-    }
-  }
+  const url = endpoint.startsWith("http") ? endpoint : `/server${endpoint}`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  return fetch(url, {
-    ...fetchOptions,
-    headers,
-    credentials: "include",
-  });
+  try {
+    const response = await fetch(url, {
+      ...fetchOptions,
+      headers,
+      credentials: "include",
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const error = new Error(`HTTP error! status: ${response.status}`) as ApiError;
+      error.status = response.status;
+      try {
+        error.data = await response.json();
+      } catch {}
+      throw error;
+    }
+
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
 }
 
 /**
  * 서버 사이드 API 호출
  */
 async function serverFetch(endpoint: string, options: ApiOptions = {}) {
-  const { skipAuth = false, ...fetchOptions } = options;
+  const { skipAuth = false, timeout = 10000, ...fetchOptions } = options;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -63,13 +114,33 @@ async function serverFetch(endpoint: string, options: ApiOptions = {}) {
     }
   }
 
-  const baseUrl = process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL;
-  const url = endpoint.startsWith("http") ? endpoint : `${baseUrl}${endpoint}`;
+  const url = endpoint.startsWith("http") ? endpoint : `${process.env.SERVER_URL}${endpoint}`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  return fetch(url, {
-    ...fetchOptions,
-    headers,
-  });
+  try {
+    const response = await fetch(url, {
+      ...fetchOptions,
+      headers,
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const error = new Error(`HTTP error! status: ${response.status}`) as ApiError;
+      error.status = response.status;
+      try {
+        error.data = await response.json();
+      } catch {}
+      throw error;
+    }
+
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
 }
 
 /**
@@ -89,7 +160,6 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
 export const api = {
   get: async <T = any>(endpoint: string, options: ApiOptions = {}): Promise<T> => {
     const response = await apiFetch(endpoint, { ...options, method: "GET" });
-    if (!response.ok) throw new Error(`GET ${endpoint} failed`);
     return response.json();
   },
 
@@ -99,7 +169,6 @@ export const api = {
       method: "POST",
       body: data ? JSON.stringify(data) : undefined,
     });
-    if (!response.ok) throw new Error(`POST ${endpoint} failed`);
     return response.json();
   },
 
@@ -109,7 +178,6 @@ export const api = {
       method: "PUT",
       body: data ? JSON.stringify(data) : undefined,
     });
-    if (!response.ok) throw new Error(`PUT ${endpoint} failed`);
     return response.json();
   },
 
@@ -119,36 +187,41 @@ export const api = {
       method: "PATCH",
       body: data ? JSON.stringify(data) : undefined,
     });
-    if (!response.ok) throw new Error(`PATCH ${endpoint} failed`);
     return response.json();
   },
 
   delete: async <T = any>(endpoint: string, options: ApiOptions = {}): Promise<T> => {
     const response = await apiFetch(endpoint, { ...options, method: "DELETE" });
-    if (!response.ok) throw new Error(`DELETE ${endpoint} failed`);
     return response.json();
   },
 };
 
-// 편의 함수들
-export const authApi = {
-  // 기본 인증
+// 인증 관련 API 인터페이스
+interface AuthApi {
+  login(email: string, password: string): Promise<any>;
+  requestEmailVerification(email: string): Promise<any>;
+  verifyEmailCode(email: string, otp: string): Promise<any>;
+  getTokenWithAuthCode(uuid: string): Promise<any>;
+  register(data: { email: string; password: string; nickname: string }): Promise<any>;
+  getProfile(id: string): Promise<any>;
+  updateProfile(data: any): Promise<any>;
+  changePassword(password: string): Promise<any>;
+  deleteAccount(): Promise<any>;
+}
+
+// 인증 관련 API 구현
+export const authApi: AuthApi = {
   login: (email: string, password: string) =>
     api.post("/auth/token", { email, password, grantType: "PASSWORD" }, { skipAuth: true }),
 
-  // 이메일 인증 요청
   requestEmailVerification: (email: string) => api.post("/auth/email/challenge", { email }, { skipAuth: true }),
 
-  // 이메일 인증 코드 확인
   verifyEmailCode: (email: string, otp: string) => api.post("/auth/email/verify", { email, otp }, { skipAuth: true }),
 
-  // 인증 코드로 토큰 발급
   getTokenWithAuthCode: (uuid: string) =>
     api.post("/auth/token", { grantType: "AUTHORIZATION_CODE", uuid }, { skipAuth: true }),
 
-  // 계정 관리
-  register: (data: { email: string; password: string; nickname: string }) =>
-    api.post("/accounts", data, { skipAuth: true }),
+  register: (data) => api.post("/accounts", data, { skipAuth: true }),
 
   getProfile: (id: string) => api.get(`/profiles/${id}`),
 
