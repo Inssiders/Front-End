@@ -1,4 +1,6 @@
-import { NextLayout, NextProvider } from "@/components/provider";
+import Footer from "@/components/footer";
+import Header from "@/components/header";
+import { Providers } from "@/components/provider";
 import type { Metadata, Viewport } from "next";
 import type React from "react";
 import "./globals.css";
@@ -44,9 +46,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
       <body>
-        <NextProvider>
-          <NextLayout>{children}</NextLayout>
-        </NextProvider>
+        <Providers>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );

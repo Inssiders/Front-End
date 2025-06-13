@@ -1,17 +1,17 @@
 import { type ApiMeme, type Post } from "../types/posts";
 import {
-  type ProfileResponse as ProfileDataResponse,
   type ProfilePostsResponse as ProfilePostsDataResponse,
+  type ProfileResponse,
+  type ProfileUpdateRequest,
 } from "../types/profile";
-import { apiFetch } from "./auth";
+import { apiFetch, ApiFetchOptions } from "./auth";
 
 // Helper function to construct URL based on environment
 function constructUrl(path: string): string {
-  const baseUrl =
-    typeof window === "undefined"
-      ? process.env.SERVER_URL || "http://localhost:3000" // 서버사이드에서는 절대 URL 필요
-      : ""; // 클라이언트사이드에서는 상대 URL 사용
-
+  const baseUrl = process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL;
+  if (!baseUrl) {
+    throw new Error("SERVER_URL is not configured");
+  }
   return `${baseUrl}${path}`;
 }
 
@@ -91,78 +91,41 @@ export async function fetchProfilePosts(
 }
 
 // 프로필 정보 조회 (오버로드)
-export async function fetchProfile(accountId: string): Promise<ProfileDataResponse>;
-export async function fetchProfile(
-  accountId: string,
-  accessToken: string
-): Promise<ProfileDataResponse>;
-export async function fetchProfile(
-  accountId: string,
-  accessToken?: string
-): Promise<ProfileDataResponse> {
-  // 기존 방식 지원 (accessToken 파라미터가 있는 경우)
-  if (accessToken) {
-    const url = constructUrl(`/server/profiles/${accountId}`);
-
-    const headers: HeadersInit = {
-      Accept: "application/hal+json; q=0.9, application/json; q=0.8",
-      Authorization: `Bearer ${accessToken}`,
-    };
-
-    // ISR 캐시 설정
-    const isServerSide = typeof window === "undefined";
-    const fetchOptions: RequestInit = {
-      method: "GET",
-      headers,
-    };
-
-    if (isServerSide) {
-      fetchOptions.next = {
-        revalidate: 3600, // 1시간
-        tags: [`profile-${accountId}`, "profiles"],
-      };
-    }
-
-    const response = await fetch(url, fetchOptions);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch profile");
-    }
-
-    return response.json() as Promise<ProfileDataResponse>;
-  }
-
-  // 새로운 쿠키 기반 방식
-  const isServerSide = typeof window === "undefined";
-  const fetchOptions: RequestInit = {
+export async function fetchProfile(accountId: string, options: ApiFetchOptions = {}): Promise<ProfileResponse> {
+  const response = await apiFetch(`/api/profiles/${accountId}`, {
     method: "GET",
-    headers: {
-      Accept: "application/hal+json; q=0.9, application/json; q=0.8",
-    },
-  };
-
-  if (isServerSide) {
-    fetchOptions.next = {
-      revalidate: 3600, // 1시간
-      tags: [`profile-${accountId}`, "profiles"],
-    };
-  }
-
-  const response = await apiFetch(`/profiles/${accountId}`, fetchOptions);
+    ...options,
+  });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch profile");
+    const error = await response.json();
+    throw new Error(error.detail || error.message || "프로필 조회에 실패했습니다.");
   }
 
-  return response.json() as Promise<ProfileDataResponse>;
+  return response.json();
+}
+
+// 프로필 수정
+export async function updateProfile(
+  updateData: ProfileUpdateRequest,
+  options: ApiFetchOptions = {}
+): Promise<ProfileResponse> {
+  const response = await apiFetch("/api/profiles/me", {
+    method: "PATCH",
+    body: JSON.stringify(updateData),
+    ...options,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || error.message || "프로필 수정에 실패했습니다.");
+  }
+
+  return response.json();
 }
 
 // ISR 재검증 트리거 함수
-export async function triggerRevalidation(options: {
-  userId?: string;
-  path?: string;
-  tag?: string;
-}) {
+export async function triggerRevalidation(options: { userId?: string; path?: string; tag?: string }) {
   const { userId, path, tag } = options;
 
   try {

@@ -14,7 +14,7 @@ import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./header.module.css";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
+import { CommandDialog, CommandEmpty, CommandInput, CommandList } from "./ui/command";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -83,7 +83,7 @@ export default function Header() {
   const [openMobileMenu, setOpenMobileMenu] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const isScrollingUp = useScrollDirection();
+  const isHeaderVisible = useScrollDirection();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const handleKeyDown = useCallback(
@@ -149,15 +149,13 @@ export default function Header() {
       <motion.header
         initial={{ y: -100, opacity: 0 }}
         animate={{
-          y: isScrollingUp ? 0 : -100,
-          opacity: isScrollingUp ? 1 : 0,
+          y: isHeaderVisible ? 0 : -100,
+          opacity: isHeaderVisible ? 1 : 0,
         }}
         transition={{
-          duration: 0.4,
-          ease: [0.4, 0, 0.2, 1],
-          type: "spring",
-          stiffness: 300,
-          damping: 30,
+          duration: 0.3,
+          ease: [0.25, 0.46, 0.45, 0.94],
+          type: "tween",
         }}
         className={styles.header}
       >
@@ -357,79 +355,75 @@ export default function Header() {
                       </Button>
                     </motion.div>
                   </SheetTrigger>
-                  <SheetContent side="right" className={styles.mobileMenuContent} asChild>
+                  <SheetContent side="right" className={styles.mobileMenuContent}>
+                    <SheetHeader>
+                      <SheetTitle className={styles.mobileMenuTitle}>메뉴 ✨</SheetTitle>
+                    </SheetHeader>
                     <motion.div
-                      initial={{ x: 320, opacity: 0 }}
+                      className={styles.mobileMenuSection}
+                      initial={{ x: 20, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: 320, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.1 }}
                     >
-                      <SheetHeader>
-                        <SheetTitle className={styles.mobileMenuTitle}>메뉴 ✨</SheetTitle>
-                      </SheetHeader>
-                      <div className={styles.mobileMenuSection}>
-                        {navItems.map((category, categoryIndex) => (
-                          <motion.div
-                            key={category.category}
-                            className={styles.mobileMenuCategory}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: categoryIndex * 0.1 }}
-                          >
-                            <h3 className={styles.mobileMenuCategoryTitle}>{category.category}</h3>
-                            <div className={styles.mobileMenuItems}>
-                              {category.items.map((item, itemIndex) => (
-                                <motion.div
-                                  key={item.name}
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: categoryIndex * 0.1 + itemIndex * 0.05 }}
-                                  whileHover={{ x: 6, scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
+                      {navItems.map((category, categoryIndex) => (
+                        <motion.div
+                          key={category.category}
+                          className={styles.mobileMenuCategory}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: categoryIndex * 0.1 }}
+                        >
+                          <h3 className={styles.mobileMenuCategoryTitle}>{category.category}</h3>
+                          <div className={styles.mobileMenuItems}>
+                            {category.items.map((item, itemIndex) => (
+                              <motion.div
+                                key={item.name}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: categoryIndex * 0.1 + itemIndex * 0.05 }}
+                                whileHover={{ x: 6, scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                              >
+                                <Link
+                                  href={item.href}
+                                  className={cn(
+                                    styles.mobileMenuItem,
+                                    pathname === item.href ? styles.mobileMenuItemActive : styles.mobileMenuItemInactive
+                                  )}
+                                  onClick={() => setOpenMobileMenu(false)}
                                 >
-                                  <Link
-                                    href={item.href}
+                                  <motion.div
                                     className={cn(
-                                      styles.mobileMenuItem,
+                                      styles.mobileMenuItemIcon,
                                       pathname === item.href
-                                        ? styles.mobileMenuItemActive
-                                        : styles.mobileMenuItemInactive
+                                        ? styles.mobileMenuItemIconActive
+                                        : styles.mobileMenuItemIconInactive
                                     )}
-                                    onClick={() => setOpenMobileMenu(false)}
+                                    whileHover={{ rotate: 5, scale: 1.1 }}
                                   >
-                                    <motion.div
-                                      className={cn(
-                                        styles.mobileMenuItemIcon,
-                                        pathname === item.href
-                                          ? styles.mobileMenuItemIconActive
-                                          : styles.mobileMenuItemIconInactive
-                                      )}
-                                      whileHover={{ rotate: 5, scale: 1.1 }}
-                                    >
-                                      {item.icon}
-                                    </motion.div>
-                                    <div>
-                                      <div className={styles.mobileMenuItemText}>
-                                        {item.name} {item.emoji}
-                                      </div>
-                                      <div
-                                        className={cn(
-                                          styles.mobileMenuItemDesc,
-                                          pathname === item.href
-                                            ? styles.mobileMenuItemDescActive
-                                            : styles.mobileMenuItemDescInactive
-                                        )}
-                                      >
-                                        {item.description}
-                                      </div>
+                                    {item.icon}
+                                  </motion.div>
+                                  <div>
+                                    <div className={styles.mobileMenuItemText}>
+                                      {item.name} {item.emoji}
                                     </div>
-                                  </Link>
-                                </motion.div>
-                              ))}
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
+                                    <div
+                                      className={cn(
+                                        styles.mobileMenuItemDesc,
+                                        pathname === item.href
+                                          ? styles.mobileMenuItemDescActive
+                                          : styles.mobileMenuItemDescInactive
+                                      )}
+                                    >
+                                      {item.description}
+                                    </div>
+                                  </div>
+                                </Link>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      ))}
                     </motion.div>
                   </SheetContent>
                 </Sheet>
@@ -474,55 +468,6 @@ export default function Header() {
                 <span className={styles.searchModalEmptyText}>검색 결과가 없습니다 😢</span>
               </motion.div>
             </CommandEmpty>
-            <CommandGroup heading="✨ 추천 검색어">
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-                <CommandItem
-                  onSelect={() => {
-                    setSearch("최신 트렌드");
-                    handleSearchSubmit();
-                  }}
-                  className={styles.searchModalItem}
-                >
-                  <motion.div
-                    className={styles.searchModalItemContent}
-                    whileHover={{ x: 4 }}
-                    transition={{ type: "spring", stiffness: 400 }}
-                  >
-                    <motion.div
-                      className={`${styles.searchModalItemIcon} ${styles.searchModalItemIconSearch}`}
-                      whileHover={{ rotate: 5, scale: 1.1 }}
-                    >
-                      <Search className="h-4 w-4 text-purple-600" />
-                    </motion.div>
-                    <span className={styles.searchModalItemText}>최신 트렌드 🔥</span>
-                  </motion.div>
-                </CommandItem>
-              </motion.div>
-
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-                <CommandItem
-                  onSelect={() => {
-                    setSearch("인기 밈");
-                    handleSearchSubmit();
-                  }}
-                  className={styles.searchModalItem}
-                >
-                  <motion.div
-                    className={styles.searchModalItemContent}
-                    whileHover={{ x: 4 }}
-                    transition={{ type: "spring", stiffness: 400 }}
-                  >
-                    <motion.div
-                      className={`${styles.searchModalItemIcon} ${styles.searchModalItemIconSparkles}`}
-                      whileHover={{ rotate: 5, scale: 1.1 }}
-                    >
-                      <Sparkles className="h-4 w-4 text-cyan-600" />
-                    </motion.div>
-                    <span className={styles.searchModalItemText}>인기 밈 🎭</span>
-                  </motion.div>
-                </CommandItem>
-              </motion.div>
-            </CommandGroup>
           </CommandList>
         </motion.div>
       </CommandDialog>

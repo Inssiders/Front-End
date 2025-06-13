@@ -2,14 +2,7 @@
 
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { Check, LogIn } from "lucide-react";
@@ -40,11 +33,11 @@ export default function SignInForm({ onLoginFail }: SignInFormProps) {
       const res = await signIn("credentials", {
         email: values.email,
         password: values.password,
-        grant_type: "password",
+        grantType: "PASSWORD",
         redirect: false,
         callbackUrl: "/",
       });
-
+      console.log(res);
       if (!res?.error) {
         router.push("/");
       } else {

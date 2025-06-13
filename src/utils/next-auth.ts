@@ -2,12 +2,7 @@ import { removeAuthTokens, saveAuthTokens } from "@/lib/auth-actions";
 import { NextAuthOptions, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import {
-  loginWithPassword,
-  refreshAccessToken,
-  register,
-  requestEmailVerification,
-} from "./fetch/auth";
+import { loginWithPassword, refreshAccessToken, register, requestEmailVerification } from "./fetch/auth";
 import { fetchProfile } from "./fetch/profile";
 
 // 타입 확장
@@ -29,17 +24,26 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
-        grant_type: { label: "Grant Type", type: "text" },
+        grantType: { label: "Grant Type", type: "text" },
         is_register: { label: "Is Register", type: "text" },
       },
       async authorize(credentials) {
         try {
-          const { email, password, grant_type, is_register } = credentials!;
+          console.log("=== AUTHORIZE FUNCTION START ===");
+          console.log("Received credentials:", {
+            email: credentials?.email,
+            grantType: credentials?.grantType,
+            is_register: credentials?.is_register,
+            password: credentials?.password,
+          });
+
+          const { email, password, grantType, is_register } = credentials!;
 
           let authResponse;
 
           // 회원가입 처리
           if (is_register === "true") {
+            console.log("Processing registration for:", email);
             try {
               await register({ email, password, nickname: "" });
               // 회원가입 성공 후 자동 로그인
@@ -50,23 +54,30 @@ export const authOptions: NextAuthOptions = {
             }
           } else {
             // 기존 로그인 로직
-            if (grant_type === "authorization_code") {
+            console.log("Processing login with grantType:", grantType);
+            if (grantType === "AUTHORIZATION_CODE") {
+              console.log("Using AUTHORIZATION_CODE flow");
               authResponse = await requestEmailVerification(email);
-            } else if (grant_type === "password") {
+            } else if (grantType === "PASSWORD") {
+              console.log("Using PASSWORD flow for email:", email);
               authResponse = await loginWithPassword(email, password);
             } else {
+              console.log("Invalid grantType:", grantType);
               return null;
             }
           }
 
-          if (!authResponse?.data?.token) return null;
+          if (!authResponse?.data?.access_token) {
+            console.log("❌ No access_token found in auth response, returning null");
+            return null;
+          }
 
           // 이메일 인증의 경우 토큰이 없을 수 있음
-          if (grant_type === "authorization_code" && !authResponse.data.token.access_token) {
+          if (grantType === "AUTHORIZATION_CODE" && !authResponse.data.access_token) {
             return {
               id: "0",
               email,
-              grantType: "authorization_code",
+              grantType: "AUTHORIZATION_CODE",
               accessToken: "",
               refreshToken: "",
               exp: Math.floor(Date.now() / 1000) + 300, // 5분
@@ -81,12 +92,12 @@ export const authOptions: NextAuthOptions = {
           }
 
           // 토큰 정보 저장
-          const { access_token, refresh_token, expires_in } = authResponse.data.token;
+          const { access_token, refresh_token, expires_in } = authResponse.data;
           const accountId = "1"; // JWT의 sub claim에서 추출 필요
 
           // 토큰을 쿠키에 저장
           try {
-            await saveAuthTokens(authResponse.data.token);
+            await saveAuthTokens(authResponse.data);
           } catch (error) {
             console.error("Failed to save auth tokens to cookies:", error);
           }
@@ -106,12 +117,12 @@ export const authOptions: NextAuthOptions = {
             const profileResponse = await fetchProfile(accountId);
             profileData = {
               nickname: profileResponse.data.nickname,
-              profileImage: profileResponse.data.profileUrl,
+              profileImage: profileResponse.data.profile_url,
               bio: profileResponse.data.bio || "",
               followerCount: profileResponse.data.follower_count || 0,
               postCount: profileResponse.data.post_count || 0,
-              accountVisible: profileResponse.data.accountVisible ?? true,
-              followerVisible: profileResponse.data.followerVisible ?? true,
+              accountVisible: profileResponse.data.account_visible ?? true,
+              followerVisible: profileResponse.data.follower_visible ?? true,
             };
           } catch (error) {
             console.error("프로필 정보 조회에 실패했습니다:", error);
@@ -120,7 +131,7 @@ export const authOptions: NextAuthOptions = {
           return {
             id: accountId,
             email,
-            grantType: authResponse.data.grant_type,
+            grantType: grantType as "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN",
             accessToken: access_token,
             refreshToken: refresh_token || "",
             exp: Math.floor(Date.now() / 1000) + expires_in,
@@ -133,7 +144,9 @@ export const authOptions: NextAuthOptions = {
             ...profileData,
           };
         } catch (error) {
-          console.error("로그인에 실패했습니다:", error);
+          console.error("=== AUTHORIZE FUNCTION ERROR ===");
+          console.error("Error details:", error);
+          console.error("Error type:", typeof error);
           return null;
         }
       },
@@ -188,7 +201,7 @@ export const authOptions: NextAuthOptions = {
 
       // 리프레시 토큰 만료 체크 (7일 전부터 경고, 1일 전부터 갱신 시도)
       if (token.refreshTokenExp) {
-        const refreshExpiresSoon = token.refreshTokenExp < currentTime + 86400; // 1일 전
+        const refreshExpiresSoon = token.refreshTokenExp < currentTime + 60; // 1분 전
         const refreshExpired = token.refreshTokenExp < currentTime;
 
         if (refreshExpired) {
@@ -208,7 +221,7 @@ export const authOptions: NextAuthOptions = {
 
             // 새로운 토큰을 쿠키에 저장
             try {
-              await saveAuthTokens(response.data.token);
+              await saveAuthTokens(response.data);
             } catch (error) {
               console.error("Failed to update auth tokens in cookies:", error);
             }
@@ -218,9 +231,9 @@ export const authOptions: NextAuthOptions = {
 
             return {
               ...token,
-              accessToken: response.data.token.access_token,
-              refreshToken: response.data.token.refresh_token || token.refreshToken,
-              exp: Math.floor(Date.now() / 1000) + response.data.token.expires_in,
+              accessToken: response.data.access_token,
+              refreshToken: response.data.refresh_token || token.refreshToken,
+              exp: Math.floor(Date.now() / 1000) + response.data.expires_in,
               refreshTokenExp: newRefreshTokenExp, // 리프레시 토큰 수명 연장
             };
           } catch (error) {
@@ -240,7 +253,7 @@ export const authOptions: NextAuthOptions = {
 
             // 새로운 토큰을 쿠키에 저장
             try {
-              await saveAuthTokens(response.data.token);
+              await saveAuthTokens(response.data);
             } catch (error) {
               console.error("Failed to update auth tokens in cookies:", error);
             }
@@ -250,30 +263,30 @@ export const authOptions: NextAuthOptions = {
               const profileResponse = await fetchProfile(accountId);
               return {
                 ...token,
-                accessToken: response.data.token.access_token,
-                refreshToken: response.data.token.refresh_token || "",
-                exp: Math.floor(Date.now() / 1000) + response.data.token.expires_in,
-                refreshTokenExp: response.data.token.refresh_token
-                  ? Math.floor(Date.now() / 1000) + response.data.token.expires_in * 24 // 새 리프레시 토큰 만료 시간
+                accessToken: response.data.access_token,
+                refreshToken: response.data.refresh_token || "",
+                exp: Math.floor(Date.now() / 1000) + response.data.expires_in,
+                refreshTokenExp: response.data.refresh_token
+                  ? Math.floor(Date.now() / 1000) + response.data.expires_in * 24 // 새 리프레시 토큰 만료 시간
                   : token.refreshTokenExp, // 새 리프레시 토큰이 없으면 기존 유지
                 nickname: profileResponse.data.nickname,
-                profileImage: profileResponse.data.profileUrl,
+                profileImage: profileResponse.data.profile_url,
                 bio: profileResponse.data.bio || "",
                 followerCount: profileResponse.data.follower_count || 0,
                 postCount: profileResponse.data.post_count || 0,
-                accountVisible: profileResponse.data.accountVisible ?? true,
-                followerVisible: profileResponse.data.followerVisible ?? true,
+                accountVisible: profileResponse.data.account_visible ?? true,
+                followerVisible: profileResponse.data.follower_visible ?? true,
               };
             } catch (error) {
               console.error("프로필 정보 업데이트에 실패했습니다:", error);
               // 프로필 정보 업데이트 실패해도 토큰 갱신은 성공
               return {
                 ...token,
-                accessToken: response.data.token.access_token,
-                refreshToken: response.data.token.refresh_token || "",
-                exp: Math.floor(Date.now() / 1000) + response.data.token.expires_in,
-                refreshTokenExp: response.data.token.refresh_token
-                  ? Math.floor(Date.now() / 1000) + response.data.token.expires_in * 24
+                accessToken: response.data.access_token,
+                refreshToken: response.data.refresh_token || "",
+                exp: Math.floor(Date.now() / 1000) + response.data.expires_in,
+                refreshTokenExp: response.data.refresh_token
+                  ? Math.floor(Date.now() / 1000) + response.data.expires_in * 24
                   : token.refreshTokenExp,
               };
             }
@@ -288,16 +301,16 @@ export const authOptions: NextAuthOptions = {
 
                 // 새로운 토큰을 쿠키에 저장
                 try {
-                  await saveAuthTokens(finalResponse.data.token);
+                  await saveAuthTokens(finalResponse.data);
                 } catch (cookieError) {
                   console.error("Failed to update auth tokens in cookies:", cookieError);
                 }
 
                 return {
                   ...token,
-                  accessToken: finalResponse.data.token.access_token,
-                  refreshToken: finalResponse.data.token.refresh_token || "",
-                  exp: Math.floor(Date.now() / 1000) + finalResponse.data.token.expires_in,
+                  accessToken: finalResponse.data.access_token,
+                  refreshToken: finalResponse.data.refresh_token || "",
+                  exp: Math.floor(Date.now() / 1000) + finalResponse.data.expires_in,
                 };
               } catch (finalError) {
                 console.error("최종 토큰 갱신도 실패했습니다:", finalError);
@@ -332,7 +345,7 @@ export const authOptions: NextAuthOptions = {
 
           // 새로운 토큰을 쿠키에 저장
           try {
-            await saveAuthTokens(response.data.token);
+            await saveAuthTokens(response.data);
           } catch (error) {
             console.error("Failed to update auth tokens in cookies:", error);
           }
@@ -342,19 +355,19 @@ export const authOptions: NextAuthOptions = {
             const profileResponse = await fetchProfile(accountId);
             return {
               ...token,
-              accessToken: response.data.token.access_token,
-              refreshToken: response.data.token.refresh_token || "",
-              exp: Math.floor(Date.now() / 1000) + response.data.token.expires_in,
-              refreshTokenExp: response.data.token.refresh_token
-                ? Math.floor(Date.now() / 1000) + response.data.token.expires_in * 24 // 새 리프레시 토큰 만료 시간
+              accessToken: response.data.access_token,
+              refreshToken: response.data.refresh_token || "",
+              exp: Math.floor(Date.now() / 1000) + response.data.expires_in,
+              refreshTokenExp: response.data.refresh_token
+                ? Math.floor(Date.now() / 1000) + response.data.expires_in * 24 // 새 리프레시 토큰 만료 시간
                 : token.refreshTokenExp, // 새 리프레시 토큰이 없으면 기존 유지
               nickname: profileResponse.data.nickname,
-              profileImage: profileResponse.data.profileUrl,
+              profileImage: profileResponse.data.profile_url,
               bio: profileResponse.data.bio || "",
               followerCount: profileResponse.data.follower_count || 0,
               postCount: profileResponse.data.post_count || 0,
-              accountVisible: profileResponse.data.accountVisible ?? true,
-              followerVisible: profileResponse.data.followerVisible ?? true,
+              accountVisible: profileResponse.data.account_visible ?? true,
+              followerVisible: profileResponse.data.follower_visible ?? true,
             };
           } catch (error) {
             console.error("프로필 정보 업데이트에 실패했습니다:", error);
@@ -362,9 +375,9 @@ export const authOptions: NextAuthOptions = {
 
           return {
             ...token,
-            accessToken: response.data.token.access_token,
-            refreshToken: response.data.token.refresh_token || "",
-            exp: Math.floor(Date.now() / 1000) + response.data.token.expires_in,
+            accessToken: response.data.access_token,
+            refreshToken: response.data.refresh_token || "",
+            exp: Math.floor(Date.now() / 1000) + response.data.expires_in,
           };
         } catch (error) {
           console.error("토큰 갱신에 실패했습니다:", error);

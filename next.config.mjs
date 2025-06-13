@@ -118,15 +118,12 @@ const nextConfig = {
   },
   async rewrites() {
     // 개발 환경에서만 API 프록시 설정
-    if (process.env.NODE_ENV === "development") {
-      return [
-        {
-          source: "/server/:path*",
-          destination: `${process.env.SERVER_URL}/api/:path*`,
-        },
-      ];
-    }
-    return [];
+    return [
+      {
+        source: "/server/:path*",
+        destination: `${process.env.SERVER_URL}/api/:path*`,
+      },
+    ];
   },
   typescript: {
     ignoreBuildErrors: true,

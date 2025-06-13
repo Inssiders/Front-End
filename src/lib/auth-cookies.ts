@@ -78,20 +78,17 @@ export async function refreshAccessToken(): Promise<boolean> {
   }
 
   try {
-    const response = await fetch(
-      `${process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/token`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          grant_type: "refresh_token",
-          refresh_token: refreshToken,
-          client_id: "inssider-app",
-        }),
-      }
-    );
+    const response = await fetch(`${process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        grantType: "refresh_token",
+        refresh_token: refreshToken,
+        client_id: "inssider-app",
+      }),
+    });
 
     if (!response.ok) {
       await clearAuthCookies();

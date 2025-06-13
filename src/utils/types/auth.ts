@@ -1,13 +1,10 @@
 export interface AuthResponse {
   message: string;
   data: {
-    grant_type: "authorization_code" | "password" | "refresh_token";
-    token: {
-      access_token: string;
-      token_type: string;
-      expires_in: number;
-      refresh_token?: string;
-    };
+    access_token: string;
+    refresh_token?: string;
+    token_type: string;
+    expires_in: number;
   };
 }
 
@@ -49,12 +46,12 @@ export interface ProfileResponse {
   message: string;
   data: {
     nickname: string;
-    profileUrl: string;
+    profile_url: string;
     bio?: string;
     follower_count?: number;
     post_count?: number;
-    accountVisible?: boolean;
-    followerVisible?: boolean;
+    account_visible?: boolean;
+    follower_visible?: boolean;
   };
 }
 

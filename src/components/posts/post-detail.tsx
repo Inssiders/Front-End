@@ -2,26 +2,39 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { useRef, useState } from "react";
-import { VideoSection } from "./components/video-section";
-import { PostHeader } from "./components/post-header";
-import { PostContent } from "./components/post-component";
-import { ActionButtons } from "./components/action-buttons";
-import { CommentSection } from "./components/comment-section";
-import { CommentForm } from "./components/comment-form";
-import { RelatedPosts } from "./related-posts";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { Button } from "../ui/button";
+import { ActionButtons } from "./components/action-buttons";
+import CommentForm from "./components/comment-form";
+import { CommentSection } from "./components/comment-section";
+import { PostContent } from "./components/post-component";
+import { PostHeader } from "./components/post-header";
+import { VideoSection } from "./components/video-section";
+import { RelatedPosts } from "./related-posts";
 
 interface PostDetailProps {
   post: any; // TODO: 타입 정의 필요
+  isPreview?: boolean;
+  handlePreviewMode?: () => void;
 }
 
-export function PostDetail({ post }: PostDetailProps) {
+export function PostDetail({ post, isPreview, handlePreviewMode }: PostDetailProps) {
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
-  const [comments, setComments] = useState(
-    post.comments_list || post.comments || post.comment_list || []
-  );
+  const [comments, setComments] = useState([]);
   const [replyTo, setReplyTo] = useState<{ commentId: string; username: string } | null>(null);
+
+  useEffect(() => {
+    if (post && !isPreview) {
+      setComments(post.comments_list || post.comments || post.comment_list || []);
+    }
+  }, [post]);
+
+  useEffect(() => {
+    if (post && !isPreview) {
+      setComments(post.comments_list || post.comments || post.comment_list || []);
+    }
+  }, [post]);
 
   const fetchComments = async () => {
     const res = await fetch(`/api/posts/${post.post_id}/comments`);
@@ -70,12 +83,9 @@ export function PostDetail({ post }: PostDetailProps) {
   const handleDeleteReply = async (commentId: string, replyId: string) => {
     if (window.confirm("대댓글을 삭제하시겠습니까?")) {
       try {
-        const response = await fetch(
-          `/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`,
-          {
-            method: "DELETE",
-          }
-        );
+        const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
+          method: "DELETE",
+        });
         if (response.ok) {
           fetchComments();
           toast.success("대댓글이 삭제되었습니다.");
@@ -113,16 +123,13 @@ export function PostDetail({ post }: PostDetailProps) {
   // 대댓글 수정 함수
   const handleEditReply = async (commentId: string, replyId: string, newContent: string) => {
     try {
-      const response = await fetch(
-        `/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ reply_content: newContent }),
-        }
-      );
+      const response = await fetch(`/api/posts/${post.post_id}/comments/${commentId}/replies/${replyId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reply_content: newContent }),
+      });
 
       if (response.ok) {
         fetchComments();
@@ -141,44 +148,52 @@ export function PostDetail({ post }: PostDetailProps) {
 
   return (
     <div className="container mx-auto px-2 py-4 md:px-4 md:py-8">
+      {isPreview && handlePreviewMode && (
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">밈 작성</h1>
+          <Button onClick={handlePreviewMode}>미리보기</Button>
+        </div>
+      )}
       <Card className="mx-auto w-full overflow-hidden md:flex md:h-[700px] md:flex-row">
-        <VideoSection mediaUrl={post.post_media_url} title={post.post_title} />
+        <VideoSection mediaUrl={post.media_url} title={post.title} />
         <div className="flex flex-col md:h-full md:w-2/5 md:overflow-y-auto">
           <CardContent className="flex flex-1 flex-col p-4 md:p-6">
             <PostHeader
               userId={post.user_id}
               username={post.user_detail_username}
               profileUrl={post.user_detail_profile_url}
-              createdAt={post.post_created_at}
+              createdAt={post.media_dpload_time}
             />
             <PostContent
-              title={post.post_title}
-              content={post.post_content}
+              title={post.title}
+              content={post.content}
               categoryName={post.category_name}
-              tagNames={post.tag_names}
-              likes={post.post_likes}
+              tagNames={post.tags}
+              likes={post.likes}
               comments={totalComments}
             />
             <ActionButtons onCommentClick={() => commentInputRef.current?.focus()} />
-            <div className="flex min-h-[200px] flex-1 flex-col">
-              <CommentSection
-                postId={post.post_id}
-                comments={comments}
-                onRefresh={handleCommentSubmit}
-                onReply={(commentId, username) => setReplyTo({ commentId, username })}
-                onDeleteComment={handleDeleteComment}
-                onDeleteReply={handleDeleteReply}
-                onEditComment={handleEditComment}
-                onEditReply={handleEditReply}
-              />
-              <CommentForm
-                postId={post.post_id}
-                commentInputRef={commentInputRef as React.RefObject<HTMLTextAreaElement>}
-                onCommentSubmit={handleCommentSubmit}
-                replyTo={replyTo}
-                onCancelReply={() => setReplyTo(null)}
-              />
-            </div>
+            {
+              <div className="flex min-h-[200px] flex-1 flex-col">
+                <CommentSection
+                  postId={post.post_id}
+                  comments={comments}
+                  onRefresh={handleCommentSubmit}
+                  onReply={(commentId, username) => setReplyTo({ commentId, username })}
+                  onDeleteComment={handleDeleteComment}
+                  onDeleteReply={handleDeleteReply}
+                  onEditComment={handleEditComment}
+                  onEditReply={handleEditReply}
+                />
+                <CommentForm
+                  ref={commentInputRef}
+                  postId={post.post_id}
+                  replyTo={replyTo || undefined}
+                  onCommentAdded={handleCommentSubmit}
+                  onCancel={replyTo ? () => setReplyTo(null) : undefined}
+                />
+              </div>
+            }
           </CardContent>
         </div>
       </Card>

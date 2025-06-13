@@ -24,7 +24,7 @@ const BASE_URL = process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL;
 interface TokenRequest {
   email?: string;
   password?: string;
-  grant_type: "authorization_code" | "password" | "refresh_token";
+  grantType: "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN";
   uuid?: string;
   refresh_token?: string;
   client_id?: string;
@@ -40,12 +40,12 @@ interface ProfileResponse {
   message: string;
   data: {
     nickname: string;
-    profileUrl: string;
+    profile_url: string;
     bio?: string;
     follower_count?: number;
     post_count?: number;
-    accountVisible?: boolean;
-    followerVisible?: boolean;
+    account_visible?: boolean;
+    follower_visible?: boolean;
   };
 }
 
@@ -93,25 +93,22 @@ const handlers = [
   // 토큰 발급/갱신
   http.post(`${BASE_URL}/api/auth/token`, async ({ request }) => {
     const body = (await request.json()) as TokenRequest;
-    const { email, password, grant_type, uuid, refresh_token, client_id } = body;
+    const { email, password, grantType, uuid, refresh_token, client_id } = body;
 
     // authorization_code 방식
-    if (grant_type === "authorization_code" && uuid) {
+    if (grantType === "AUTHORIZATION_CODE" && uuid) {
       return HttpResponse.json({
         message: "토큰 발급에 성공했습니다.",
         data: {
-          grant_type: "authorization_code",
-          token: {
-            access_token: "ba6c81d0-6f98-4707-b2c0-f83585527026",
-            token_type: "Bearer",
-            expires_in: 300, // 5분
-          },
+          access_token: "ba6c81d0-6f98-4707-b2c0-f83585527026",
+          token_type: "Bearer",
+          expires_in: 300, // 5분
         },
       } as AuthResponse);
     }
 
     // password 방식
-    if (grant_type === "password" && email && password) {
+    if (grantType === "PASSWORD" && email && password) {
       const user = mockUsers.find((u) => u.email === email);
       if (!user || user.password !== password) {
         return HttpResponse.json(mockErrors.unauthorized, { status: 401 });
@@ -124,29 +121,23 @@ const handlers = [
       return HttpResponse.json({
         message: "토큰 발급에 성공했습니다.",
         data: {
-          grant_type: "password",
-          token: {
-            access_token: mockTokens.access_token,
-            token_type: "Bearer",
-            expires_in: mockTokens.expires_in,
-            refresh_token: mockTokens.refresh_token,
-          },
+          access_token: mockTokens.access_token,
+          token_type: "Bearer",
+          expires_in: mockTokens.expires_in,
+          refresh_token: mockTokens.refresh_token,
         },
       } as AuthResponse);
     }
 
     // refresh_token 방식
-    if (grant_type === "refresh_token" && refresh_token && client_id === "inssider-app") {
+    if (grantType === "REFRESH_TOKEN" && refresh_token && client_id === "inssider-app") {
       return HttpResponse.json({
         message: "토큰 발급에 성공했습니다.",
         data: {
-          grant_type: "refresh_token",
-          token: {
-            access_token: mockTokens.access_token,
-            token_type: "Bearer",
-            expires_in: mockTokens.expires_in,
-            refresh_token: mockTokens.refresh_token,
-          },
+          access_token: mockTokens.access_token,
+          token_type: "Bearer",
+          expires_in: mockTokens.expires_in,
+          refresh_token: mockTokens.refresh_token,
         },
       } as AuthResponse);
     }
@@ -179,12 +170,12 @@ const handlers = [
         message: "조회에 성공했습니다.",
         data: {
           nickname: user.nickname,
-          profileUrl: user.profileUrl,
+          profile_url: user.profileUrl,
           bio: user.bio,
           follower_count: user.follower_count,
           post_count: user.post_count,
-          accountVisible: user.accountVisible,
-          followerVisible: user.followerVisible,
+          account_visible: user.accountVisible,
+          follower_visible: user.followerVisible,
         },
       } as ProfileResponse);
     }
@@ -195,7 +186,7 @@ const handlers = [
         message: "조회에 성공했습니다.",
         data: {
           nickname: user.nickname,
-          profileUrl: user.profileUrl,
+          profile_url: user.profileUrl,
           bio: user.bio,
           follower_count: user.follower_count,
           post_count: user.post_count,
@@ -208,7 +199,7 @@ const handlers = [
       message: "조회에 성공했습니다.",
       data: {
         nickname: user.nickname,
-        profileUrl: user.profileUrl,
+        profile_url: user.profileUrl,
       },
     } as ProfileResponse);
   }),
@@ -284,9 +275,30 @@ const handlers = [
   http.post(`${BASE_URL}/api/auth/email/verify`, async ({ request }) => {
     const { email, otp } = (await request.json()) as EmailVerifyRequest;
 
-    const verification = emailVerificationStore.get(email);
-
-    if (!verification || verification.expiresAt < Date.now() || verification.code !== otp) {
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return HttpResponse.json(
+        {
+          type: "https://api.inssider.com/problems/email-invalid-request",
+          title: "이메일 검증 실패",
+          status: 422,
+          detail: "유효한 이메일 형식이 아닙니다. 다시 확인해주세요.",
+          instance: "/api/auth/email/verify",
+          errors: [
+            {
+              field: "email",
+              code: "REGEX_FAILED",
+              message: "이메일 표현식 검증에 실패했습니다.",
+            },
+          ],
+        },
+        { status: 422 }
+      );
+    }
+    console.log(otp);
+    // Mock 환경에서는 "000000"만 허용
+    if (otp !== "000000") {
       return HttpResponse.json(
         {
           type: "https://api.example.com/problems/invalid-request",

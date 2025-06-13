@@ -16,7 +16,7 @@ export function PostHeader({ userId, username, profileUrl, createdAt }: PostHead
       <Link href={`/profile/${userId}`}>
         <Avatar>
           <AvatarImage src={profileUrl || "/placeholder.svg?height=50&width=50"} alt={username} />
-          <AvatarFallback>{username.slice(0, 2) || "유저"}</AvatarFallback>
+          <AvatarFallback>{username ? username.slice(0, 2) : "유저"}</AvatarFallback>
         </Avatar>
       </Link>
       <div className="flex flex-col">
