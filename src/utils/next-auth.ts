@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
-        grantType: { label: "Grant Type", type: "text" },
+        grant_type: { label: "Grant Type", type: "text" },
         is_register: { label: "Is Register", type: "text" },
       },
       async authorize(credentials) {
@@ -32,12 +32,12 @@ export const authOptions: NextAuthOptions = {
           console.log("=== AUTHORIZE FUNCTION START ===");
           console.log("Received credentials:", {
             email: credentials?.email,
-            grantType: credentials?.grantType,
+            grant_type: credentials?.grant_type,
             is_register: credentials?.is_register,
             password: credentials?.password,
           });
 
-          const { email, password, grantType, is_register } = credentials!;
+          const { email, password, grant_type, is_register } = credentials!;
 
           let authResponse;
 
@@ -54,15 +54,15 @@ export const authOptions: NextAuthOptions = {
             }
           } else {
             // 기존 로그인 로직
-            console.log("Processing login with grantType:", grantType);
-            if (grantType === "AUTHORIZATION_CODE") {
+            console.log("Processing login with grant_type:", grant_type);
+            if (grant_type === "AUTHORIZATION_CODE") {
               console.log("Using AUTHORIZATION_CODE flow");
               authResponse = await requestEmailVerification(email);
-            } else if (grantType === "PASSWORD") {
+            } else if (grant_type === "PASSWORD") {
               console.log("Using PASSWORD flow for email:", email);
               authResponse = await loginWithPassword(email, password);
             } else {
-              console.log("Invalid grantType:", grantType);
+              console.log("Invalid grant_type:", grant_type);
               return null;
             }
           }
@@ -73,11 +73,11 @@ export const authOptions: NextAuthOptions = {
           }
 
           // 이메일 인증의 경우 토큰이 없을 수 있음
-          if (grantType === "AUTHORIZATION_CODE" && !authResponse.data.access_token) {
+          if (grant_type === "AUTHORIZATION_CODE" && !authResponse.data.access_token) {
             return {
               id: "0",
               email,
-              grantType: "AUTHORIZATION_CODE",
+              grant_type: "AUTHORIZATION_CODE",
               accessToken: "",
               refreshToken: "",
               exp: Math.floor(Date.now() / 1000) + 300, // 5분
@@ -131,7 +131,7 @@ export const authOptions: NextAuthOptions = {
           return {
             id: accountId,
             email,
-            grantType: grantType as "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN",
+            grant_type: grant_type as "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN",
             accessToken: access_token,
             refreshToken: refresh_token || "",
             exp: Math.floor(Date.now() / 1000) + expires_in,
@@ -182,7 +182,7 @@ export const authOptions: NextAuthOptions = {
           postCount: token.postCount,
           accountVisible: token.accountVisible,
           followerVisible: token.followerVisible,
-          grantType: token.grantType,
+          grant_type: token.grant_type,
           deletedAt: token.deletedAt,
           error: token.error,
         },

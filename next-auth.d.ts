@@ -6,7 +6,7 @@ declare module "next-auth" {
     user: {
       id: string;
       email: string;
-      grantType: "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN";
+      grant_type: "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN";
       accessToken: string;
       refreshToken: string;
       exp: number;
@@ -31,7 +31,7 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     id: string;
     email: string;
-    grantType: "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN";
+    grant_type: "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN";
     accessToken: string;
     refreshToken: string;
     exp: number;
@@ -57,7 +57,7 @@ declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT {
     id: string;
     email: string;
-    grantType: "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN";
+    grant_type: "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN";
     accessToken: string;
     refreshToken: string;
     exp: number;

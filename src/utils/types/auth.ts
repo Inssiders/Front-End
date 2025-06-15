@@ -4,7 +4,7 @@ export const GRANT_TYPE = {
   REFRESH_TOKEN: "REFRESH_TOKEN",
 } as const;
 
-export type GrantType = (typeof GRANT_TYPE)[keyof typeof GRANT_TYPE];
+export type grant_type = (typeof GRANT_TYPE)[keyof typeof GRANT_TYPE];
 
 // 각 인증 방식별 요청 타입 정의
 export interface PasswordGrantRequest {

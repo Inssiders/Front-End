@@ -213,14 +213,14 @@ interface AuthApi {
 // 인증 관련 API 구현
 export const authApi: AuthApi = {
   login: (email: string, password: string) =>
-    api.post("/auth/token", { email, password, grantType: "PASSWORD" }, { skipAuth: true }),
+    api.post("/auth/token", { email, password, grant_type: "PASSWORD" }, { skipAuth: true }),
 
   requestEmailVerification: (email: string) => api.post("/auth/email/challenge", { email }, { skipAuth: true }),
 
   verifyEmailCode: (email: string, otp: string) => api.post("/auth/email/verify", { email, otp }, { skipAuth: true }),
 
   getTokenWithAuthCode: (uuid: string) =>
-    api.post("/auth/token", { grantType: "AUTHORIZATION_CODE", uuid }, { skipAuth: true }),
+    api.post("/auth/token", { grant_type: "AUTHORIZATION_CODE", uuid }, { skipAuth: true }),
 
   register: (data) => api.post("/accounts", data, { skipAuth: true }),
 
