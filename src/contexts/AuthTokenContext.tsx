@@ -72,7 +72,7 @@ export function useAuthedApi() {
 
   return {
     get: <T = any,>(endpoint: string, options: RequestInit = {}) =>
-      fetch(`/server/${endpoint}`, {
+      fetch(`/server${endpoint}`, {
         ...options,
         method: "GET",
         headers: {
@@ -84,7 +84,7 @@ export function useAuthedApi() {
       }).then((res) => res.json() as Promise<T>),
 
     post: <T = any,>(endpoint: string, data?: any, options: RequestInit = {}) =>
-      fetch(`/server/${endpoint}`, {
+      fetch(`/server${endpoint}`, {
         ...options,
         method: "POST",
         headers: {
@@ -97,7 +97,7 @@ export function useAuthedApi() {
       }).then((res) => res.json() as Promise<T>),
 
     put: <T = any,>(endpoint: string, data?: any, options: RequestInit = {}) =>
-      fetch(`/server/${endpoint}`, {
+      fetch(`/server${endpoint}`, {
         ...options,
         method: "PUT",
         headers: {
@@ -110,7 +110,7 @@ export function useAuthedApi() {
       }).then((res) => res.json() as Promise<T>),
 
     patch: <T = any,>(endpoint: string, data?: any, options: RequestInit = {}) =>
-      fetch(`/server/${endpoint}`, {
+      fetch(`/server${endpoint}`, {
         ...options,
         method: "PATCH",
         headers: {
@@ -123,7 +123,7 @@ export function useAuthedApi() {
       }).then((res) => res.json() as Promise<T>),
 
     delete: <T = any,>(endpoint: string, options: RequestInit = {}) =>
-      fetch(`/server/${endpoint}`, {
+      fetch(`/server${endpoint}`, {
         ...options,
         method: "DELETE",
         headers: {

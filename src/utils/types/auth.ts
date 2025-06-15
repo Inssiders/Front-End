@@ -1,3 +1,31 @@
+export const GRANT_TYPE = {
+  PASSWORD: "PASSWORD",
+  EMAIL: "EMAIL",
+  REFRESH_TOKEN: "REFRESH_TOKEN",
+} as const;
+
+export type GrantType = (typeof GRANT_TYPE)[keyof typeof GRANT_TYPE];
+
+// 각 인증 방식별 요청 타입 정의
+export interface PasswordGrantRequest {
+  grant_type: typeof GRANT_TYPE.PASSWORD;
+  email: string;
+  password: string;
+}
+
+export interface EmailGrantRequest {
+  grant_type: typeof GRANT_TYPE.EMAIL;
+  uuid: string;
+}
+
+export interface RefreshTokenGrantRequest {
+  grant_type: typeof GRANT_TYPE.REFRESH_TOKEN;
+  refreshToken: string;
+  clientId: string;
+}
+
+export type TokenRequest = PasswordGrantRequest | EmailGrantRequest | RefreshTokenGrantRequest;
+
 export interface AuthResponse {
   message: string;
   data: {
