@@ -48,19 +48,27 @@ export async function fetchProfilePosts(
     profileFilter?: "posts" | "likes";
     size?: number;
     cursor?: string;
-    page?: number;
+    keyword?: string;
+    categoryId?: number;
+    initialData?: ProfilePostsDataResponse;
   } = {}
 ): Promise<ProfilePostsDataResponse> {
-  const { profileFilter = "posts", size = 10, cursor, page } = options;
+  const { profileFilter = "posts", size = 10, cursor, keyword, categoryId, initialData } = options;
+
+  // initialData가 있으면 바로 반환
+  if (initialData) {
+    return initialData;
+  }
 
   const params = new URLSearchParams({
-    profile_filter: profileFilter,
     size: size.toString(),
-    user_id: userId,
+    profile_filter: profileFilter,
   });
 
+  // Optional parameters
   if (cursor) params.set("cursor", cursor);
-  if (page) params.set("page", page.toString());
+  if (keyword) params.set("keyword", keyword);
+  if (categoryId) params.set("category_id", categoryId.toString());
 
   // ISR 캐시 설정
   const isServerSide = typeof window === "undefined";
@@ -81,7 +89,7 @@ export async function fetchProfilePosts(
     fetchOptions.cache = "no-store";
   }
 
-  const response = await apiFetch(`posts?${params.toString()}`, fetchOptions);
+  const response = await apiFetch(`/profiles/${userId}?${params.toString()}`, fetchOptions);
 
   if (!response.ok) {
     throw new Error("프로필 데이터를 가져오는데 실패했습니다");
@@ -92,7 +100,7 @@ export async function fetchProfilePosts(
 
 // 프로필 정보 조회 (오버로드)
 export async function fetchProfile(accountId: string, options: ApiFetchOptions = {}): Promise<ProfileResponse> {
-  const response = await apiFetch(`/api/profiles/${accountId}`, {
+  const response = await apiFetch(`/profiles/${accountId}`, {
     method: "GET",
     ...options,
   });
@@ -110,7 +118,7 @@ export async function updateProfile(
   updateData: ProfileUpdateRequest,
   options: ApiFetchOptions = {}
 ): Promise<ProfileResponse> {
-  const response = await apiFetch("/api/profiles/me", {
+  const response = await apiFetch("/profiles/me", {
     method: "PATCH",
     body: JSON.stringify(updateData),
     ...options,
