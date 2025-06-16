@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthToken } from "@/contexts/AuthTokenContext";
-import { isApiReachable } from "@/utils/network";
+import { isApiReachable } from "@/utils/api-client";
 import { useQuery } from "@tanstack/react-query";
 
 interface FetchOptions {
