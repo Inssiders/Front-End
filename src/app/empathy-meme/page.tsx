@@ -3,6 +3,7 @@ import { getCategories, getPosts } from "@/utils/fetch/posts";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import EmpathyMemeClientWrapper from "./_components/empathy-meme-client-wrapper";
+import PostCategories from "@/components/posts/post-categories";
 
 export const metadata: Metadata = {
   title: "공감밈 - 인싸이더",
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export default async function EmpathyMemePage() {
   const [categoriesResponse, postsResponse] = await Promise.all([
     getCategories(),
-    getPosts({ category: "99", page: 1, size: PAGE_SIZE.POSTS }),
+    getPosts({ category: "99", size: PAGE_SIZE.POSTS }),
   ]);
 
   const categories = categoriesResponse.data?.categories || [];
@@ -34,6 +35,7 @@ export default async function EmpathyMemePage() {
         </div>
       }
     >
+      <PostCategories categories={categories} />
       <EmpathyMemeClientWrapper categories={categories} category="99" initialPosts={posts} hasNextPage={hasNextPage} />
     </Suspense>
   );

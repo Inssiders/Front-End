@@ -1,7 +1,5 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
-
 import { PostCategoriesProps } from "@/utils/types/posts";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -18,11 +16,14 @@ export default function PostCategories({ categories = [], id = "1" }: PostCatego
     categories.length > 0
       ? [
           { id: "all", name: "전체", label: "전체" },
-          ...categories.map((cat) => ({
-            id: String(cat.id),
-            name: cat.label,
-            label: cat.label,
-          })),
+          ...categories.map(
+            (cat) => ({
+              id: String(cat.id),
+              name: cat.name,
+              label: cat.label,
+            }),
+            console.log("cate:", categories)
+          ),
         ]
       : [{ id: "all", name: "전체", label: "전체" }];
 
@@ -84,11 +85,8 @@ export default function PostCategories({ categories = [], id = "1" }: PostCatego
           </div>
 
           <div className="flex items-center gap-2 w-full md:w-auto">
-     
             <Link href={`/create/${id}`}>
-              <h3 className="">
-                밈 생성하기
-              </h3>
+              <h3 className="">밈 생성하기</h3>
             </Link>
           </div>
         </div>

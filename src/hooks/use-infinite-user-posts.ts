@@ -20,7 +20,7 @@ export function useInfiniteMemes({
   profileFilter?: "posts" | "likes";
   size?: number;
   enabled?: boolean;
-  initialData?: any[]; // 초기 데이터
+  initialData?: any; // 초기 데이터
 }) {
   const hasInitialData = initialData && initialData.length > 0;
 
@@ -29,7 +29,7 @@ export function useInfiniteMemes({
   const lastFetchTime = useRef<number>(0);
 
   const queryResult = useInfiniteQuery({
-    queryKey: ["memes", category, userId, profileFilter],
+    queryKey: ["content", category, userId, profileFilter],
     enabled: enabled, // 항상 활성화 (무한스크롤 가능하도록)
     staleTime: 10 * 60 * 1000, // 10분 동안 데이터를 fresh로 간주 (인스타그램 스타일)
     gcTime: 30 * 60 * 1000, // 30분 동안 캐시 유지
@@ -42,20 +42,27 @@ export function useInfiniteMemes({
         pages: [
           {
             items: initialData,
-            nextPage: 2,
+            nextCursor: initialData.nextCursor,
             total: initialData.length,
           },
         ],
-        pageParams: [1],
+        pageParams: [undefined],
       },
     }),
-    queryFn: async ({ pageParam = hasInitialData ? 2 : 1 }) => {
+    queryFn: async ({ pageParam = null }) => {
       // 프로필 모드일 때는 다른 엔드포인트 사용
       const isProfileMode = userId && profileFilter;
       const endpoint = isProfileMode ? `/users/${userId}/posts` : "/posts";
+      const url = new URL("/api/posts", window.location.origin);
+      if (pageParam) {
+        url.searchParams.set("cursor", String(pageParam));
+      }
 
+      if (pageParam) {
+        url.searchParams.set("cursor", String(pageParam));
+      }
       const params = new URLSearchParams();
-      params.set("page", String(pageParam));
+
       params.set("size", String(size));
 
       if (category) {
@@ -71,23 +78,23 @@ export function useInfiniteMemes({
       if (!res.ok) throw new Error("Failed to fetch posts");
       const json = await res.json();
 
-      const items: Post[] = json.data.memes.map((row: any) => ({
+      const items: Post[] = json.data.content.map((row: any) => ({
         id: row.id?.toString() || Date.now().toString(),
         title: row.title,
-        content: row.content,
-        category_id: row.category_id,
-        media_url: row.media_url,
-        media_upload_time: row.media_upload_time,
-        account_id: row.user_id,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
+        content: row.content || "",
+        category_id: row.category_id || null,
+        media_url: row.media_url || "",
+        media_upload_time: row.media_upload_time || "",
+        account_id: row.account_id,
+        created_at: row.created_at || "",
+        updated_at: row.updated_at || "",
         is_deleted: false,
 
         // UI를 위한 추가 정보
         author: {
-          account_id: row.user_id,
-          account_name: `User ${row.user_id}`,
-          profile_image: "/placeholder.svg",
+          account_id: row.account_id,
+          account_name: row.nickname || `User ${row.account_id}`,
+          profile_image: row.profile_url || "/placeholder.svg",
         },
         likes: row.like_count || 0,
         comment_count: row.comment_count || 0,
@@ -96,12 +103,12 @@ export function useInfiniteMemes({
 
       return {
         items,
-        nextPage: json.data.pageInfo.page < json.data.pageInfo.totalPages ? json.data.pageInfo.page + 1 : undefined,
-        total: json.data.pageInfo.totalElements,
+        nextCursor: json.data.has_next ? json.data.next_cursor : undefined,
+        total: items.length,
       };
     },
-    getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: hasInitialData ? 2 : 1, // 초기 데이터가 있으면 2부터 시작
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: undefined,
   });
 
   // 쿨다운 시간 체크 함수
@@ -133,7 +140,6 @@ export function useInfiniteMemes({
     try {
       setIsLoadingNext(true);
       lastFetchTime.current = Date.now();
-
       await queryResult.fetchNextPage();
     } catch (error) {
       console.error("❌ 무한스크롤 실패:", error);

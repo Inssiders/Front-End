@@ -17,9 +17,9 @@ export const DEFAULT_PAGE_SIZE = PAGE_SIZE.POSTS;
  * API 관련 상수
  */
 export const API_ENDPOINTS = {
-  POSTS: "/server/posts",
-  CATEGORIES: "/server/categories",
-  USERS: "/server/users",
+  POSTS: "/api/posts",
+  CATEGORIES: "/api/categories",
+  USERS: "/api/users",
 } as const;
 
 export type ApiEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS];

@@ -30,16 +30,17 @@ function convertApiMemeToPost(row: any): Post {
 export async function getPosts(params: {
   category?: string;
   keyword?: string;
-  page?: number;
+  cursor?: number;
   size?: number;
-}): Promise<{ posts: Post[]; hasNextPage: boolean; total: number }> {
+}): Promise<{ posts: Post[]; hasNextPage: boolean; total: number; nextCursor: number | null }> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
-    const url = new URL(`${baseUrl}/server/posts`);
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://52.78.186.60";
+    const url = new URL(`${baseUrl}/api/posts`);
 
-    url.searchParams.set("page", String(params.page || 1));
     url.searchParams.set("size", String(params.size || 12));
-
+    if (params.cursor) {
+      url.searchParams.set("cursor", String(params.cursor));
+    }
     if (params.category) {
       url.searchParams.set("category_id", params.category);
     }
@@ -54,21 +55,24 @@ export async function getPosts(params: {
 
     if (!response.ok) {
       console.error("Posts 조회 실패:", response.status);
+
       return {
         posts: [],
         hasNextPage: false,
         total: 0,
+        nextCursor: null,
       };
     }
 
     const json = await response.json();
 
-    const posts: Post[] = json.data.memes.map(convertApiMemeToPost);
-
+    const posts: Post[] = json.data.content.map(convertApiMemeToPost);
+    console.log("Posts:", posts);
     return {
       posts,
-      hasNextPage: json.data.pageInfo.page < json.data.pageInfo.totalPages,
-      total: json.data.pageInfo.totalElements,
+      hasNextPage: Boolean(json.data.next_cursor), // next_cursor가 있으면 true
+      total: json.data.totalElements,
+      nextCursor: json.data.next_cursor ?? null,
     };
   } catch (error) {
     console.error("Posts 조회 중 오류:", error);
@@ -76,6 +80,7 @@ export async function getPosts(params: {
       posts: [],
       hasNextPage: false,
       total: 0,
+      nextCursor: null,
     };
   }
 }
@@ -84,8 +89,8 @@ export async function getPosts(params: {
 export async function getCategories(): Promise<CategoriesResponse> {
   try {
     // SSR 환경에서는 절대 URL이 필요
-    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
-    const apiUrl = `${baseUrl}/server/categories`;
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://52.78.186.60";
+    const apiUrl = `${baseUrl}/api/categories`;
 
     const response = await fetch(apiUrl, {
       cache: "force-cache", // SSR 캐싱
