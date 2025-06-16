@@ -1,6 +1,6 @@
 "use server";
 
-import { api } from "@/utils/fetch/interceptor";
+import { apiFetch } from "@/utils/api-client";
 import bcrypt from "bcryptjs";
 import { clearAuthCookies, setAuthCookies, TokenData } from "./auth-cookies";
 
@@ -15,25 +15,21 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * 회원가입 Server Action
  */
-export async function createAccount(data: { email: string; password: string; authorizationCode: string }) {
+export async function createAccount(data: { email: string; password: string; accessToken: string }) {
   try {
-    // 비밀번호 해싱
-    const hashedPassword = await hashPassword(data.password);
     // 서버 API 호출
-    const response = await api.post(
-      "accounts",
-      {
+    const response = await apiFetch("/accounts", {
+      body: JSON.stringify({
         register_type: "PASSWORD",
         email: data.email,
-        password: hashedPassword,
+        password: data.password,
+      }),
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${data.accessToken}`,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${data.authorizationCode}`,
-        },
-      }
-    );
-    console.log(response);
+    });
+    console.log("createAccount", response);
 
     return { success: true };
   } catch (error) {

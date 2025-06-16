@@ -33,7 +33,7 @@ export default function SignInForm({ onLoginFail }: SignInFormProps) {
       const res = await signIn("credentials", {
         email: values.email,
         password: values.password,
-        grantType: "PASSWORD",
+        grant_type: "PASSWORD",
         redirect: false,
         callbackUrl: "/",
       });

@@ -24,7 +24,7 @@ const BASE_URL = process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL;
 interface TokenRequest {
   email?: string;
   password?: string;
-  grantType: "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN";
+  grant_type: "AUTHORIZATION_CODE" | "PASSWORD" | "REFRESH_TOKEN";
   uuid?: string;
   refresh_token?: string;
   client_id?: string;
@@ -93,10 +93,10 @@ const handlers = [
   // 토큰 발급/갱신
   http.post(`${BASE_URL}/api/auth/token`, async ({ request }) => {
     const body = (await request.json()) as TokenRequest;
-    const { email, password, grantType, uuid, refresh_token, client_id } = body;
+    const { email, password, grant_type, uuid, refresh_token, client_id } = body;
 
     // authorization_code 방식
-    if (grantType === "AUTHORIZATION_CODE" && uuid) {
+    if (grant_type === "AUTHORIZATION_CODE" && uuid) {
       return HttpResponse.json({
         message: "토큰 발급에 성공했습니다.",
         data: {
@@ -108,7 +108,7 @@ const handlers = [
     }
 
     // password 방식
-    if (grantType === "PASSWORD" && email && password) {
+    if (grant_type === "PASSWORD" && email && password) {
       const user = mockUsers.find((u) => u.email === email);
       if (!user || user.password !== password) {
         return HttpResponse.json(mockErrors.unauthorized, { status: 401 });
@@ -130,7 +130,7 @@ const handlers = [
     }
 
     // refresh_token 방식
-    if (grantType === "REFRESH_TOKEN" && refresh_token && client_id === "inssider-app") {
+    if (grant_type === "REFRESH_TOKEN" && refresh_token && client_id === "inssider-app") {
       return HttpResponse.json({
         message: "토큰 발급에 성공했습니다.",
         data: {

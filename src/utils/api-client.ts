@@ -53,7 +53,7 @@ async function clientFetch(endpoint: string, options: ApiOptions = {}) {
   if (!isOnline()) {
     throw new Error("Network is offline");
   }
-
+  console.log("clientFetch", endpoint, options);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(fetchOptions.headers as Record<string, string>),
@@ -100,6 +100,7 @@ async function clientFetch(endpoint: string, options: ApiOptions = {}) {
  * 서버 사이드 API 호출
  */
 async function serverFetch(endpoint: string, options: ApiOptions = {}) {
+  console.log("options", options);
   const { skipAuth = false, timeout = 10000, ...fetchOptions } = options;
 
   const headers: Record<string, string> = {
@@ -114,7 +115,7 @@ async function serverFetch(endpoint: string, options: ApiOptions = {}) {
     }
   }
 
-  const url = endpoint.startsWith("http") ? endpoint : `${process.env.SERVER_URL}${endpoint}`;
+  const url = endpoint.startsWith("http") ? endpoint : `${process.env.SERVER_URL}/api${endpoint}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -124,7 +125,7 @@ async function serverFetch(endpoint: string, options: ApiOptions = {}) {
       headers,
       signal: controller.signal,
     });
-
+    console.log("serverFetch", url, response);
     clearTimeout(timeoutId);
 
     if (!response.ok) {
@@ -205,21 +206,21 @@ interface AuthApi {
   register(data: { email: string; password: string; nickname: string }): Promise<any>;
   getProfile(id: string): Promise<any>;
   updateProfile(data: any): Promise<any>;
-  changePassword(password: string): Promise<any>;
+  changePassword(password: string, accessToken: string): Promise<any>;
   deleteAccount(): Promise<any>;
 }
 
 // 인증 관련 API 구현
 export const authApi: AuthApi = {
   login: (email: string, password: string) =>
-    api.post("/auth/token", { email, password, grantType: "PASSWORD" }, { skipAuth: true }),
+    api.post("/auth/token", { email, password, grant_type: "PASSWORD" }, { skipAuth: true }),
 
   requestEmailVerification: (email: string) => api.post("/auth/email/challenge", { email }, { skipAuth: true }),
 
   verifyEmailCode: (email: string, otp: string) => api.post("/auth/email/verify", { email, otp }, { skipAuth: true }),
 
   getTokenWithAuthCode: (uuid: string) =>
-    api.post("/auth/token", { grantType: "AUTHORIZATION_CODE", uuid }, { skipAuth: true }),
+    api.post("/auth/token", { grant_type: "AUTHORIZATION_CODE", uuid }, { skipAuth: true }),
 
   register: (data) => api.post("/accounts", data, { skipAuth: true }),
 
@@ -227,7 +228,15 @@ export const authApi: AuthApi = {
 
   updateProfile: (data: any) => api.patch("/profiles/me", data),
 
-  changePassword: (password: string) => api.patch("/accounts/me/password", { password }),
+  changePassword: (password: string, accessToken: string) =>
+    api.patch(
+      "/accounts/me/password",
+      { password },
+      {
+        skipAuth: true,
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    ),
 
   deleteAccount: () => api.delete("/accounts/me"),
 };
