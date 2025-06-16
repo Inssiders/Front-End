@@ -2,7 +2,6 @@
 
 import { createAccount } from "@/lib/auth-actions";
 import {
-  getEmailValidationMessage,
   getPasswordRequirements,
   getPasswordStrength,
   validateEmail,
@@ -90,7 +89,6 @@ export default function SignUpClient() {
       };
 
   // 실시간 피드백 메시지
-  const emailFeedback = emailValue ? getEmailValidationMessage(emailValue) : null;
   const passwordValidation = passwordValue ? validatePassword(passwordValue) : null;
   const passwordConfirmResult =
     passwordValue && passwordConfirmValue ? validatePasswordConfirm(passwordValue, passwordConfirmValue) : null;
@@ -130,7 +128,7 @@ export default function SignUpClient() {
 
     try {
       const response = await authApi.verifyEmail(getValues("email"), otp);
-
+      console.log(response);
       if (response.data?.verified) {
         setAuthorizationCode(response.data.authorization_code);
         setVerificationStep("signup");
@@ -150,34 +148,33 @@ export default function SignUpClient() {
     try {
       setIsLoading(true);
 
-      // 1. 계정 생성
+      // 1. 인가 코드로 JWT 토큰 발급
+      const tokenResponse = await authApi.loginWithEmail(authorizationCode);
+
+      if (!tokenResponse.data?.access_token) {
+        throw new Error("토큰 발급에 실패했습니다.");
+      }
+
+      // 2. JWT 토큰으로 계정 생성
       await createAccount({
         email: data.email,
         password: data.password,
-        authorizationCode,
+        accessToken: tokenResponse.data.access_token,
       });
 
-      // 2. 인증 코드로 토큰 발급
-      const tokenResponse = await authApi.login(data.email, data.password);
+      // 3. NextAuth로 자동 로그인
+      const result = await signIn("credentials", {
+        accessToken: tokenResponse.data.access_token,
+        refreshToken: tokenResponse.data.refresh_token,
+        tokenType: tokenResponse.data.token_type,
+        expiresIn: tokenResponse.data.expires_in,
+        redirect: false,
+      });
 
-      if (tokenResponse.data) {
-        // 3. NextAuth로 자동 로그인
-        const result = await signIn("credentials", {
-          accessToken: tokenResponse.data.access_token,
-          refreshToken: tokenResponse.data.refresh_token,
-          tokenType: tokenResponse.data.token_type,
-          expiresIn: tokenResponse.data.expires_in,
-          redirect: false,
-        });
-
-        if (result?.ok) {
-          router.push("/dashboard");
-        } else {
-          setError("자동 로그인에 실패했습니다. 수동으로 로그인해주세요.");
-          router.push("/auth/signin");
-        }
+      if (result?.ok) {
+        router.push("/dashboard");
       } else {
-        setError("토큰 발급에 실패했습니다. 수동으로 로그인해주세요.");
+        setError("자동 로그인에 실패했습니다. 수동으로 로그인해주세요.");
         router.push("/auth/signin");
       }
     } catch (err) {

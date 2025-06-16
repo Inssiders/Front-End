@@ -1,7 +1,6 @@
 "use client";
 
-import { useAuthToken } from "@/contexts/AuthTokenContext";
-import { isApiReachable } from "@/utils/api-client";
+import { apiFetch } from "@/utils/fetch/auth";
 import { useQuery } from "@tanstack/react-query";
 
 interface FetchOptions {
@@ -26,7 +25,6 @@ export function useData<T = any>(
   mockDataUrl?: string,
   options: UseDataOptions = {}
 ) {
-  const { accessToken } = useAuthToken();
   const {
     enabled = true,
     staleTime = 5 * 60 * 1000, // 5분
@@ -45,24 +43,14 @@ export function useData<T = any>(
     refetchOnWindowFocus,
     retry,
     queryFn: async () => {
-      // 서버 연결 가능 여부 확인
-      const isConnected = await isApiReachable();
-
-      if (isConnected && apiUrl) {
+      if (apiUrl) {
         // API 서버 사용
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
-          ...fetchOptions.headers,
-        };
-
-        if (accessToken) {
-          headers.Authorization = `Bearer ${accessToken}`;
-        }
-
-        const response = await fetch(apiUrl, {
+        const response = await apiFetch(apiUrl, {
           cache: fetchOptions.cache || "default",
           credentials: fetchOptions.credentials || "include",
-          headers,
+          headers: {
+            ...fetchOptions.headers,
+          },
         });
 
         if (!response.ok) {

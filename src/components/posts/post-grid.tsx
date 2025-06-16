@@ -35,8 +35,7 @@ export default function PostsGrid({
   const hasInitialData = isControlled && controlledPosts && controlledPosts.length > 0;
 
   // 무한스크롤 활성화 조건: 비제어 모드이거나, 초기 데이터가 있거나, 제어 모드에서 hasNextPage가 true인 경우
-  const shouldEnableInfiniteScroll =
-    !isControlled || hasInitialData || (isControlled && controlledHasNextPage);
+  const shouldEnableInfiniteScroll = !isControlled || hasInitialData || (isControlled && controlledHasNextPage);
 
   const infiniteQuery = useInfiniteMemes({
     category,
@@ -58,9 +57,7 @@ export default function PostsGrid({
 
   // 최종 hasNextPage 결정 (제어 모드에서는 controlledHasNextPage 사용)
   const hasNextPage =
-    isControlled && !hasInitialData
-      ? (controlledHasNextPage ?? false)
-      : (infiniteHasNextPage ?? false);
+    isControlled && !hasInitialData ? (controlledHasNextPage ?? false) : (infiniteHasNextPage ?? false);
 
   // 최종 게시물 데이터 결정 - 스크롤 자연스럽게 밀리도록 최적화
   const posts = useMemo(() => {
@@ -76,8 +73,7 @@ export default function PostsGrid({
   }, [isControlled, hasInitialData, controlledPosts, infiniteData]);
 
   // 캐시된 데이터가 있으면 로딩으로 간주하지 않음
-  const isLoading =
-    isControlled && !hasInitialData ? controlledLoading : infiniteLoading && !posts.length;
+  const isLoading = isControlled && !hasInitialData ? controlledLoading : infiniteLoading && !posts.length;
 
   // 이벤트 핸들러
   const handleLike = (id: number | string) => {
@@ -169,14 +165,9 @@ export default function PostsGrid({
       {/* 무한스크롤 표시 */}
       {shouldEnableInfiniteScroll && (
         <>
-          {hasNextPage || isFetchingNextPage || isLoadingNext ? (
-            <InfiniteScrollTrigger
-              hasNextPage={hasNextPage}
-              isFetchingNextPage={isFetchingNextPage || isLoadingNext} // 통합된 로딩 상태
-              target={target}
-            />
+          {hasNextPage || isFetchingNextPage ? (
+            <InfiniteScrollTrigger hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} target={target} />
           ) : (
-            /* 인스타그램 스타일: 간단한 완료 표시 */
             posts.length > 0 && (
               <div className="py-8 text-center">
                 <div className="text-xs text-gray-400 dark:text-gray-500">•••</div>

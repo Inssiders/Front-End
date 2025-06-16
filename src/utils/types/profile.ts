@@ -1,4 +1,4 @@
-import { ApiMeme, CursorPageInfo, Post } from "./posts";
+import { ApiMeme, Post } from "./posts";
 
 export interface ProfileResponse {
   message: string;
@@ -25,8 +25,9 @@ export interface ProfileUpdateRequest {
 export interface ProfilePostsResponse {
   message: string;
   data: {
-    memes: ApiMeme[];
-    pageInfo: CursorPageInfo;
+    content: ApiMeme[];
+    has_next: boolean;
+    next_cursor: string | null;
   };
 }
 

@@ -89,7 +89,7 @@ export interface OffsetPageInfo {
 export interface CursorPageInfo {
   limit: number;
   next: boolean;
-  nextCursor?: string;
+  lastId?: number;
 }
 
 // API 링크 정보
@@ -113,8 +113,9 @@ export interface PostsResponse {
 export interface ProfilePostsResponse {
   message: string;
   data: {
-    memes: ApiMeme[];
-    pageInfo: CursorPageInfo;
+    content: ApiMeme[];
+    has_next: boolean;
+    next_cursor: string | null;
   };
 }
 
@@ -132,6 +133,8 @@ export interface ProfileQueryParams {
   profile_filter: "posts" | "likes";
   size?: number;
   cursor?: string;
+  keyword?: string;
+  category_id?: number;
 }
 
 // 통합 쿼리 파라미터 타입
@@ -212,11 +215,11 @@ export interface MemeToPostConverter {
   (apiMeme: ApiMeme, id?: number | string): Post;
 }
 
-export type PostData= { 
+export type PostData = {
   title: string;
   content: string;
   media_url: string;
   media_upload_time: string;
   category_name: string;
   tags: string[];
-}
+};

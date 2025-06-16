@@ -98,7 +98,7 @@ export default function SignInClient() {
       const result = await signIn("credentials", {
         email: form.email,
         password: form.password,
-        grantType: "PASSWORD",
+        grant_type: "PASSWORD",
         redirect: false,
         callbackUrl: "/",
       });

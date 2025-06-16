@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuthToken } from "@/contexts/AuthTokenContext";
 import { DEFAULT_PAGE_SIZE, INFINITE_SCROLL } from "@/utils/constant";
 import { debounceThrottle } from "@/utils/debounce-throttle";
+import { apiFetch } from "@/utils/fetch/auth";
 import { Post } from "@/utils/types/posts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -22,15 +22,14 @@ export function useInfiniteMemes({
   enabled?: boolean;
   initialData?: any; // 초기 데이터
 }) {
-  const { accessToken } = useAuthToken();
-  const hasInitialData = initialData && Array.isArray(initialData.data?.content) && initialData.data.content.length > 0;
+  const hasInitialData = initialData && initialData.length > 0;
 
   // 중복 호출 방지를 위한 상태 관리
   const [isLoadingNext, setIsLoadingNext] = useState(false);
   const lastFetchTime = useRef<number>(0);
 
   const queryResult = useInfiniteQuery({
-    queryKey: ["memes", category, userId, profileFilter],
+    queryKey: ["content", category, userId, profileFilter],
     enabled: enabled, // 항상 활성화 (무한스크롤 가능하도록)
     staleTime: 10 * 60 * 1000, // 10분 동안 데이터를 fresh로 간주 (인스타그램 스타일)
     gcTime: 30 * 60 * 1000, // 30분 동안 캐시 유지
@@ -43,7 +42,7 @@ export function useInfiniteMemes({
         pages: [
           {
             items: initialData,
-            nextCursor: initialData.data.next_cursor,
+            nextCursor: initialData.nextCursor,
             total: initialData.length,
           },
         ],
@@ -53,30 +52,29 @@ export function useInfiniteMemes({
     queryFn: async ({ pageParam = null }) => {
       // 프로필 모드일 때는 다른 엔드포인트 사용
       const isProfileMode = userId && profileFilter;
-      const url = new URL(isProfileMode ? `/api/users/${userId}/posts` : "/api/posts", window.location.origin);
+      const endpoint = isProfileMode ? `/users/${userId}/posts` : "/posts";
+      const url = new URL("/api/posts", window.location.origin);
       if (pageParam) {
         url.searchParams.set("cursor", String(pageParam));
       }
 
-      url.searchParams.set("size", String(size));
+      if (pageParam) {
+        url.searchParams.set("cursor", String(pageParam));
+      }
+      const params = new URLSearchParams();
+
+      params.set("size", String(size));
 
       if (category) {
-        url.searchParams.set("category_id", category);
+        params.set("category_id", category);
       }
 
       if (isProfileMode) {
-        url.searchParams.set("filter", profileFilter);
+        params.set("filter", profileFilter);
       }
 
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
+      const res = await apiFetch(`${endpoint}?${params.toString()}`);
 
-      if (accessToken) {
-        headers.Authorization = `Bearer ${accessToken}`;
-      }
-
-      const res = await fetch(url.toString(), { headers, credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch posts");
       const json = await res.json();
 

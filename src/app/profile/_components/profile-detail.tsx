@@ -9,7 +9,7 @@ import { ProfileData, ProfilePostsResponse } from "@/utils/types/profile";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import ProfileLikes from "./profile-likes";
-import ProfilePosts from "./profile-posts";
+import { ProfilePosts } from "./profile-posts";
 
 interface ProfileDetailProps {
   profile: ProfileData;
@@ -18,12 +18,7 @@ interface ProfileDetailProps {
   initialLikesData?: ProfilePostsResponse;
 }
 
-export function ProfileDetail({
-  profile,
-  initialTab,
-  initialPostsData,
-  initialLikesData,
-}: ProfileDetailProps) {
+export function ProfileDetail({ profile, initialTab, initialPostsData, initialLikesData }: ProfileDetailProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -84,16 +79,12 @@ export function ProfileDetail({
                   src={profile.user_detail_profile_url || "/placeholder.svg"}
                   alt={profile.user_detail_username || profile.user_id}
                 />
-                <AvatarFallback>
-                  {profile.user_detail_username?.[0] || profile.user_id?.[0]}
-                </AvatarFallback>
+                <AvatarFallback>{profile.user_detail_username?.[0] || profile.user_id?.[0]}</AvatarFallback>
               </Avatar>
               <CardTitle className="mb-1 text-2xl font-bold">
                 {profile.user_detail_username || profile.user_id}
               </CardTitle>
-              <CardDescription className="mb-4">
-                @{profile.user_detail_username || profile.user_id}
-              </CardDescription>
+              <CardDescription className="mb-4">@{profile.user_detail_username || profile.user_id}</CardDescription>
               <div className="mb-6 flex gap-2">
                 <Badge variant="secondary" className="flex flex-col items-center px-4 py-2">
                   <span className="font-bold">{profile.posts?.toLocaleString() ?? 0}</span>
@@ -117,14 +108,10 @@ export function ProfileDetail({
                   <CardTitle className="mb-2 text-base font-bold">소개</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <p className="mb-4 text-gray-700">
-                    {profile.user_detail_introduction || "소개가 없습니다."}
-                  </p>
+                  <p className="mb-4 text-gray-700">{profile.user_detail_introduction || "소개가 없습니다."}</p>
                   <p className="text-sm text-gray-500">
                     가입일:{" "}
-                    {profile.user_created_at
-                      ? new Date(profile.user_created_at).toLocaleDateString("ko-KR")
-                      : "-"}
+                    {profile.user_created_at ? new Date(profile.user_created_at).toLocaleDateString("ko-KR") : "-"}
                   </p>
                 </CardContent>
               </Card>
@@ -137,7 +124,7 @@ export function ProfileDetail({
                 </TabsList>
                 <Separator />
                 <TabsContent value="posts" className="mt-6">
-                  <ProfilePosts id={id} initialData={initialPostsData} />
+                  <ProfilePosts userId={id} initialData={initialPostsData} />
                 </TabsContent>
                 <TabsContent value="likes" className="mt-6">
                   <ProfileLikes id={id} initialData={initialLikesData} />

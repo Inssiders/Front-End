@@ -32,7 +32,7 @@ export async function getPosts(params: {
   keyword?: string;
   cursor?: number;
   size?: number;
-}): Promise<{ posts: Post[]; hasNextPage: boolean; total: number }> {
+}): Promise<{ posts: Post[]; hasNextPage: boolean; total: number; nextCursor: number | null }> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://52.78.186.60";
     const url = new URL(`${baseUrl}/api/posts`);
@@ -55,21 +55,24 @@ export async function getPosts(params: {
 
     if (!response.ok) {
       console.error("Posts 조회 실패:", response.status);
+
       return {
         posts: [],
         hasNextPage: false,
         total: 0,
+        nextCursor: null,
       };
     }
 
     const json = await response.json();
 
     const posts: Post[] = json.data.content.map(convertApiMemeToPost);
-
+    console.log("Posts:", posts);
     return {
       posts,
       hasNextPage: Boolean(json.data.next_cursor), // next_cursor가 있으면 true
       total: json.data.totalElements,
+      nextCursor: json.data.next_cursor ?? null,
     };
   } catch (error) {
     console.error("Posts 조회 중 오류:", error);
@@ -77,6 +80,7 @@ export async function getPosts(params: {
       posts: [],
       hasNextPage: false,
       total: 0,
+      nextCursor: null,
     };
   }
 }

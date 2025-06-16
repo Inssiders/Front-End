@@ -1,4 +1,5 @@
 import { ProfileDetailLoading } from "@/app/profile/_components/profile-detail-loading";
+import { apiFetch } from "@/utils/fetch/auth";
 import { fetchProfilePosts } from "@/utils/fetch/profile";
 import { ProfileData } from "@/utils/types/profile";
 import dynamic from "next/dynamic";
@@ -26,6 +27,18 @@ interface ProfileDetailPageProps {
   };
 }
 
+interface ProfileResponse {
+  message: string;
+  data: {
+    nickname: string;
+    profile_url: string;
+    bio: string;
+    created_at: string;
+    follower_count: number;
+    following_count: number;
+  };
+}
+
 // Meme 데이터에서 ProfileData로 변환하는 유틸리티 함수
 function transformMemeToProfileData(meme: any, userId: string): ProfileData {
   return {
@@ -43,13 +56,13 @@ function transformMemeToProfileData(meme: any, userId: string): ProfileData {
 export const revalidate = 3600; // 1시간 (3600초) ISR 재생성 주기
 
 export default async function ProfileDetailPage({ params, searchParams }: ProfileDetailPageProps) {
-  // params가 해결되기를 기다립니다
   const { id: userId } = await params;
   const { tab } = await searchParams;
 
   try {
-    // 초기 게시물 데이터 및 좋아요 데이터를 병렬로 가져오기
-    const [postsData, likesData] = await Promise.all([
+    // 프로필 정보와 게시물 데이터를 병렬로 가져오기
+    const [profileResponse, postsData, likesData] = await Promise.all([
+      apiFetch(`/profiles/${userId}`).then((res) => res.json() as Promise<ProfileResponse>),
       fetchProfilePosts(userId, {
         profileFilter: "posts",
         size: 20,
@@ -60,25 +73,17 @@ export default async function ProfileDetailPage({ params, searchParams }: Profil
       }),
     ]);
 
-    // 첫 번째 meme에서 사용자 정보 추출 (또는 기본값 사용)
-    const firstMeme = postsData.data.memes[0];
-
     // ProfileData 형태로 변환
-    const profile: ProfileData = firstMeme
-      ? transformMemeToProfileData(firstMeme, userId)
-      : {
-          user_id: userId,
-          user_detail_username: `사용자${userId}`,
-          user_detail_profile_url: "/placeholder.svg?height=150&width=150&text=U",
-          user_detail_introduction: "안녕하세요! 인싸이더에서 활동중입니다.",
-          user_created_at: new Date().toISOString(),
-          posts: postsData.data.memes.length,
-          followers: 0,
-          following: 0,
-        };
-
-    // 실제 게시물 수 업데이트
-    profile.posts = postsData.data.memes.length;
+    const profile: ProfileData = {
+      user_id: userId,
+      user_detail_username: profileResponse.data.nickname || `사용자${userId}`,
+      user_detail_profile_url: profileResponse.data.profile_url || "/placeholder.svg?height=150&width=150&text=U",
+      user_detail_introduction: profileResponse.data.bio || "안녕하세요! 인싸이더에서 활동중입니다.",
+      user_created_at: profileResponse.data.created_at || new Date().toISOString(),
+      posts: postsData?.data?.content?.length || 0,
+      followers: profileResponse.data.follower_count || 0,
+      following: profileResponse.data.following_count || 0,
+    };
 
     return (
       <main className="flex min-h-screen flex-col bg-gray-50">

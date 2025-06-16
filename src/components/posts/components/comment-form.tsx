@@ -1,5 +1,5 @@
 // src/components/posts/post-detail/CommentForm.tsx
-import { useAuthToken } from "@/contexts/AuthTokenContext";
+import { apiFetch } from "@/utils/fetch/auth";
 import { forwardRef, useState } from "react";
 import styles from "./comment-form.module.css";
 
@@ -14,25 +14,17 @@ const CommentForm = forwardRef<HTMLTextAreaElement, CommentFormProps>(
   ({ postId, replyTo, onCommentAdded, onCancel }, ref) => {
     const [content, setContent] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { accessToken } = useAuthToken();
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!content.trim() || isSubmitting || !accessToken) return;
+      if (!content.trim() || isSubmitting) return;
 
       setIsSubmitting(true);
       try {
-        const url = replyTo
-          ? `/api/posts/${postId}/comments/${replyTo.commentId}/replies`
-          : `/api/posts/${postId}/comments`;
+        const url = replyTo ? `/posts/${postId}/comments/${replyTo.commentId}/replies` : `/posts/${postId}/comments`;
 
-        const res = await fetch(url, {
+        const res = await apiFetch(url, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials: "include",
           body: JSON.stringify({ content: content.trim() }),
         });
 
@@ -66,11 +58,7 @@ const CommentForm = forwardRef<HTMLTextAreaElement, CommentFormProps>(
               취소
             </button>
           )}
-          <button
-            type="submit"
-            disabled={!content.trim() || isSubmitting || !accessToken}
-            className={styles.submitButton}
-          >
+          <button type="submit" disabled={!content.trim() || isSubmitting} className={styles.submitButton}>
             {isSubmitting ? "등록 중..." : replyTo ? "답글 등록" : "댓글 등록"}
           </button>
         </div>

@@ -84,7 +84,7 @@ export async function refreshAccessToken(): Promise<boolean> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        grantType: "refresh_token",
+        grant_type: "refresh_token",
         refresh_token: refreshToken,
         client_id: "inssider-app",
       }),

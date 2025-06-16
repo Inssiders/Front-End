@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { getSession } from "next-auth/react";
 import { authOptions } from "../next-auth";
-import { type AuthResponse, type DeleteAccountResponse } from "../types/auth";
+import { GRANT_TYPE, type AuthResponse, type DeleteAccountResponse, type TokenRequest } from "../types/auth";
 
 // API fetch wrapper with cookie-based authentication
 export interface ApiFetchOptions extends RequestInit {
@@ -90,7 +90,7 @@ export async function apiFetch(endpoint: string, options: ApiFetchOptions = {}):
   if (endpoint.startsWith("http")) {
     url = endpoint;
   } else {
-    url = `/server/${endpoint}`;
+    url = `/server${endpoint}`;
   }
 
   const defaultHeaders: Record<string, string> = {
@@ -267,7 +267,7 @@ export async function loginWithPassword(email: string, password: string): Promis
     method: "POST",
     skipAuth: true, // 로그인 요청은 인증 불필요
     body: JSON.stringify({
-      grantType: "PASSWORD",
+      grant_type: "PASSWORD",
       email,
       password,
     }),
@@ -286,7 +286,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<AuthResp
     method: "POST",
     skipAuth: true, // 리프레시 토큰 요청은 인증 불필요
     body: JSON.stringify({
-      grantType: "REFRESH_TOKEN",
+      grant_type: "REFRESH_TOKEN",
       refresh_token: refreshToken,
       client_id: "inssider-app",
     }),
@@ -322,7 +322,7 @@ export async function register(data: { email: string; password: string; nickname
 
 // 회원탈퇴
 export async function deleteAccount() {
-  const response = await apiFetch("accounts/me", {
+  const response = await apiFetch("/accounts/me", {
     method: "DELETE",
   });
 
@@ -338,37 +338,53 @@ export async function deleteAccount() {
  * 인증 관련 API 헬퍼들
  */
 export const authApi = {
-  // 로그인
-  async login(email: string, password: string) {
-    return apiPost(
-      "auth/token",
-      {
-        grantType: "PASSWORD",
-        email,
-        password,
-      },
-      { skipAuth: true }
-    );
+  // 비밀번호 로그인
+  async loginWithPassword(email: string, password: string) {
+    const request: TokenRequest = {
+      grant_type: GRANT_TYPE.PASSWORD,
+      email,
+      password,
+    };
+    return apiPost("/auth/token", request, { skipAuth: true });
+  },
+
+  // 이메일 인증으로 토큰 발급
+  async loginWithEmail(uuid: string) {
+    const request: TokenRequest = {
+      grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+      uuid,
+    };
+    return apiPost("/auth/token", request, { skipAuth: true });
+  },
+
+  // 리프레시 토큰으로 토큰 갱신
+  async refreshToken(refreshToken: string) {
+    const request: TokenRequest = {
+      grant_type: GRANT_TYPE.REFRESH_TOKEN,
+      refreshToken,
+      clientId: "inssider-app",
+    };
+    return apiPost("/auth/token", request, { skipAuth: true });
   },
 
   // 이메일 인증 코드 발송
   async sendEmailChallenge(email: string) {
-    return apiPost("auth/email/challenge", { email }, { skipAuth: true });
+    return apiPost("/auth/email/challenge", { email }, { skipAuth: true });
   },
 
   // 이메일 인증 코드 확인
   async verifyEmail(email: string, otp: string) {
-    return apiPost("auth/email/verify", { email, otp }, { skipAuth: true });
+    return apiPost("/auth/email/verify", { email, otp }, { skipAuth: true });
   },
 
   // 회원가입
   async register(data: { register_type: "password"; email: string; password: string }) {
-    return apiPost("accounts", data);
+    return apiPost("/accounts", data);
   },
 
   // 프로필 조회
   async getProfile(id: string) {
-    return apiGet(`profiles/${id}`);
+    return apiGet(`/profiles/${id}`);
   },
 
   // 프로필 업데이트
@@ -379,22 +395,22 @@ export const authApi = {
     account_visibility: boolean;
     follower_visibility: boolean;
   }) {
-    return apiPatch("profiles/me", data);
+    return apiPatch("/profiles/me", data);
   },
 
   // 비밀번호 변경
   async changePassword(password: string) {
-    return apiPatch("accounts/me/password", { password });
+    return apiPatch("/accounts/me/password", { password });
   },
 
   // 회원탈퇴
   async deleteAccount() {
-    return apiDelete("accounts/me");
+    return apiDelete("/accounts/me");
   },
 
   // 로그아웃 (쿠키는 NextAuth에서 자동 처리)
   async logout() {
-    return apiPost("auth/logout");
+    return apiPost("/auth/logout");
   },
 };
 

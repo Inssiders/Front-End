@@ -19,6 +19,7 @@ export default function FindPwdPage() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ email: "", code: "", password: "" });
   const [sentCode, setSentCode] = useState(false);
+  const [authorizationCode, setAuthorizationCode] = useState<string | null>(null);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.id]: e.target.value });
@@ -43,10 +44,14 @@ export default function FindPwdPage() {
     e.preventDefault();
     try {
       setLoading(true);
-      // TODO: 실제 인증번호 확인 API 구현 필요
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setStep("reset");
-      toast.success("인증이 완료되었습니다");
+      const data = await authApi.verifyEmailCode(form.email, form.code);
+      if (data.data.verified) {
+        setAuthorizationCode(data.data.authorization_code);
+        setStep("reset");
+        toast.success("인증이 완료되었습니다");
+      } else {
+        throw new Error("인증에 실패했습니다");
+      }
     } catch (error) {
       toast.error("인증번호를 다시 확인해주세요.");
     } finally {
@@ -56,9 +61,19 @@ export default function FindPwdPage() {
 
   async function handleResetPwd(e: React.FormEvent) {
     e.preventDefault();
+    if (!authorizationCode) {
+      toast.error("인증이 필요합니다");
+      return;
+    }
     try {
       setLoading(true);
-      await authApi.changePassword(form.password);
+
+      const tokenResponse = await authApi.getTokenWithAuthCode(authorizationCode);
+      const accessToken = tokenResponse.data.access_token;
+      console.log(accessToken);
+
+      await authApi.changePassword(form.password, accessToken);
+
       setStep("done");
       toast.success("비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.");
       setTimeout(() => {
