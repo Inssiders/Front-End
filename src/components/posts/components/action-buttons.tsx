@@ -1,13 +1,15 @@
 // src/components/posts/post-detail/ActionButtons.tsx
 import { Button } from "@/components/ui/button";
+import { likePost } from "@/utils/fetch/post-detail";
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 
 interface ActionButtonsProps {
   onCommentClick: () => void;
+  id: number;
 }
 
-export function ActionButtons({ onCommentClick }: ActionButtonsProps) {
+export function ActionButtons({ onCommentClick, id }: ActionButtonsProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
 
@@ -20,11 +22,13 @@ export function ActionButtons({ onCommentClick }: ActionButtonsProps) {
     }
   }, []);
 
-  const handleLike = useCallback(() => {
+  const handleLike = useCallback(async () => {
     setIsLiked((prev) => !prev);
     setLikeAnimating(true);
+    const likeData = await likePost(id);
+    setIsLiked(likeData.data.liked);
     setTimeout(() => setLikeAnimating(false), 500);
-  }, []);
+  }, [id]);
 
   return (
     <div className="mb-6 flex items-center gap-3">

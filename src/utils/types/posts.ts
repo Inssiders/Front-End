@@ -213,6 +213,7 @@ export interface MemeToPostConverter {
 }
 
 export type PostData= { 
+  post_id: number;
   title: string;
   content: string;
   media_url: string;
@@ -220,3 +221,10 @@ export type PostData= {
   category_name: string;
   tags: string[];
 }
+export type CommentData = {
+  id: number;
+  content: string;
+  writer: string;
+  created_at: string;
+  children: CommentData[];
+} 

@@ -51,7 +51,7 @@ export async function getPosts(params: {
     const response = await fetch(url.toString(), {
       cache: "no-store", // 항상 최신 데이터
     });
-
+    
     if (!response.ok) {
       console.error("Posts 조회 실패:", response.status);
       return {
@@ -64,7 +64,6 @@ export async function getPosts(params: {
     const json = await response.json();
 
     const posts: Post[] = json.data.memes.map(convertApiMemeToPost);
-
     return {
       posts,
       hasNextPage: json.data.pageInfo.page < json.data.pageInfo.totalPages,

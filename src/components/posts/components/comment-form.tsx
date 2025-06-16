@@ -2,15 +2,16 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { addComment } from "@/utils/fetch/post-detail";
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 interface CommentFormProps {
-  postId: string;
+  postId: number;
   commentInputRef: React.RefObject<HTMLTextAreaElement>;
   onCommentSubmit: () => void;
-  replyTo?: { commentId: string; username: string } | null;
+  replyTo?: { commentId: number; username: string } | null;
   onCancelReply?: () => void;
 }
 
@@ -26,6 +27,13 @@ export function CommentForm({
   });
 
   const onSubmit = async (values: { comment: string }) => {
+    addComment(postId, values.comment, replyTo?.commentId).then((data :any | undefined) => {
+      if (data) {
+        onCommentSubmit();
+        form.reset();
+        toast.success("댓글이 등록되었습니다.");
+      }
+    })
     try {
       if (replyTo) {
         // 대댓글 등록

@@ -83,14 +83,7 @@ export default function PostCategories({ categories = [], id = "1" }: PostCatego
             ))}
           </div>
 
-          <div className="flex items-center gap-2 w-full md:w-auto">
-     
-            <Link href={`/create/${id}`}>
-              <h3 className="">
-                밈 생성하기
-              </h3>
-            </Link>
-          </div>
+       
         </div>
       </div>
     </div>

@@ -7,9 +7,10 @@ import { PostData } from '@/utils/types/posts'
 
 
 
-const PostContainer = ({ post }: { post: any }) => {
+const PostEmpathyContainer = () => {
     const [previewMode, setPreviewMode] = useState(false)
     const [postData, setPostData] = useState<PostData>({
+        post_id: 0,
         title: "",
         content: "",
         media_url: "",
@@ -39,4 +40,4 @@ const PostContainer = ({ post }: { post: any }) => {
   )
 }
 
-export default PostContainer
+export default PostEmpathyContainer

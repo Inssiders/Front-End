@@ -4,16 +4,15 @@ import { ReplyForm } from "./reply-form";
 import { DetailComment } from "@/mocks/types";
 import { X, Edit2, Check, X as XIcon } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { CommentData } from "@/utils/types/posts";
 
 interface CommentSectionProps {
   postId: string;
-  comments: DetailComment[];
+  comments: CommentData[];
   onRefresh: () => void;
-  onReply: (commentId: string, username: string) => void;
-  onDeleteComment: (commentId: string) => void;
-  onDeleteReply: (commentId: string, replyId: string) => void;
-  onEditComment: (commentId: string, newContent: string) => void;
-  onEditReply: (commentId: string, replyId: string, newContent: string) => void;
+  onReply: (commentId: number, username: string) => void;
+  onDeleteComment: (commentId: number) => void;
+  onEditComment: (commentId: number, newContent: string) => void;
 }
 
 export function CommentSection({
@@ -22,23 +21,21 @@ export function CommentSection({
   onRefresh,
   onReply,
   onDeleteComment,
-  onDeleteReply,
   onEditComment,
-  onEditReply,
 }: CommentSectionProps) {
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editingReplyId, setEditingReplyId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState<string>("");
   const editInputRef = useRef<HTMLTextAreaElement>(null);
 
   // 에딧 모드 시작
-  const startEditComment = (commentId: string, currentContent: string) => {
+  const startEditComment = (commentId: number, currentContent: string) => {
     setEditingCommentId(commentId);
     setEditingReplyId(null);
     setEditContent(currentContent);
   };
 
-  const startEditReply = (replyId: string, currentContent: string) => {
+  const startEditReply = (replyId: number, currentContent: string) => {
     setEditingReplyId(replyId);
     setEditingCommentId(null);
     setEditContent(currentContent);
@@ -60,9 +57,9 @@ export function CommentSection({
   };
 
   // 대댓글 수정 완료
-  const submitReplyEdit = (commentId: string) => {
+  const submitReplyEdit = () => {
     if (editingReplyId && editContent.trim()) {
-      onEditReply(commentId, editingReplyId, editContent.trim());
+      onEditComment(editingReplyId, editContent.trim());
       cancelEdit();
     }
   };
@@ -89,26 +86,26 @@ export function CommentSection({
         .slice()
         .reverse()
         .map((comment) => (
-          <div key={comment.comment_id} className="relative mb-4">
+          <div key={comment.id} className="relative mb-4">
             {/* 댓글 삭제 버튼 */}
             <button
               className="absolute right-0 top-0 p-1 text-gray-400 hover:text-red-500"
-              onClick={() => onDeleteComment(comment.comment_id)}
+              onClick={() => onDeleteComment(comment.id)}
               aria-label="댓글 삭제"
             >
               <X size={16} />
             </button>
 
             <div className="flex items-center gap-2">
-              <span className="font-bold">{comment.user_username}</span>
+              <span className="font-bold">{comment.writer}</span>
               <span className="text-xs text-gray-400">
-                {new Date(comment.comment_created_at).toLocaleString()}
+                {new Date(comment.created_at).toLocaleString()}
               </span>
             </div>
 
             {/* 댓글 내용 - 에딧 모드/뷰 모드 */}
             <div className="ml-2 mt-1">
-              {editingCommentId === comment.comment_id ? (
+              {editingCommentId === comment.id ? (
                 <div className="space-y-2">
                   <textarea
                     ref={editInputRef}
@@ -137,10 +134,10 @@ export function CommentSection({
                 </div>
               ) : (
                 <div className="flex items-start justify-between">
-                  <span>{comment.comment_content}</span>
+                  <span>{comment.content}</span>
                   <button
                     className="ml-2 p-1 text-gray-400 hover:text-blue-500"
-                    onClick={() => startEditComment(comment.comment_id, comment.comment_content)}
+                    onClick={() => startEditComment(comment.id, comment.content)}
                     aria-label="댓글 수정"
                   >
                     <Edit2 size={14} />
@@ -151,15 +148,15 @@ export function CommentSection({
 
             <button
               className="ml-2 mt-1 text-xs text-blue-500"
-              onClick={() => onReply(comment.comment_id, comment.user_username)}
+              onClick={() => onReply(comment.id, comment.writer)}
             >
               답글
             </button>
 
             {/* 대댓글 리스트 */}
-            {comment.replies && comment.replies.length > 0 && (
+            {comment.children && comment.children.length > 0 && (
               <div className="ml-6 mt-2 space-y-2">
-                {comment.replies
+                {comment.children
                   .slice()
                   .reverse()
                   .map((reply: any) => (
@@ -172,7 +169,7 @@ export function CommentSection({
                         {/* 대댓글 삭제 버튼 */}
                         <button
                           className="ml-auto p-1 text-gray-400 hover:text-red-500"
-                          onClick={() => onDeleteReply(comment.comment_id, reply.reply_id)}
+                          onClick={() => onDeleteComment(reply.id)}
                           aria-label="대댓글 삭제"
                         >
                           <X size={14} />
@@ -194,7 +191,7 @@ export function CommentSection({
                             <div className="flex gap-2">
                               <button
                                 className="flex items-center gap-1 rounded bg-blue-500 px-3 py-1 text-xs text-white hover:bg-blue-600"
-                                onClick={() => submitReplyEdit(comment.comment_id)}
+                                onClick={() => submitReplyEdit()}
                               >
                                 <Check size={12} />
                                 수정하기

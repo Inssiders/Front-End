@@ -10,20 +10,23 @@ import CategorySelect from './components/category-select'
 import FeildBox from './components/feild-box'
 import { Button } from '../ui/button'
 import { PostData } from '@/utils/types/posts'
+import { createPost } from '@/utils/fetch/post-detail'
 
 interface PostBasicProps {
     postData: PostData
     onChange: (data: PostData) => void
     handlePreviewMode: () => void
-  }
+    editMode?: boolean
+    handleEditRequest?: () => void
+}
 const categories = [
     { value: "news", label: "뉴스" },
     { value: "sports", label: "스포츠" },
     { value: "music", label: "음악" },
     { value: "movie", label: "영화" },
-  ];
+];
 
-const PostBasic = ({ handlePreviewMode, onChange, postData }: PostBasicProps) => {
+const PostBasic = ({ handlePreviewMode, onChange, postData, editMode, handleEditRequest }: PostBasicProps) => {
     const basicRef = useRef<{ [key: string]: any }>({});
 
 
@@ -33,7 +36,7 @@ const PostBasic = ({ handlePreviewMode, onChange, postData }: PostBasicProps) =>
         console.log(basicRef.current)
 
     };
-    
+
     const changeTitleHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange({ ...postData, title: e.target.value })
     }
@@ -49,12 +52,20 @@ const PostBasic = ({ handlePreviewMode, onChange, postData }: PostBasicProps) =>
     const categoryChangeHandler = (category_name: string) => {
         onChange({ ...postData, category_name })
     }
+
+    // POST /server/posts 호출 함수 (Authorization 헤더는 미들웨어가 자동 추가)
+
+    const handleCreateMeme = async () => {
+        const data = await createPost(postData)
+        console.log(data)
+    }
     return (
         <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">밈 작성</h1>
                 <Button onClick={handlePreviewMode}>미리보기</Button>
             </div>
+
             <Card className="w-full">
                 <CardContent>
                     <FeildBox label="제목">
@@ -79,6 +90,13 @@ const PostBasic = ({ handlePreviewMode, onChange, postData }: PostBasicProps) =>
                     <FeildBox label="카테고리">
                         <CategorySelect categories={categories} onChange={categoryChangeHandler} value={postData.category_name} />
                     </FeildBox>
+                    {editMode ? (<div className="flex justify-end mt-4">
+                        <Button onClick={handleEditRequest}>수정 완료</Button>
+                    </div>) : (<div className="flex justify-end mt-4">
+                        <Button onClick={handleCreateMeme} color="primary">
+                            밈 생성
+                        </Button>
+                    </div>)}
                 </CardContent>
 
             </Card>

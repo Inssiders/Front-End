@@ -46,7 +46,6 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
       getCategories(),
       getPosts({ category, page: 1, size: PAGE_SIZE.POSTS }),
     ]);
-
     return (
       <Suspense
         fallback={

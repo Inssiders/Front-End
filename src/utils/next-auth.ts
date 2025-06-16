@@ -53,6 +53,7 @@ export const authOptions: NextAuthOptions = {
             if (grant_type === "authorization_code") {
               authResponse = await requestEmailVerification(email);
             } else if (grant_type === "password") {
+              console.log("loginWithPassword", email, password);
               authResponse = await loginWithPassword(email, password);
             } else {
               return null;

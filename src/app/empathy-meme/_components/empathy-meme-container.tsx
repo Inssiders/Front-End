@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import styles from "./empathy-meme-container.module.css";
+import { Line } from "recharts";
+import Link from "next/link";
 
 interface FloatingCircle {
   width: number;
@@ -24,6 +26,7 @@ interface EmpathyMemeContainerProps {
   initialPosts: Post[];
   hasNextPage: boolean;
   headerType?: "default" | "posts" | "none";
+  id?: string;
 }
 
 export default function EmpathyMemeContainer({
@@ -32,6 +35,7 @@ export default function EmpathyMemeContainer({
   initialPosts,
   hasNextPage,
   headerType = "default",
+  id = "1",
 }: EmpathyMemeContainerProps) {
   const [circles, setCircles] = useState<FloatingCircle[]>([]);
 
@@ -161,7 +165,14 @@ export default function EmpathyMemeContainer({
           >
             {/* Simple Top Accent */}
             <div className={styles.topAccent} />
+            <div className="flex items-center gap-2 w-full md:w-auto">
 
+              <Link href={`/empathy-meme/create/${id}`}>
+                <h3 className="">
+                  밈 생성하기
+                </h3>
+              </Link>
+            </div>
             {/* Clean Content Area */}
             <div className={styles.contentWrapper}>
               <PostsGrid

@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
 // 동적 import
-const EmpathyMemeContainer = dynamic(() => import("./_components/empathy-meme-container"), {
+const  EmpathyMemeContainer = dynamic(() => import("./_components/empathy-meme-container"), {
   loading: () => (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50">
       <div className="container mx-auto px-4 py-8">
