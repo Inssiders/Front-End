@@ -351,7 +351,7 @@ export const authApi = {
   // 이메일 인증으로 토큰 발급
   async loginWithEmail(uuid: string) {
     const request: TokenRequest = {
-      grant_type: GRANT_TYPE.EMAIL,
+      grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
       uuid,
     };
     return apiPost("/auth/token", request, { skipAuth: true });

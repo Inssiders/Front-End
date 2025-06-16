@@ -206,7 +206,7 @@ interface AuthApi {
   register(data: { email: string; password: string; nickname: string }): Promise<any>;
   getProfile(id: string): Promise<any>;
   updateProfile(data: any): Promise<any>;
-  changePassword(password: string): Promise<any>;
+  changePassword(password: string, accessToken: string): Promise<any>;
   deleteAccount(): Promise<any>;
 }
 
@@ -228,7 +228,15 @@ export const authApi: AuthApi = {
 
   updateProfile: (data: any) => api.patch("/profiles/me", data),
 
-  changePassword: (password: string) => api.patch("/accounts/me/password", { password }),
+  changePassword: (password: string, accessToken: string) =>
+    api.patch(
+      "/accounts/me/password",
+      { password },
+      {
+        skipAuth: true,
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    ),
 
   deleteAccount: () => api.delete("/accounts/me"),
 };
