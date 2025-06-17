@@ -1,32 +1,42 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileData, ProfilePostsResponse } from "@/utils/types/profile";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import ProfileHeader from "./profile-header";
 import ProfileLikes from "./profile-likes";
-import { ProfilePosts } from "./profile-posts";
+import ProfilePosts from "./profile-posts";
+import { ProfileTabs } from "./profile-tabs";
 
-interface ProfileDetailProps {
+export interface QueryParams {
+  categoryId?: number;
+  keyword?: string;
+  size: number;
+}
+
+export interface ProfileDetailProps {
   profile: ProfileData;
   initialTab?: string;
   initialPostsData?: ProfilePostsResponse;
   initialLikesData?: ProfilePostsResponse;
+  queryParams?: QueryParams;
 }
 
-export function ProfileDetail({ profile, initialTab, initialPostsData, initialLikesData }: ProfileDetailProps) {
+export function ProfileDetail({
+  profile,
+  initialTab = "posts",
+  initialPostsData,
+  initialLikesData,
+  queryParams = {
+    size: 20,
+  },
+}: ProfileDetailProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   // 초기 탭 설정: 쿼리 파라미터 > initialTab > 기본값 'posts'
-  const [activeTab, setActiveTab] = useState(() => {
-    return searchParams.get("tab") || initialTab || "posts";
-  });
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   // URL 업데이트 함수
   const updateURL = useCallback(
@@ -68,72 +78,17 @@ export function ProfileDetail({ profile, initialTab, initialPostsData, initialLi
   const id = profile.user_id;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="overflow-hidden">
-        <div className="h-48 w-full bg-gradient-to-r from-blue-200 to-orange-100" />
-        <CardContent className="mt-6">
-          <div className="flex flex-col md:flex-row">
-            <div className="flex flex-col items-center md:w-1/3 md:items-start">
-              <Avatar className="mb-4 size-32 border-4 border-white">
-                <AvatarImage
-                  src={profile.user_detail_profile_url || "/placeholder.svg"}
-                  alt={profile.user_detail_username || profile.user_id}
-                />
-                <AvatarFallback>{profile.user_detail_username?.[0] || profile.user_id?.[0]}</AvatarFallback>
-              </Avatar>
-              <CardTitle className="mb-1 text-2xl font-bold">
-                {profile.user_detail_username || profile.user_id}
-              </CardTitle>
-              <CardDescription className="mb-4">@{profile.user_detail_username || profile.user_id}</CardDescription>
-              <div className="mb-6 flex gap-2">
-                <Badge variant="secondary" className="flex flex-col items-center px-4 py-2">
-                  <span className="font-bold">{profile.posts?.toLocaleString() ?? 0}</span>
-                  <span className="text-xs text-gray-500">게시물</span>
-                </Badge>
-                {profile.followers !== undefined && (
-                  <Badge variant="secondary" className="flex flex-col items-center px-4 py-2">
-                    <span className="font-bold">{profile.followers.toLocaleString()}</span>
-                    <span className="text-xs text-gray-500">팔로워</span>
-                  </Badge>
-                )}
-                {profile.following !== undefined && (
-                  <Badge variant="secondary" className="flex flex-col items-center px-4 py-2">
-                    <span className="font-bold">{profile.following.toLocaleString()}</span>
-                    <span className="text-xs text-gray-500">팔로잉</span>
-                  </Badge>
-                )}
-              </div>
-              <Card className="mb-6 w-full rounded-lg bg-gray-50 p-4">
-                <CardHeader className="mb-2 p-0">
-                  <CardTitle className="mb-2 text-base font-bold">소개</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <p className="mb-4 text-gray-700">{profile.user_detail_introduction || "소개가 없습니다."}</p>
-                  <p className="text-sm text-gray-500">
-                    가입일:{" "}
-                    {profile.user_created_at ? new Date(profile.user_created_at).toLocaleDateString("ko-KR") : "-"}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="mt-8 md:mt-0 md:w-2/3 md:pl-8">
-              <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-                <TabsList className="mb-4 w-full">
-                  <TabsTrigger value="posts">게시물</TabsTrigger>
-                  <TabsTrigger value="likes">좋아요</TabsTrigger>
-                </TabsList>
-                <Separator />
-                <TabsContent value="posts" className="mt-6">
-                  <ProfilePosts userId={id} initialData={initialPostsData} />
-                </TabsContent>
-                <TabsContent value="likes" className="mt-6">
-                  <ProfileLikes id={id} initialData={initialLikesData} />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="container mx-auto max-w-7xl px-4 py-8">
+      <ProfileHeader profile={profile} />
+      <ProfileTabs value={activeTab} onValueChange={handleTabChange} />
+
+      <div className="mt-8">
+        {activeTab === "posts" ? (
+          <ProfilePosts userId={id} initialData={initialPostsData} queryParams={queryParams} />
+        ) : (
+          <ProfileLikes userId={id} initialData={initialLikesData} queryParams={queryParams} />
+        )}
+      </div>
     </div>
   );
 }

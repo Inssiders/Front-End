@@ -3,67 +3,85 @@
 import { DEFAULT_PAGE_SIZE, INFINITE_SCROLL } from "@/utils/constant";
 import { debounceThrottle } from "@/utils/debounce-throttle";
 import { apiFetch } from "@/utils/fetch/auth";
-import { Post } from "@/utils/types/posts";
+import { ApiMeme } from "@/utils/types/posts";
+import { ProfilePostsResponse } from "@/utils/types/profile";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+interface UseInfiniteMemeProps {
+  category?: string;
+  userId?: string;
+  profileFilter?: "post" | "like";
+  size?: number;
+  keyword?: string;
+  enabled?: boolean;
+  initialData?: ProfilePostsResponse;
+}
+
+interface PageData {
+  data: {
+    content: ApiMeme[];
+    has_next: boolean;
+    next_cursor: string | null;
+  };
+}
 
 export function useInfiniteMemes({
   category,
   userId,
   profileFilter,
   size = DEFAULT_PAGE_SIZE,
+  keyword,
   enabled = true,
   initialData,
-}: {
-  category?: string;
-  userId?: string;
-  profileFilter?: "posts" | "likes";
-  size?: number;
-  enabled?: boolean;
-  initialData?: any[]; // 초기 데이터
-}) {
-  const hasInitialData = initialData && initialData.length > 0;
+}: UseInfiniteMemeProps) {
+  const hasInitialData = initialData?.data?.content && initialData.data.content.length > 0;
 
   // 중복 호출 방지를 위한 상태 관리
   const [isLoadingNext, setIsLoadingNext] = useState(false);
   const lastFetchTime = useRef<number>(0);
 
   const queryResult = useInfiniteQuery({
-    queryKey: ["memes", category, userId, profileFilter],
-    enabled: enabled, // 항상 활성화 (무한스크롤 가능하도록)
-    staleTime: 10 * 60 * 1000, // 10분 동안 데이터를 fresh로 간주 (인스타그램 스타일)
-    gcTime: 30 * 60 * 1000, // 30분 동안 캐시 유지
-    refetchOnWindowFocus: false, // 창 포커스 시 자동 리페치 비활성화
-    refetchOnMount: !hasInitialData, // 초기 데이터가 있으면 마운트 시 리페치 하지 않음
-    retry: INFINITE_SCROLL.RETRY_COUNT, // 실패 시 재시도
-    retryDelay: INFINITE_SCROLL.RETRY_DELAY, // 재시도 지연시간
+    queryKey: ["memes", category, userId, profileFilter] as const,
+    enabled: enabled,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: !hasInitialData,
+    retry: INFINITE_SCROLL.RETRY_COUNT,
+    retryDelay: INFINITE_SCROLL.RETRY_DELAY,
     ...(hasInitialData && {
       initialData: {
         pages: [
           {
-            items: initialData,
-            nextPage: 2,
-            total: initialData.length,
+            data: {
+              content: initialData.data.content,
+              has_next: initialData.data.has_next,
+              next_cursor: initialData.data.next_cursor,
+            },
           },
         ],
-        pageParams: [1],
+        pageParams: [undefined],
       },
     }),
-    queryFn: async ({ pageParam = hasInitialData ? 2 : 1 }) => {
+    queryFn: async ({ pageParam }) => {
       // 프로필 모드일 때는 다른 엔드포인트 사용
       const isProfileMode = userId && profileFilter;
       const endpoint = isProfileMode ? `/users/${userId}/posts` : "/posts";
 
       const params = new URLSearchParams();
-      params.set("page", String(pageParam));
       params.set("size", String(size));
 
       if (category) {
         params.set("category_id", category);
       }
 
-      if (isProfileMode) {
-        params.set("filter", profileFilter);
+      if (isProfileMode && profileFilter) {
+        params.set("profile_filter", profileFilter);
+      }
+
+      if (pageParam) {
+        params.set("last_id", pageParam);
       }
 
       const res = await apiFetch(`${endpoint}?${params.toString()}`);
@@ -71,37 +89,16 @@ export function useInfiniteMemes({
       if (!res.ok) throw new Error("Failed to fetch posts");
       const json = await res.json();
 
-      const items: Post[] = json.data.memes.map((row: any) => ({
-        id: row.id?.toString() || Date.now().toString(),
-        title: row.title,
-        content: row.content,
-        category_id: row.category_id,
-        media_url: row.media_url,
-        media_upload_time: row.media_upload_time,
-        account_id: row.user_id,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-        is_deleted: false,
-
-        // UI를 위한 추가 정보
-        author: {
-          account_id: row.user_id,
-          account_name: `User ${row.user_id}`,
-          profile_image: "/placeholder.svg",
-        },
-        likes: row.like_count || 0,
-        comment_count: row.comment_count || 0,
-        is_liked: row.is_liked || false,
-      }));
-
       return {
-        items,
-        nextPage: json.data.pageInfo.page < json.data.pageInfo.totalPages ? json.data.pageInfo.page + 1 : undefined,
-        total: json.data.pageInfo.totalElements,
+        data: {
+          content: json.data.content || [],
+          has_next: json.data.has_next,
+          next_cursor: json.data.next_cursor,
+        },
       };
     },
-    getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: hasInitialData ? 2 : 1, // 초기 데이터가 있으면 2부터 시작
+    getNextPageParam: (lastPage) => lastPage.data.next_cursor,
+    initialPageParam: undefined,
   });
 
   // 쿨다운 시간 체크 함수
@@ -198,5 +195,6 @@ export function useInfiniteMemes({
     target,
     // 추가 상태 노출
     isLoadingNext: isLoadingNext || queryResult.isFetchingNextPage,
+    fetchNextPage: debouncedThrottledFetchNextPage,
   };
 }

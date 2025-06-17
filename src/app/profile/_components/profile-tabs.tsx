@@ -4,23 +4,22 @@ import ProfileLikes from "@/app/profile/_components/profile-likes";
 import ProfilePosts from "@/app/profile/_components/profile-posts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
-import { Grid3X3, Heart } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 interface ProfileTabsProps {
-  userId?: string;
-  initialTab?: string;
+  value: string;
+  onValueChange: (value: string) => void;
 }
 
-export function ProfileTabs({ userId = "1", initialTab }: ProfileTabsProps) {
+export function ProfileTabs({ value, onValueChange }: ProfileTabsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   // 초기 탭 설정: 쿼리 파라미터 > initialTab > 기본값 'posts'
   const [activeTab, setActiveTab] = useState(() => {
-    return searchParams.get("tab") || initialTab || "posts";
+    return searchParams.get("tab") || value || "posts";
   });
 
   // URL 업데이트 함수
@@ -58,22 +57,10 @@ export function ProfileTabs({ userId = "1", initialTab }: ProfileTabsProps) {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <Tabs defaultValue="posts" value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="mx-auto mb-8 w-full max-w-3xl rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
-          <TabsTrigger
-            value="posts"
-            className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
-          >
-            <Grid3X3 className="mr-2 size-4" />
-            게시물
-          </TabsTrigger>
-          <TabsTrigger
-            value="likes"
-            className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
-          >
-            <Heart className="mr-2 size-4" />
-            좋아요
-          </TabsTrigger>
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <TabsList className="mb-4 w-full">
+          <TabsTrigger value="posts">게시물</TabsTrigger>
+          <TabsTrigger value="likes">좋아요</TabsTrigger>
         </TabsList>
 
         <motion.div
@@ -83,10 +70,10 @@ export function ProfileTabs({ userId = "1", initialTab }: ProfileTabsProps) {
           transition={{ duration: 0.3 }}
         >
           <TabsContent value="posts">
-            <ProfilePosts id={userId} />
+            <ProfilePosts userId="1" />
           </TabsContent>
           <TabsContent value="likes">
-            <ProfileLikes id={userId} />
+            <ProfileLikes userId="1" />
           </TabsContent>
         </motion.div>
       </Tabs>

@@ -1,5 +1,6 @@
 import { PAGE_SIZE } from "@/utils/constant";
 import { getCategories, getPosts } from "@/utils/fetch/posts";
+import { Category, CATEGORY_LABELS, CategoryData } from "@/utils/types/posts";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
@@ -42,10 +43,16 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
 
   try {
     // ISR로 카테고리와 첫 페이지 posts 데이터 가져오기
-    const [categories, initialPosts] = await Promise.all([
+    const [categoriesResponse, initialPosts] = await Promise.all([
       getCategories(),
       getPosts({ category, page: 1, size: PAGE_SIZE.POSTS }),
     ]);
+
+    const categories: CategoryData[] = Object.entries(CATEGORY_LABELS).map(([id, label]) => ({
+      id: parseInt(id),
+      type: Category[parseInt(id) as Category],
+      name: label,
+    }));
 
     return (
       <Suspense
@@ -68,7 +75,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
         }
       >
         <PostsPageClient
-          categories={categories.data.categories}
+          categories={categories}
           category={category}
           initialPosts={initialPosts.posts}
           hasNextPage={initialPosts.hasNextPage}
@@ -92,10 +99,13 @@ export async function generateMetadata({ searchParams }: PostsPageProps) {
   const resolvedSearchParams = await searchParams;
   const category = resolvedSearchParams.category;
 
+  // Get category label if category exists
+  const categoryLabel = category && Object.entries(CATEGORY_LABELS).find(([id]) => id === category)?.[1];
+
   return {
-    title: category ? `${category} 카테고리 | 인싸이더` : "트렌드 포스트 | 인싸이더",
-    description: category
-      ? `${category} 카테고리의 최신 밈과 트렌드를 확인해보세요.`
+    title: categoryLabel ? `${categoryLabel} 카테고리 | 인싸이더` : "트렌드 포스트 | 인싸이더",
+    description: categoryLabel
+      ? `${categoryLabel} 카테고리의 최신 밈과 트렌드를 확인해보세요.`
       : "인싸이더에서 가장 핫한 밈과 트렌드를 실시간으로 확인해보세요.",
   };
 }

@@ -1,4 +1,4 @@
-import { CategoriesResponse, Post } from "@/utils/types/posts";
+import { CategoriesResponse, Post, PostData } from "@/utils/types/posts";
 
 // posts 데이터를 UI Post 타입으로 변환하는 함수
 function convertApiMemeToPost(row: any): Post {
@@ -31,6 +31,7 @@ export async function getPosts(params: {
   category?: string;
   keyword?: string;
   page?: number;
+  profileFilter?: "post" | "like";
   size?: number;
 }): Promise<{ posts: Post[]; hasNextPage: boolean; total: number }> {
   try {
@@ -83,21 +84,26 @@ export async function getPosts(params: {
 // 카테고리 데이터 가져오기 함수
 export async function getCategories(): Promise<CategoriesResponse> {
   try {
-    // SSR 환경에서는 절대 URL이 필요
+    // Check if running on client or server
+    const isClient = typeof window !== "undefined";
     const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
-    const apiUrl = `${baseUrl}/server/categories`;
 
+    // Use different endpoints for client and server
+    const apiUrl = isClient
+      ? `/server/categories` // Client-side endpoint
+      : `${baseUrl}/api/categories`; // Server-side endpoint
+    console.log(apiUrl);
     const response = await fetch(apiUrl, {
+      method: "GET",
       cache: "force-cache", // SSR 캐싱
     });
+    console.log(response);
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       console.error("카테고리 조회 실패:", response.status);
       return {
         message: "카테고리 조회 실패",
-        data: {
-          categories: [],
-        },
+        data: [],
       };
     }
 
@@ -107,9 +113,59 @@ export async function getCategories(): Promise<CategoriesResponse> {
     console.error("카테고리 조회 중 오류:", error);
     return {
       message: "카테고리 조회 중 오류",
-      data: {
-        categories: [],
-      },
+      data: [],
     };
+  }
+}
+
+export interface CreatePostResponse {
+  message: string;
+  data: {
+    title: string;
+    content: string;
+    media_url: string;
+    media_upload_time: string;
+    category_type: string;
+    tags: string[];
+    created_at: string;
+  };
+}
+
+export async function createPost(postData: PostData): Promise<CreatePostResponse> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("로그인이 필요합니다.");
+    }
+
+    const response = await fetch(`${baseUrl}/server/posts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        title: postData.title,
+        content: postData.content,
+        media_url: postData.media_url,
+        media_upload_time: postData.media_upload_time,
+        category_name: postData.category_name,
+        tags: postData.tags,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "밈 생성에 실패했습니다.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("알 수 없는 오류가 발생했습니다.");
   }
 }

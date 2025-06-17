@@ -1,33 +1,34 @@
 // src/components/posts/post-detail/VideoSection.tsx
-'use client'
-import React, { useEffect, useState, useRef } from 'react';
+"use client";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { HoverVideo } from "./HoverVideo";
 
-interface VideoSectionProps {
+export interface VideoSectionProps {
   mediaUrl: string;
-  title: string;
-  isEdit?: boolean;
+  onMediaUrlChange: (url: string) => void;
 }
 
-function isValidVideoUrl(url: string) {
-  if (!url) return false;
+function isValidYouTubeUrl(url: string) {
+  if (!url) return true; // Empty URL is valid (optional field)
   try {
     const parsed = new URL(url);
     if (!/^https?:$/.test(parsed.protocol)) return false;
-    return true;
+
+    // YouTube URL 패턴 검사
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+    return !!match;
   } catch {
     return false;
   }
 }
 
 function getEmbedUrl(url: string) {
-  // shorts, youtu.be, watch?v=, embed/ 모두 지원
-  const match = url.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/
-  );
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
   if (match && match[1]) {
     return `https://www.youtube.com/embed/${match[1]}`;
   }
-  return url; // 이미 embed면 그대로
+  return url;
 }
 
 // Instagram 임베드 컴포넌트
@@ -60,50 +61,41 @@ function getEmbedUrl(url: string) {
 //   );
 // }
 
-export function VideoSection({ mediaUrl, title, isEdit = false }: VideoSectionProps) {
-  const [videoUrl, setVideoUrl] = useState('');
-  useEffect(() => {
-    setVideoUrl(mediaUrl);
-  }, [mediaUrl]);
+export function VideoSection({ mediaUrl, onMediaUrlChange }: VideoSectionProps) {
+  const [error, setError] = useState<string>("");
 
-  if (!isValidVideoUrl(videoUrl)) {
-    return (
-      <div className="md:w-3/5 aspect-video flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none text-red-500 text-center">
-        유효하지 않은 url 입니다
-      </div>
-    );
-  }
+  const handleUrlChange = (url: string) => {
+    if (!url) {
+      setError("");
+      onMediaUrlChange("");
+      return;
+    }
 
-  // Instagram URL 체크
-  // const isInstagram = /instagram\.com\/(reel|p|tv)\//.test(videoUrl);
-  // if (isInstagram) {
-  //   return (
-  //     <div className="aspect-[4/5] flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none">
-  //       <InstagramEmbed url={videoUrl.split('?')[0]} />
-  //     </div>
-  //   );
-  // }
+    if (!isValidYouTubeUrl(url)) {
+      setError("유효한 YouTube URL이 아닙니다. YouTube 동영상 URL만 입력 가능합니다.");
+      onMediaUrlChange(url);
+      return;
+    }
 
-  // YouTube면 embed 변환, 아니면 원본 사용
-  let src = getEmbedUrl(videoUrl);
-  const isYoutube = src.includes('youtube.com/embed');
+    setError("");
+    onMediaUrlChange(url);
+  };
 
   return (
-    <div className={`md:w-full aspect-video flex items-center justify-center bg-gray-50 md:rounded-l-lg ${isEdit ? 'md:rounded-r-lg' : 'md:rounded-r-none'} overflow-hidden`}>
-      {isYoutube ? (
-        <iframe
-          src={src}
-          title={title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="w-full h-full"
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Input
+          placeholder="YouTube 동영상 URL을 입력해주세요 (예: https://youtube.com/watch?v=...)"
+          value={mediaUrl}
+          onChange={(e) => handleUrlChange(e.target.value)}
+          className={`focus:ring-2 ${error ? "border-red-500 focus:ring-red-500" : "focus:ring-purple-500"}`}
         />
-      ) : (
-        <video
-          src={src}
-          controls
-          className={`w-full h-full} `}
-        />
+        {error && <p className="text-sm text-red-500">{error}</p>}
+      </div>
+      {mediaUrl && !error && (
+        <div className="w-full aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+          <HoverVideo url={mediaUrl} />
+        </div>
       )}
     </div>
   );

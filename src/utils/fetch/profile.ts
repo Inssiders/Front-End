@@ -17,85 +17,65 @@ function constructUrl(path: string): string {
 
 // Utility function to transform meme data to post format
 export function transformMemeToPost(meme: ApiMeme, id?: number | string): Post {
+  const memeId =
+    id?.toString() || meme.id?.toString() || Date.now().toString() + Math.random().toString(36).substr(2, 9);
+  const writerId = meme.writer?.id?.toString() || "0";
+  const categoryId = (
+    typeof meme.category_type === "string" ? parseInt(meme.category_type, 10) || 0 : meme.category_type || 0
+  ).toString();
+
   return {
-    id: id || Date.now().toString() + Math.random().toString(36).substr(2, 9),
+    id: memeId,
     title: meme.title,
-    content: meme.content,
-    category_id: meme.category_id,
+    content: meme.content || "",
+    category_id: categoryId,
     media_url: meme.media_url,
     media_upload_time: meme.media_upload_time,
-    account_id: meme.user_id,
+    account_id: writerId,
     created_at: meme.created_at,
-    updated_at: meme.updated_at,
+    updated_at: meme.updated_at || meme.created_at,
     is_deleted: false,
-
-    // UI를 위한 추가 정보 - 실제 API에서 제공되면 매핑, 아니면 기본값
     author: {
-      account_id: meme.user_id,
-      account_name: `User ${meme.user_id}`, // API에 실제 이름 필드가 있으면 해당 필드 사용
-      profile_image: "/placeholder.svg", // API에 실제 프로필 이미지 필드가 있으면 해당 필드 사용
+      account_id: writerId,
+      account_name: meme.writer?.nickname || `User ${writerId}`,
+      profile_image: meme.writer?.profile_url || "/placeholder.svg",
     },
-    likes: 0, // API에서 제공되는 좋아요 수가 있으면 해당 필드 사용
-    comment_count: 0, // API에서 제공되는 댓글 수가 있으면 해당 필드 사용
-    is_liked: false, // API에서 제공되는 좋아요 상태가 있으면 해당 필드 사용
+    likes: meme.like_count || 0,
+    comment_count: meme.comment_count || 0,
+    is_liked: meme.is_liked || false,
   };
+}
+
+interface FetchProfilePostsParams {
+  profileFilter?: "post" | "like";
+  size?: number;
+  cursor?: string;
+  keyword?: string;
+  categoryId?: number;
+  initialData?: ProfilePostsDataResponse;
 }
 
 // 프로필 포스트 조회
 export async function fetchProfilePosts(
   userId: string,
-  options: {
-    profileFilter?: "posts" | "likes";
-    size?: number;
-    cursor?: string;
-    keyword?: string;
-    categoryId?: number;
-    initialData?: ProfilePostsDataResponse;
-  } = {}
+  { profileFilter = "post", size = 20, cursor, keyword, categoryId, initialData }: FetchProfilePostsParams = {}
 ): Promise<ProfilePostsDataResponse> {
-  const { profileFilter = "posts", size = 10, cursor, keyword, categoryId, initialData } = options;
-
-  // initialData가 있으면 바로 반환
-  if (initialData) {
+  if (!cursor && initialData) {
     return initialData;
   }
 
-  const params = new URLSearchParams({
-    size: size.toString(),
-    profile_filter: profileFilter,
-  });
+  const params = new URLSearchParams();
+  if (size) params.append("size", size.toString());
+  if (cursor) params.append("cursor", cursor);
+  if (keyword) params.append("keyword", keyword);
+  if (categoryId) params.append("categoryId", categoryId.toString());
 
-  // Optional parameters
-  if (cursor) params.set("cursor", cursor);
-  if (keyword) params.set("keyword", keyword);
-  if (categoryId) params.set("category_id", categoryId.toString());
+  const endpoint = `/profiles/${userId}/${profileFilter === "like" ? "likes" : "posts"}${
+    params.toString() ? `?${params.toString()}` : ""
+  }`;
 
-  // ISR 캐시 설정
-  const isServerSide = typeof window === "undefined";
-  const fetchOptions: RequestInit = {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
-  };
-
-  // 서버사이드에서만 캐시 설정 적용
-  if (isServerSide) {
-    fetchOptions.next = {
-      tags: [`profile-${userId}`, `${profileFilter}-${userId}`, "posts"],
-    };
-  } else {
-    // 클라이언트사이드에서는 캐시 비활성화
-    fetchOptions.cache = "no-store";
-  }
-
-  const response = await apiFetch(`/profiles/${userId}?${params.toString()}`, fetchOptions);
-
-  if (!response.ok) {
-    throw new Error("프로필 데이터를 가져오는데 실패했습니다");
-  }
-
-  return response.json() as Promise<ProfilePostsDataResponse>;
+  const response = await apiFetch(endpoint);
+  return response.json();
 }
 
 // 프로필 정보 조회 (오버로드)
