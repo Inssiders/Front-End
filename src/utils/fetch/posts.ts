@@ -1,120 +1,78 @@
-import { CategoriesResponse, Post, PostData } from "@/utils/types/posts";
+import { ApiResponse, CategoriesResponse, PostData, PostsQueryParams, PostsResponse } from "@/types/posts";
 
-// posts 데이터를 UI Post 타입으로 변환하는 함수
-function convertApiMemeToPost(row: any): Post {
-  return {
-    id: row.id?.toString() || Date.now().toString(),
-    title: row.title,
-    content: row.content,
-    category_id: row.category_id,
-    media_url: row.media_url,
-    media_upload_time: row.media_upload_time,
-    account_id: row.user_id,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
-    is_deleted: false,
-
-    // UI를 위한 추가 정보
-    author: {
-      account_id: row.user_id,
-      account_name: `User ${row.user_id}`,
-      profile_image: "/placeholder.svg",
-    },
-    likes: row.like_count || 0,
-    comment_count: row.comment_count || 0,
-    is_liked: row.is_liked || false,
-  };
-}
-
-// SSR용 posts 데이터 가져오기 함수
-export async function getPosts(params: {
-  category?: string;
-  keyword?: string;
-  page?: number;
-  profileFilter?: "post" | "like";
-  size?: number;
-}): Promise<{ posts: Post[]; hasNextPage: boolean; total: number }> {
+// 게시물 목록 가져오기
+export async function getPosts({
+  last_id,
+  size = 12,
+  page = 1,
+  keyword,
+  category_id,
+  profile_filter,
+}: PostsQueryParams = {}): Promise<ApiResponse<PostsResponse>> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
-    const url = new URL(`${baseUrl}/server/posts`);
-
-    url.searchParams.set("page", String(params.page || 1));
-    url.searchParams.set("size", String(params.size || 12));
-
-    if (params.category) {
-      url.searchParams.set("category_id", params.category);
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL || "http://localhost:3000";
+    var url;
+    if (typeof window === "undefined") {
+      url = `${baseUrl}/api/posts`;
+    } else {
+      url = "/server/posts";
     }
 
-    if (params.keyword) {
-      url.searchParams.set("keyword", params.keyword);
-    }
+    // 쿼리 파라미터 추가
+    const params = new URLSearchParams();
+    if (last_id) params.append("last_id", last_id.toString());
+    if (size) params.append("size", size.toString());
+    if (page) params.append("page", page.toString());
+    if (keyword) params.append("keyword", keyword);
+    if (category_id) params.append("category_id", category_id);
+    if (profile_filter) params.append("profile_filter", profile_filter);
+
+    url += `?${params.toString()}`;
 
     const response = await fetch(url.toString(), {
-      cache: "no-store", // 항상 최신 데이터
+      method: "GET",
+      cache: "no-store", // 실시간 데이터를 위해 캐시 비활성화
     });
 
     if (!response.ok) {
-      console.error("Posts 조회 실패:", response.status);
-      return {
-        posts: [],
-        hasNextPage: false,
-        total: 0,
-      };
+      throw new Error(`게시물 조회 실패: ${response.status}`);
     }
 
-    const json = await response.json();
-
-    const posts: Post[] = json.data.memes.map(convertApiMemeToPost);
-
-    return {
-      posts,
-      hasNextPage: json.data.pageInfo.page < json.data.pageInfo.totalPages,
-      total: json.data.pageInfo.totalElements,
-    };
+    const data: ApiResponse<PostsResponse> = await response.json();
+    return data;
   } catch (error) {
-    console.error("Posts 조회 중 오류:", error);
-    return {
-      posts: [],
-      hasNextPage: false,
-      total: 0,
-    };
+    console.error("게시물 조회 중 오류 발생:", error);
+    throw error;
   }
 }
 
-// 카테고리 데이터 가져오기 함수
+// 카테고리 목록 가져오기
 export async function getCategories(): Promise<CategoriesResponse> {
   try {
-    // Check if running on client or server
-    const isClient = typeof window !== "undefined";
-    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL || "http://localhost:3000";
+    var url;
 
-    // Use different endpoints for client and server
-    const apiUrl = isClient
-      ? `/server/categories` // Client-side endpoint
-      : `${baseUrl}/api/categories`; // Server-side endpoint
-    console.log(apiUrl);
-    const response = await fetch(apiUrl, {
+    if (typeof window === "undefined") {
+      url = `${baseUrl}/api/categories`;
+    } else {
+      // Client: 프록시를 통한 호출
+      url = "/server/categories";
+    }
+
+    const response = await fetch(url, {
       method: "GET",
       cache: "force-cache", // SSR 캐싱
     });
-    console.log(response);
 
-    if (response.status !== 200) {
-      console.error("카테고리 조회 실패:", response.status);
-      return {
-        message: "카테고리 조회 실패",
-        data: [],
-      };
+    if (!response.ok) {
+      throw new Error(`카테고리 조회 실패: ${response.status}`);
     }
 
     const data: CategoriesResponse = await response.json();
     return data;
   } catch (error) {
-    console.error("카테고리 조회 중 오류:", error);
-    return {
-      message: "카테고리 조회 중 오류",
-      data: [],
-    };
+    console.error("카테고리 조회 중 오류 발생:", error);
+    throw error;
   }
 }
 
@@ -133,7 +91,7 @@ export interface CreatePostResponse {
 
 export async function createPost(postData: PostData): Promise<CreatePostResponse> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL || "http://localhost:3000";
     const token = localStorage.getItem("token");
 
     if (!token) {

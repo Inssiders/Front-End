@@ -1,115 +1,43 @@
-import { type ApiMeme, type Post } from "../types/posts";
-import {
-  type ProfilePostsResponse as ProfilePostsDataResponse,
-  type ProfileResponse,
-  type ProfileUpdateRequest,
-} from "../types/profile";
-import { apiFetch, ApiFetchOptions } from "./auth";
+import { ProfileResponse, ProfileUpdateRequest } from "@/types/profile";
 
 // Helper function to construct URL based on environment
-function constructUrl(path: string): string {
-  const baseUrl = process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL;
-  if (!baseUrl) {
-    throw new Error("SERVER_URL is not configured");
-  }
-  return `${baseUrl}${path}`;
-}
-
-// Utility function to transform meme data to post format
-export function transformMemeToPost(meme: ApiMeme, id?: number | string): Post {
-  const memeId =
-    id?.toString() || meme.id?.toString() || Date.now().toString() + Math.random().toString(36).substr(2, 9);
-  const writerId = meme.writer?.id?.toString() || "0";
-  const categoryId = (
-    typeof meme.category_type === "string" ? parseInt(meme.category_type, 10) || 0 : meme.category_type || 0
-  ).toString();
-
-  return {
-    id: memeId,
-    title: meme.title,
-    content: meme.content || "",
-    category_id: categoryId,
-    media_url: meme.media_url,
-    media_upload_time: meme.media_upload_time,
-    account_id: writerId,
-    created_at: meme.created_at,
-    updated_at: meme.updated_at || meme.created_at,
-    is_deleted: false,
-    author: {
-      account_id: writerId,
-      account_name: meme.writer?.nickname || `User ${writerId}`,
-      profile_image: meme.writer?.profile_url || "/placeholder.svg",
-    },
-    likes: meme.like_count || 0,
-    comment_count: meme.comment_count || 0,
-    is_liked: meme.is_liked || false,
-  };
-}
-
-interface FetchProfilePostsParams {
-  profileFilter?: "post" | "like";
-  size?: number;
-  cursor?: string;
-  keyword?: string;
-  categoryId?: number;
-  initialData?: ProfilePostsDataResponse;
-}
-
-// 프로필 포스트 조회
-export async function fetchProfilePosts(
-  userId: string,
-  { profileFilter = "post", size = 20, cursor, keyword, categoryId, initialData }: FetchProfilePostsParams = {}
-): Promise<ProfilePostsDataResponse> {
-  if (!cursor && initialData) {
-    return initialData;
-  }
-
-  const params = new URLSearchParams();
-  if (size) params.append("size", size.toString());
-  if (cursor) params.append("cursor", cursor);
-  if (keyword) params.append("keyword", keyword);
-  if (categoryId) params.append("categoryId", categoryId.toString());
-
-  const endpoint = `/profiles/${userId}/${profileFilter === "like" ? "likes" : "posts"}${
-    params.toString() ? `?${params.toString()}` : ""
-  }`;
-
-  const response = await apiFetch(endpoint);
-  return response.json();
+function getBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 }
 
 // 프로필 정보 조회 (오버로드)
-export async function fetchProfile(accountId: string, options: ApiFetchOptions = {}): Promise<ProfileResponse> {
-  const response = await apiFetch(`/profiles/${accountId}`, {
+export async function fetchProfile(userId: string): Promise<ProfileResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/profiles/${userId}`, {
     method: "GET",
-    ...options,
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || error.message || "프로필 조회에 실패했습니다.");
+  if (!res.ok) {
+    throw new Error("Failed to fetch profile");
   }
 
-  return response.json();
+  return res.json();
 }
 
 // 프로필 수정
-export async function updateProfile(
-  updateData: ProfileUpdateRequest,
-  options: ApiFetchOptions = {}
-): Promise<ProfileResponse> {
-  const response = await apiFetch("/profiles/me", {
+export async function updateProfile(userId: string, data: ProfileUpdateRequest): Promise<ProfileResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/profiles/${userId}`, {
     method: "PATCH",
-    body: JSON.stringify(updateData),
-    ...options,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || error.message || "프로필 수정에 실패했습니다.");
+  if (!res.ok) {
+    throw new Error("Failed to update profile");
   }
 
-  return response.json();
+  return res.json();
 }
 
 // ISR 재검증 트리거 함수

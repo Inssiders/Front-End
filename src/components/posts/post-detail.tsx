@@ -155,7 +155,7 @@ export function PostDetail({ post, isPreview, handlePreviewMode }: PostDetailPro
         </div>
       )}
       <Card className="mx-auto w-full overflow-hidden md:flex md:h-[700px] md:flex-row">
-        <VideoSection mediaUrl={post.media_url} title={post.title} />
+        <VideoSection mediaUrl={post.media_url} onMediaUrlChange={() => {}} />
         <div className="flex flex-col md:h-full md:w-2/5 md:overflow-y-auto">
           <CardContent className="flex flex-1 flex-col p-4 md:p-6">
             <PostHeader

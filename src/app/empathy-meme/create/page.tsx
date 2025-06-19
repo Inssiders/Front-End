@@ -1,6 +1,6 @@
 import PostContainer from "@/components/posts/post-container";
+import { Category, CATEGORY_LABELS, CategoryOption } from "@/types/posts";
 import { getCategories } from "@/utils/fetch/posts";
-import { Category, CATEGORY_LABELS, CategoryOption } from "@/utils/types/posts";
 
 export default async function CreateMemePage() {
   const categoriesResponse = await getCategories();
@@ -11,7 +11,7 @@ export default async function CreateMemePage() {
 
   const categories: CategoryOption[] = categoriesResponse.data.map((type) => ({
     value: Number(type) as Category,
-    label: CATEGORY_LABELS[Number(type) as Category],
+    label: CATEGORY_LABELS[type as keyof typeof CATEGORY_LABELS],
   }));
 
   return (

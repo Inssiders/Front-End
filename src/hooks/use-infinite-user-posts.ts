@@ -1,200 +1,117 @@
 "use client";
 
-import { DEFAULT_PAGE_SIZE, INFINITE_SCROLL } from "@/utils/constant";
-import { debounceThrottle } from "@/utils/debounce-throttle";
-import { apiFetch } from "@/utils/fetch/auth";
-import { ApiMeme } from "@/utils/types/posts";
-import { ProfilePostsResponse } from "@/utils/types/profile";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ApiResponse, Post, PostsResponse } from "@/types/posts";
+import { getPosts } from "@/utils/fetch/posts";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef } from "react";
 
 interface UseInfiniteMemeProps {
-  category?: string;
+  category_id?: string;
   userId?: string;
   profileFilter?: "post" | "like";
+  searchQuery?: string;
   size?: number;
-  keyword?: string;
   enabled?: boolean;
-  initialData?: ProfilePostsResponse;
-}
-
-interface PageData {
-  data: {
-    content: ApiMeme[];
-    has_next: boolean;
-    next_cursor: string | null;
-  };
+  initialData?: Post[];
 }
 
 export function useInfiniteMemes({
-  category,
+  category_id,
   userId,
   profileFilter,
-  size = DEFAULT_PAGE_SIZE,
-  keyword,
-  enabled = true,
+  searchQuery,
+  size,
+  enabled,
   initialData,
 }: UseInfiniteMemeProps) {
-  const hasInitialData = initialData?.data?.content && initialData.data.content.length > 0;
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const targetRef = useRef<HTMLDivElement | null>(null);
+  const queryClient = useQueryClient();
 
-  // 중복 호출 방지를 위한 상태 관리
-  const [isLoadingNext, setIsLoadingNext] = useState(false);
-  const lastFetchTime = useRef<number>(0);
+  // 카테고리나 검색어가 변경될 때마다 쿼리 초기화
+  useEffect(() => {
+    queryClient.resetQueries({
+      queryKey: ["userPosts", userId, profileFilter, category_id, searchQuery],
+    });
+  }, [category_id, queryClient, userId, profileFilter, searchQuery]);
 
-  const queryResult = useInfiniteQuery({
-    queryKey: ["memes", category, userId, profileFilter] as const,
-    enabled: enabled,
-    staleTime: 10 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnMount: !hasInitialData,
-    retry: INFINITE_SCROLL.RETRY_COUNT,
-    retryDelay: INFINITE_SCROLL.RETRY_DELAY,
-    ...(hasInitialData && {
-      initialData: {
-        pages: [
-          {
-            data: {
-              content: initialData.data.content,
-              has_next: initialData.data.has_next,
-              next_cursor: initialData.data.next_cursor,
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, ...rest } = useInfiniteQuery<
+    ApiResponse<PostsResponse>
+  >({
+    queryKey: ["userPosts", userId, profileFilter, category_id, searchQuery],
+    queryFn: ({ pageParam }) =>
+      getPosts({
+        page: pageParam as number,
+        size,
+        category_id: category_id,
+        profile_filter: profileFilter,
+        keyword: searchQuery,
+      }),
+    getNextPageParam: (lastPage) => (lastPage.data.has_next ? lastPage.data.next_cursor : undefined),
+    enabled: enabled !== false, // undefined도 true로 처리
+    initialPageParam: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes (previously cacheTime)
+    networkMode: "offlineFirst",
+    initialData: initialData
+      ? {
+          pageParams: [1],
+          pages: [
+            {
+              message: "Success",
+              data: {
+                content: initialData,
+                has_next: true,
+                next_cursor: 2,
+              },
             },
-          },
-        ],
-        pageParams: [undefined],
-      },
-    }),
-    queryFn: async ({ pageParam }) => {
-      // 프로필 모드일 때는 다른 엔드포인트 사용
-      const isProfileMode = userId && profileFilter;
-      const endpoint = isProfileMode ? `/users/${userId}/posts` : "/posts";
-
-      const params = new URLSearchParams();
-      params.set("size", String(size));
-
-      if (category) {
-        params.set("category_id", category);
-      }
-
-      if (isProfileMode && profileFilter) {
-        params.set("profile_filter", profileFilter);
-      }
-
-      if (pageParam) {
-        params.set("last_id", pageParam);
-      }
-
-      const res = await apiFetch(`${endpoint}?${params.toString()}`);
-
-      if (!res.ok) throw new Error("Failed to fetch posts");
-      const json = await res.json();
-
-      return {
-        data: {
-          content: json.data.content || [],
-          has_next: json.data.has_next,
-          next_cursor: json.data.next_cursor,
-        },
-      };
-    },
-    getNextPageParam: (lastPage) => lastPage.data.next_cursor,
-    initialPageParam: undefined,
+          ],
+        }
+      : undefined,
+    refetchOnMount: true, // 컴포넌트 마운트 시 항상 새로운 데이터 가져오기
   });
 
-  // 쿨다운 시간 체크 함수
-  const canFetchNext = useCallback(() => {
-    const now = Date.now();
-    const timeSinceLastFetch = now - lastFetchTime.current;
-    return timeSinceLastFetch >= INFINITE_SCROLL.COOLDOWN_TIME;
-  }, []);
-
-  // 실제 fetchNextPage 실행 함수 (중복 호출 방지 로직 포함)
-  const executeFetchNextPage = useCallback(async () => {
-    // 중복 호출 방지 조건들
-    if (isLoadingNext) {
-      return;
-    }
-
-    if (!queryResult.hasNextPage) {
-      return;
-    }
-
-    if (queryResult.isFetchingNextPage) {
-      return;
-    }
-
-    if (!canFetchNext()) {
-      return;
-    }
-
-    try {
-      setIsLoadingNext(true);
-      lastFetchTime.current = Date.now();
-
-      await queryResult.fetchNextPage();
-    } catch (error) {
-      console.error("❌ 무한스크롤 실패:", error);
-    } finally {
-      // 로딩 상태 해제 (약간의 지연으로 중복 방지)
-      setTimeout(() => {
-        setIsLoadingNext(false);
-      }, 200);
-    }
-  }, [isLoadingNext, queryResult.hasNextPage, queryResult.isFetchingNextPage, queryResult.fetchNextPage, canFetchNext]);
-
-  // 디바운싱 + 쓰로틀링이 적용된 fetchNextPage 함수
-  const debouncedThrottledFetchNextPage = useCallback(
-    debounceThrottle(
-      executeFetchNextPage,
-      INFINITE_SCROLL.DEBOUNCE_DELAY, // 100ms 디바운싱
-      INFINITE_SCROLL.THROTTLE_DELAY // 300ms 쓰로틀링
-    ),
-    [executeFetchNextPage]
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [target] = entries;
+      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
   );
 
-  const target = useRef<HTMLDivElement | null>(null);
-
   useEffect(() => {
-    if (!target.current || !enabled) return;
-    if (!queryResult.hasNextPage || queryResult.isFetchingNextPage) return;
+    const element = targetRef.current;
+    if (!element) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          // 디바운싱 + 쓰로틀링이 적용된 함수 호출
-          debouncedThrottledFetchNextPage();
-        }
-      },
-      {
-        threshold: INFINITE_SCROLL.THRESHOLD, // 트리거 감도
-        rootMargin: INFINITE_SCROLL.ROOT_MARGIN, // 미리 로드할 거리 (인스타그램 스타일)
-      }
-    );
+    // Cleanup previous observer
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
 
-    observer.observe(target.current);
+    // Create new observer with better thresholds
+    observerRef.current = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: "100px", // 더 일찍 로드 시작
+      threshold: 0.1,
+    });
+
+    observerRef.current.observe(element);
 
     return () => {
-      if (target.current) observer.unobserve(target.current);
-      observer.disconnect();
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
     };
-  }, [enabled, queryResult.hasNextPage, queryResult.isFetchingNextPage, debouncedThrottledFetchNextPage]);
-
-  // 로딩 상태 업데이트
-  useEffect(() => {
-    if (!queryResult.isFetchingNextPage && isLoadingNext) {
-      const timer = setTimeout(() => {
-        setIsLoadingNext(false);
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [queryResult.isFetchingNextPage, isLoadingNext]);
+  }, [handleObserver]);
 
   return {
-    ...queryResult,
-    target,
-    // 추가 상태 노출
-    isLoadingNext: isLoadingNext || queryResult.isFetchingNextPage,
-    fetchNextPage: debouncedThrottledFetchNextPage,
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    target: targetRef,
+    ...rest,
   };
 }

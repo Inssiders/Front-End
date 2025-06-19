@@ -1,8 +1,9 @@
 import { QueryParams } from "@/app/profile/_components/profile-detail";
 import { ProfileDetailLoading } from "@/app/profile/_components/profile-detail-loading";
+import { ProfileData } from "@/types/profile";
+import { DEFAULT_PAGE_SIZE } from "@/utils/constant";
 import { apiFetch } from "@/utils/fetch/auth";
-import { fetchProfilePosts } from "@/utils/fetch/profile";
-import { ProfileData } from "@/utils/types/profile";
+import { getPosts } from "@/utils/fetch/posts";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
@@ -47,29 +48,25 @@ interface ProfileResponse {
 export const revalidate = 3600; // 1시간 (3600초) ISR 재생성 주기
 
 export default async function ProfileDetailPage({ params, searchParams }: ProfileDetailPageProps) {
-  const { id: userId } = params;
-  const { tab, category: categoryId, sort = "latest", keyword, size = "20" } = searchParams;
+  const { id: userId } = await params;
+  const { tab = "posts", sort = "latest", keyword, size = DEFAULT_PAGE_SIZE.toString() } = await searchParams;
 
   try {
     // 프로필 정보와 게시물 데이터를 병렬로 가져오기
     const [profileResponse, postsData, likesData] = await Promise.all([
       apiFetch(`/profiles/${userId}`).then((res) => res.json() as Promise<ProfileResponse>),
-      fetchProfilePosts(userId, {
-        profileFilter: "post",
+      getPosts({
+        profile_filter: "post",
         size: parseInt(size),
-        categoryId: categoryId ? parseInt(categoryId) : undefined,
         keyword,
       }),
-      fetchProfilePosts(userId, {
-        profileFilter: "like",
+      getPosts({
+        profile_filter: "like",
         size: parseInt(size),
-        categoryId: categoryId ? parseInt(categoryId) : undefined,
         keyword,
       }),
     ]);
-    console.log(profileResponse);
-    console.log(postsData);
-    console.log(likesData);
+
     // ProfileData 형태로 변환
     const profile: ProfileData = {
       user_id: userId,
@@ -83,7 +80,6 @@ export default async function ProfileDetailPage({ params, searchParams }: Profil
     };
 
     const queryParams: QueryParams = {
-      categoryId: categoryId ? parseInt(categoryId) : undefined,
       keyword,
       size: parseInt(size),
     };
@@ -94,8 +90,8 @@ export default async function ProfileDetailPage({ params, searchParams }: Profil
           <ProfileDetail
             profile={profile}
             initialTab={tab}
-            initialPostsData={postsData}
-            initialLikesData={likesData}
+            initialPostsData={postsData?.data?.content || []}
+            initialLikesData={likesData?.data?.content || []}
             queryParams={queryParams}
           />
         </Suspense>
@@ -115,7 +111,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Profil
 }
 
 export async function generateMetadata({ params }: ProfileDetailPageProps) {
-  const { id: userId } = params;
+  const { id: userId } = await params;
 
   return {
     title: `${userId} 프로필 | 인싸이더`,

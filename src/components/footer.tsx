@@ -1,4 +1,4 @@
-import { Github, Instagram, Twitter } from "lucide-react";
+import { Github } from "lucide-react";
 import Link from "next/link";
 import styles from "./footer.module.css";
 
@@ -32,7 +32,7 @@ export default function Footer() {
             <p className={styles.copyright}>© 2025 inSSider. All rights reserved.</p>
             <div className={styles.socialLinks}>
               <a
-                href="https://github.com"
+                href="https://github.com/Inssiders"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.socialLink}
@@ -40,7 +40,7 @@ export default function Footer() {
               >
                 <Github size={14} />
               </a>
-              <a
+              {/* <a
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -57,7 +57,7 @@ export default function Footer() {
                 aria-label="Twitter"
               >
                 <Twitter size={14} />
-              </a>
+              </a> */}
             </div>
           </div>
         </div>

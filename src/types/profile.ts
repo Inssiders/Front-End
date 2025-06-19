@@ -1,4 +1,4 @@
-import { ApiMeme, Post } from "./posts";
+import { ApiMeme, Post } from "@/types/posts";
 
 export interface ProfileResponse {
   message: string;
@@ -22,7 +22,7 @@ export interface ProfileUpdateRequest {
 }
 
 // posts.ts의 ProfilePostsResponse를 재사용
-export interface ProfilePostsResponse {
+export interface PostsResponse {
   message: string;
   data: {
     content: ApiMeme[];

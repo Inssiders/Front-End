@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { CATEGORY_LABELS, Category, PostCardProps } from "@/utils/types/posts";
+import { CATEGORY_IDS, CATEGORY_LABELS, CategoryType, PostCardProps } from "@/types/posts";
 import { Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -22,8 +22,16 @@ export default function PostCard({
 }: PostCardProps) {
   const [isCardHovered, setIsCardHovered] = useState(false);
 
-  // Convert string category_id to number for enum lookup
-  const categoryId = Number(post.category_id) as Category;
+  // post가 undefined인 경우를 처리
+  if (!post) {
+    return null;
+  }
+
+  const categoryKey = post?.category_id
+    ? (Object.keys(CATEGORY_IDS) as CategoryType[]).find((key) => CATEGORY_IDS[key] === post.category_id)
+    : "USER_CONTENTS";
+
+  const categoryLabel = categoryKey ? CATEGORY_LABELS[categoryKey] : "유저 컨텐츠";
 
   return (
     <Card
@@ -47,7 +55,7 @@ export default function PostCard({
         )}
 
         {/* 카테고리 배지 */}
-        <div className={styles.badge}>{CATEGORY_LABELS[categoryId]}</div>
+        <div className={styles.badge}>{categoryLabel}</div>
       </div>
 
       {/* 콘텐츠 영역 */}
@@ -89,11 +97,11 @@ export default function PostCard({
               onClick={() => onLike(post.id)}
             >
               <Heart className={`${styles.actionIcon} ${post.is_liked ? styles.likedIcon : ""}`} />
-              {post?.likes?.toLocaleString()}
+              {(post?.like_count || 0).toLocaleString()}
             </button>
             <button className={`${styles.actionButton} ${styles.commentButton}`} onClick={() => onComment(post.id)}>
               <MessageCircle className={styles.actionIcon} />
-              {post?.comment_count?.toLocaleString()}
+              {(post?.comment_count || 0).toLocaleString()}
             </button>
           </div>
         )}

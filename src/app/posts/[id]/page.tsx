@@ -28,7 +28,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     await startServer();
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   const baseUrl = process.env.SERVER_URL || "http://localhost:3000";
   const res = await fetch(`${baseUrl}/api/posts/${id}/detail`, { cache: "no-store" });

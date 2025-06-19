@@ -128,7 +128,6 @@ export default function SignUpClient() {
 
     try {
       const response = await authApi.verifyEmail(getValues("email"), otp);
-      console.log(response);
       if (response.data?.verified) {
         setAuthorizationCode(response.data.authorization_code);
         setVerificationStep("signup");

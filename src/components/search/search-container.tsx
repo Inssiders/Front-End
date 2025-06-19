@@ -2,7 +2,7 @@
 
 import PostsGrid from "@/components/posts/post-grid";
 import { motion } from "framer-motion";
-import { Search, Sparkles, TrendingUp } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import { useState } from "react";
 import styles from "./search-container.module.css";
 import SearchHeader from "./search-header";
@@ -19,6 +19,7 @@ interface SearchContainerProps {
   initialLoading?: boolean;
   initialHasNextPage?: boolean;
   initialTotalResults?: number;
+  initialSearchTime?: number;
 }
 
 export default function SearchContainer({
@@ -31,6 +32,7 @@ export default function SearchContainer({
   initialLoading = false,
   initialHasNextPage = false,
   initialTotalResults = 0,
+  initialSearchTime,
 }: SearchContainerProps) {
   const [isFromCache, setIsFromCache] = useState(false);
 
@@ -117,7 +119,12 @@ export default function SearchContainer({
         <SearchHeader query={query} />
 
         {/* Search Stats */}
-        <SearchStats query={query} totalResults={currentTotalResults} loading={currentLoading} />
+        <SearchStats
+          query={query}
+          totalResults={currentTotalResults}
+          loading={currentLoading}
+          searchTime={initialSearchTime}
+        />
 
         {/* Search Results */}
         <div className={styles.resultsContainer}>
@@ -140,6 +147,7 @@ export default function SearchContainer({
                     showActions={true}
                     enableHoverPlay={true}
                     disableAnimation={isFromCache}
+                    searchQuery={query}
                   />
                 </motion.div>
               ) : (
@@ -165,30 +173,6 @@ export default function SearchContainer({
                   </motion.div>
                   <h3 className={styles.noResultsTitle}>검색 결과가 없어요 😢</h3>
                   <p className={styles.noResultsDesc}>다른 키워드로 검색해보거나 철자를 확인해보세요</p>
-                  <motion.div
-                    className={styles.searchSuggestions}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    <p className={styles.suggestionsTitle}>💡 추천 검색어</p>
-                    <div className={styles.suggestionTags}>
-                      {["최신 트렌드", "인기 밈", "공감 콘텐츠", "바이럴"].map((tag, index) => (
-                        <motion.span
-                          key={tag}
-                          className={styles.suggestionTag}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.6 + index * 0.1 }}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <TrendingUp className="w-3 h-3" />
-                          {tag}
-                        </motion.span>
-                      ))}
-                    </div>
-                  </motion.div>
                 </motion.div>
               )}
             </>

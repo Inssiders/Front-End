@@ -1,18 +1,31 @@
 "use client";
 
-import ProfileLikes from "@/app/profile/_components/profile-likes";
-import ProfilePosts from "@/app/profile/_components/profile-posts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { motion } from "framer-motion";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Post } from "@/types/posts";
+import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { QueryParams } from "./profile-detail";
+import ProfileLikes from "./profile-likes";
+import ProfilePosts from "./profile-posts";
 
 interface ProfileTabsProps {
   value: string;
   onValueChange: (value: string) => void;
+  userId: string;
+  initialPostsData?: Post[];
+  initialLikesData?: Post[];
+  queryParams?: QueryParams;
 }
 
-export function ProfileTabs({ value, onValueChange }: ProfileTabsProps) {
+export function ProfileTabs({
+  value,
+  onValueChange,
+  userId,
+  initialPostsData,
+  initialLikesData,
+  queryParams,
+}: ProfileTabsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -34,8 +47,9 @@ export function ProfileTabs({ value, onValueChange }: ProfileTabsProps) {
 
       const newURL = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
       router.replace(newURL, { scroll: false });
+      onValueChange(newTab);
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams, onValueChange]
   );
 
   // 탭 변경 핸들러
@@ -63,19 +77,43 @@ export function ProfileTabs({ value, onValueChange }: ProfileTabsProps) {
           <TabsTrigger value="likes">좋아요</TabsTrigger>
         </TabsList>
 
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <TabsContent value="posts">
-            <ProfilePosts userId="1" />
-          </TabsContent>
-          <TabsContent value="likes">
-            <ProfileLikes userId="1" />
-          </TabsContent>
-        </motion.div>
+        <div className="relative">
+          <AnimatePresence mode="wait">
+            {activeTab === "posts" ? (
+              <motion.div
+                key="posts"
+                className="absolute w-full"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ProfilePosts
+                  key="posts-content"
+                  userId={userId}
+                  initialData={initialPostsData}
+                  queryParams={queryParams}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="likes"
+                className="absolute w-full"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ProfileLikes
+                  key="likes-content"
+                  userId={userId}
+                  initialData={initialLikesData}
+                  queryParams={queryParams}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </Tabs>
     </div>
   );

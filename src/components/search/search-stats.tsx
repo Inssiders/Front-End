@@ -8,10 +8,14 @@ interface SearchStatsProps {
   query: string;
   totalResults: number;
   loading: boolean;
+  searchTime?: number;
 }
 
-export default function SearchStats({ query, totalResults, loading }: SearchStatsProps) {
+export default function SearchStats({ query, totalResults, loading, searchTime }: SearchStatsProps) {
   if (!query) return null;
+
+  // 검색 시간을 적절한 형식으로 표시
+  const formattedSearchTime = searchTime ? `${searchTime.toFixed(2)}초` : loading ? "..." : "0.00초";
 
   return (
     <motion.div
@@ -63,7 +67,7 @@ export default function SearchStats({ query, totalResults, loading }: SearchStat
           </motion.div>
           <div className={styles.statContent}>
             <span className={styles.statLabel}>검색 시간</span>
-            <span className={styles.statValue}>{loading ? "..." : "0.12초"}</span>
+            <span className={styles.statValue}>{formattedSearchTime}</span>
           </div>
         </motion.div>
       </div>

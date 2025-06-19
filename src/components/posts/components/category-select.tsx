@@ -1,5 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CATEGORY_LABELS } from "@/utils/types/posts";
+import { CATEGORY_LABELS } from "@/types/posts";
 
 export interface CategorySelectProps {
   selectedCategory: string;

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CategoryOption, PostData } from "@/utils/types/posts";
+import { CategoryOption, PostData } from "@/types/posts";
 import { motion } from "framer-motion";
 import { CategorySelect } from "./components/category-select";
 import { InputHash } from "./components/input-hash";

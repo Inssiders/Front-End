@@ -4,34 +4,81 @@ import PostCategories from "@/components/posts/post-categories";
 import PostsGrid from "@/components/posts/post-grid";
 import PostsHeader from "@/components/posts/post-header";
 import { useBfCacheOptimization, usePageCache } from "@/hooks/use-page-cache";
+import {
+  ApiResponse,
+  CATEGORY_IDS,
+  CATEGORY_LABELS,
+  CategoryData,
+  CategoryType,
+  Post,
+  PostsResponse,
+} from "@/types/posts";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./posts-page-client.module.css";
 
-interface PostsPageClientProps {
-  categories: any;
-  category?: string;
-  initialPosts?: any[];
-  hasNextPage?: boolean;
+export interface PostsPageClientProps {
+  initialPostsResponse: ApiResponse<PostsResponse>;
+  categories: CategoryType[];
+  selectedCategoryId?: string;
+  keyword?: string;
+  currentPage: number;
 }
 
-export default function PostsPageClient({ categories, category, initialPosts, hasNextPage }: PostsPageClientProps) {
+export default function PostsPageClient({
+  initialPostsResponse,
+  categories,
+  selectedCategoryId,
+  keyword,
+  currentPage,
+}: PostsPageClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [posts, setPosts] = useState<Post[]>(initialPostsResponse.data.content);
+  const [loading, setLoading] = useState(false);
+
+  // Transform categories to CategoryData format
+  const categoryData: CategoryData[] = categories.map((category) => ({
+    id: CATEGORY_IDS[category],
+    type: category,
+    name: CATEGORY_LABELS[category],
+  }));
+
   // 페이지 캐시 및 뒤로가기 최적화 적용
   usePageCache();
   useBfCacheOptimization();
 
-  const [isFromCache, setIsFromCache] = useState(false);
+  // 카테고리 변경 시 초기 데이터 업데이트
+  useEffect(() => {
+    if (initialPostsResponse?.data?.content) {
+      setPosts(initialPostsResponse.data.content);
+    }
+  }, [initialPostsResponse, selectedCategoryId]);
 
   useEffect(() => {
-    // 첫 로드 시에는 애니메이션 비활성화 (캐시된 데이터 즉시 표시)
-    setIsFromCache(true);
-
-    // 짧은 시간 후 애니메이션 재활성화
-    const timer = setTimeout(() => {
-      setIsFromCache(false);
-    }, 50); // 50ms로 줄여서 더 빠르게
-
+    // URL 변경 시 애니메이션 효과를 위해 로딩 상태 잠시 유지
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 300);
     return () => clearTimeout(timer);
-  }, [category]); // category가 변경될 때마다 실행
+  }, [selectedCategoryId]); // selectedCategoryId가 변경될 때마다 실행
+
+  // 카테고리 변경 핸들러
+  const handleCategoryChange = (category?: CategoryType) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (category) {
+      const categoryId = CATEGORY_IDS[category];
+      params.set("category_id", categoryId.toString());
+    } else {
+      params.delete("category_id");
+    }
+
+    // 페이지 초기화
+    params.set("page", "1");
+
+    // 라우터 옵션을 통해 스크롤 위치 유지
+    router.push(`/posts?${params.toString()}`, { scroll: false });
+  };
 
   return (
     <>
@@ -39,7 +86,7 @@ export default function PostsPageClient({ categories, category, initialPosts, ha
       <header className={styles.header}>
         <PostsHeader />
       </header>
-      <PostCategories categories={categories} />
+      <PostCategories categories={categoryData} id={selectedCategoryId} />
 
       {/* 메인 콘텐츠 영역 - Gen-Z 감성의 다이나믹 레이아웃 */}
       <main className={styles.mainContainer}>
@@ -66,17 +113,11 @@ export default function PostsPageClient({ categories, category, initialPosts, ha
               {/* Clean Content Area */}
               <div className={styles.contentWrapper}>
                 <PostsGrid
-                  category={category}
-                  columns={4}
-                  layout="grid"
-                  showAuthor={true}
-                  showActions={true}
-                  enableHoverPlay={true}
-                  className=""
-                  disableAnimation={isFromCache}
-                  posts={initialPosts}
-                  loading={false}
-                  hasNextPage={hasNextPage}
+                  posts={posts}
+                  loading={loading}
+                  className="min-h-[50vh]"
+                  category={selectedCategoryId}
+                  key={selectedCategoryId} // 카테고리 변경 시 컴포넌트 리마운트
                 />
               </div>
             </div>
