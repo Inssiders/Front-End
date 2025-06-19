@@ -1,26 +1,38 @@
 "use client";
 
-import ProfileLikes from "@/app/profile/_components/profile-likes";
-import ProfilePosts from "@/app/profile/_components/profile-posts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { motion } from "framer-motion";
-import { Grid3X3, Heart } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Post } from "@/types/posts";
+import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { QueryParams } from "./profile-detail";
+import ProfileLikes from "./profile-likes";
+import ProfilePosts from "./profile-posts";
 
 interface ProfileTabsProps {
-  userId?: string;
-  initialTab?: string;
+  value: string;
+  onValueChange: (value: string) => void;
+  userId: string;
+  initialPostsData?: Post[];
+  initialLikesData?: Post[];
+  queryParams?: QueryParams;
 }
 
-export function ProfileTabs({ userId = "1", initialTab }: ProfileTabsProps) {
+export function ProfileTabs({
+  value,
+  onValueChange,
+  userId,
+  initialPostsData,
+  initialLikesData,
+  queryParams,
+}: ProfileTabsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   // 초기 탭 설정: 쿼리 파라미터 > initialTab > 기본값 'posts'
   const [activeTab, setActiveTab] = useState(() => {
-    return searchParams.get("tab") || initialTab || "posts";
+    return searchParams.get("tab") || value || "posts";
   });
 
   // URL 업데이트 함수
@@ -35,8 +47,9 @@ export function ProfileTabs({ userId = "1", initialTab }: ProfileTabsProps) {
 
       const newURL = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
       router.replace(newURL, { scroll: false });
+      onValueChange(newTab);
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams, onValueChange]
   );
 
   // 탭 변경 핸들러
@@ -58,37 +71,49 @@ export function ProfileTabs({ userId = "1", initialTab }: ProfileTabsProps) {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <Tabs defaultValue="posts" value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="mx-auto mb-8 w-full max-w-3xl rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
-          <TabsTrigger
-            value="posts"
-            className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
-          >
-            <Grid3X3 className="mr-2 size-4" />
-            게시물
-          </TabsTrigger>
-          <TabsTrigger
-            value="likes"
-            className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
-          >
-            <Heart className="mr-2 size-4" />
-            좋아요
-          </TabsTrigger>
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <TabsList className="mb-4 w-full">
+          <TabsTrigger value="posts">게시물</TabsTrigger>
+          <TabsTrigger value="likes">좋아요</TabsTrigger>
         </TabsList>
 
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <TabsContent value="posts">
-            <ProfilePosts id={userId} />
-          </TabsContent>
-          <TabsContent value="likes">
-            <ProfileLikes id={userId} />
-          </TabsContent>
-        </motion.div>
+        <div className="relative">
+          <AnimatePresence mode="wait">
+            {activeTab === "posts" ? (
+              <motion.div
+                key="posts"
+                className="absolute w-full"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ProfilePosts
+                  key="posts-content"
+                  userId={userId}
+                  initialData={initialPostsData}
+                  queryParams={queryParams}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="likes"
+                className="absolute w-full"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ProfileLikes
+                  key="likes-content"
+                  userId={userId}
+                  initialData={initialLikesData}
+                  queryParams={queryParams}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </Tabs>
     </div>
   );

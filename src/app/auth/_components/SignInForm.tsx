@@ -37,7 +37,6 @@ export default function SignInForm({ onLoginFail }: SignInFormProps) {
         redirect: false,
         callbackUrl: "/",
       });
-      console.log(res);
       if (!res?.error) {
         router.push("/");
       } else {

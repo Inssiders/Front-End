@@ -2,7 +2,7 @@
 
 import PostsGrid from "@/components/posts/post-grid";
 import PostsHeader from "@/components/posts/post-header";
-import { CategoryData, Post } from "@/utils/types/posts";
+import { CategoryData, Post } from "@/types/posts";
 import { motion } from "framer-motion";
 import { Users } from "lucide-react";
 import { useEffect, useState } from "react";

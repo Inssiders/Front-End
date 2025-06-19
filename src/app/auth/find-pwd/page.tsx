@@ -70,7 +70,6 @@ export default function FindPwdPage() {
 
       const tokenResponse = await authApi.getTokenWithAuthCode(authorizationCode);
       const accessToken = tokenResponse.data.access_token;
-      console.log(accessToken);
 
       await authApi.changePassword(form.password, accessToken);
 

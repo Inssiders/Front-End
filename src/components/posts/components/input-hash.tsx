@@ -1,85 +1,63 @@
-import { X } from 'lucide-react';
-import React, { useState, useRef, useEffect } from 'react';
+"use client";
 
-interface HashTagInputProps {
+import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
+import { KeyboardEvent, useState } from "react";
+
+export interface InputHashProps {
+  tags: string[];
   onChange: (tags: string[]) => void;
-  propsTags: string[];
 }
 
-const HashTagInput: React.FC<HashTagInputProps> = ({ onChange, propsTags }) => {
-  const [input, setInput] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const spanRef = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    setTags(propsTags)
-  }, [propsTags])
-  // 입력값에 따라 인풋의 width 자동 조절
-  useEffect(() => {
-    if (spanRef.current && inputRef.current) {
-      // 최소 2em, 최대 200px
-      inputRef.current.style.width = Math.min(Math.max(spanRef.current.offsetWidth + 16, 32), 200) + 'px';
-    }
-  }, [input]);
+export function InputHash({ tags, onChange }: InputHashProps) {
+  const [inputValue, setInputValue] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && input.trim() !== '') {
-      let tag = input.trim();
-      if (!tag.startsWith('#')) tag = `#${tag}`;
-      if (!tags.includes(tag)) {
-        const newTags = [...tags, tag];
-        setTags(newTags);
-        onChange(newTags);
-      }
-      setInput('');
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && inputValue.trim()) {
       e.preventDefault();
+      const newTag = inputValue.trim();
+      if (!tags.includes(newTag)) {
+        onChange([...tags, newTag]);
+      }
+      setInputValue("");
+    } else if (e.key === "Backspace" && !inputValue && tags.length > 0) {
+      onChange(tags.slice(0, -1));
     }
   };
 
-  const handleRemove = (removeTag: string) => {
-    const newTags = tags.filter(tag => tag !== removeTag);
-    setTags(newTags);
-    onChange(newTags);
+  const removeTag = (tagToRemove: string) => {
+    onChange(tags.filter((tag) => tag !== tagToRemove));
   };
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-2 items-center">
-        {tags.map(tag => (
-          <span
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag, index) => (
+          <motion.span
             key={tag}
-            className="bg-blue-100 text-blue-700 px-2 py-1 rounded flex items-center text-sm"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-700 dark:text-purple-300"
           >
-            {tag}
+            #{tag}
             <button
               type="button"
-              className="ml-1 text-xs text-red-500"
-              onClick={() => handleRemove(tag)}
+              onClick={() => removeTag(tag)}
+              className="ml-2 text-purple-500 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
             >
-              <X />
+              ×
             </button>
-          </span>
+          </motion.span>
         ))}
-        <span ref={spanRef} className="invisible absolute whitespace-pre px-2 py-1 text-sm font-normal">
-          {input || '해시태그를 입력하세요.'}
-        </span>
-        <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder="해시태그를 입력하세요."
-          className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-sm outline-none border-none min-w-[32px] max-w-[200px]"
-          style={{ width: 32, transition: 'width 0.2s' }}
-        />
       </div>
+      <Input
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="해시태그를 입력하고 Enter를 눌러주세요"
+        className="focus:ring-2 focus:ring-purple-500 transition-all duration-300 hover:shadow-md"
+      />
     </div>
   );
-};
-
-export default HashTagInput;
+}

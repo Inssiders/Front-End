@@ -1,6 +1,6 @@
 "use client";
 
-import { CategoryData, Post } from "@/utils/types/posts";
+import { CategoryData, Post } from "@/types/posts";
 import dynamic from "next/dynamic";
 
 const EmpathyMemeContainer = dynamic(() => import("./empathy-meme-container"), {

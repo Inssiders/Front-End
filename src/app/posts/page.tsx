@@ -1,77 +1,36 @@
+import PostsPageClient from "@/components/posts/posts-page-client";
+import { Category, CATEGORY_LABELS, CategoryType } from "@/types/posts";
 import { PAGE_SIZE } from "@/utils/constant";
 import { getCategories, getPosts } from "@/utils/fetch/posts";
-import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
-// 동적 import로 PostsPageClient 최적화
-const PostsPageClient = dynamic(() => import("@/components/posts/posts-page-client"), {
-  loading: () => (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-cyan-50 p-4">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header skeleton */}
-        <div className="h-12 bg-gray-200 animate-pulse rounded-lg" />
-
-        {/* Category filter skeleton */}
-        <div className="flex space-x-2 overflow-x-auto pb-2">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-8 w-20 bg-gray-200 animate-pulse rounded-full flex-shrink-0" />
-          ))}
-        </div>
-
-        {/* Posts grid skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[...Array(12)].map((_, i) => (
-            <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-xl" />
-          ))}
-        </div>
-      </div>
-    </div>
-  ),
-});
-
 interface PostsPageProps {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: { category_id?: string; keyword?: string; page?: string };
 }
 
 // ISR 설정: 5분마다 재생성
 export const revalidate = 300; // 5분 (300초)
 
 export default async function PostsPage({ searchParams }: PostsPageProps) {
-  const resolvedSearchParams = await searchParams;
-  const category = resolvedSearchParams.category;
+  const { category_id, page = "1" } = await searchParams;
 
   try {
-    // ISR로 카테고리와 첫 페이지 posts 데이터 가져오기
-    const [categories, initialPosts] = await Promise.all([
+    const [categoriesResponse, initialPostsResponse] = await Promise.all([
       getCategories(),
-      getPosts({ category, page: 1, size: PAGE_SIZE.POSTS }),
+      getPosts({
+        category_id,
+        size: PAGE_SIZE.POSTS,
+        page: parseInt(page),
+      }),
     ]);
 
     return (
-      <Suspense
-        fallback={
-          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-cyan-50 p-4">
-            <div className="max-w-7xl mx-auto space-y-6">
-              <div className="h-12 bg-gray-200 animate-pulse rounded-lg" />
-              <div className="flex space-x-2 overflow-x-auto pb-2">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="h-8 w-20 bg-gray-200 animate-pulse rounded-full flex-shrink-0" />
-                ))}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {[...Array(12)].map((_, i) => (
-                  <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-xl" />
-                ))}
-              </div>
-            </div>
-          </div>
-        }
-      >
+      <Suspense fallback={<div>Loading...</div>}>
         <PostsPageClient
-          categories={categories.data.categories}
-          category={category}
-          initialPosts={initialPosts.posts}
-          hasNextPage={initialPosts.hasNextPage}
+          initialPostsResponse={initialPostsResponse}
+          categories={categoriesResponse.data as CategoryType[]}
+          selectedCategoryId={category_id}
+          currentPage={parseInt(page)}
         />
       </Suspense>
     );
@@ -88,14 +47,19 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
   }
 }
 
-export async function generateMetadata({ searchParams }: PostsPageProps) {
-  const resolvedSearchParams = await searchParams;
-  const category = resolvedSearchParams.category;
+export async function generateMetadata({ searchParams }: { searchParams: { category_id?: string } }) {
+  const { category_id } = await searchParams;
+
+  const categoryKey = category_id
+    ? (Object.keys(CATEGORY_LABELS) as CategoryType[]).find((key) => (Category as any)[key].toString() === category_id)
+    : undefined;
+
+  const categoryLabel = categoryKey ? CATEGORY_LABELS[categoryKey] : undefined;
 
   return {
-    title: category ? `${category} 카테고리 | 인싸이더` : "트렌드 포스트 | 인싸이더",
-    description: category
-      ? `${category} 카테고리의 최신 밈과 트렌드를 확인해보세요.`
+    title: categoryLabel ? `${categoryLabel} 카테고리 | 인싸이더` : "트렌드 포스트 | 인싸이더",
+    description: categoryLabel
+      ? `${categoryLabel} 카테고리의 최신 밈과 트렌드를 확인해보세요.`
       : "인싸이더에서 가장 핫한 밈과 트렌드를 실시간으로 확인해보세요.",
   };
 }

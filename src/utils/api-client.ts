@@ -53,7 +53,6 @@ async function clientFetch(endpoint: string, options: ApiOptions = {}) {
   if (!isOnline()) {
     throw new Error("Network is offline");
   }
-  console.log("clientFetch", endpoint, options);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(fetchOptions.headers as Record<string, string>),
@@ -100,7 +99,6 @@ async function clientFetch(endpoint: string, options: ApiOptions = {}) {
  * 서버 사이드 API 호출
  */
 async function serverFetch(endpoint: string, options: ApiOptions = {}) {
-  console.log("options", options);
   const { skipAuth = false, timeout = 10000, ...fetchOptions } = options;
 
   const headers: Record<string, string> = {
@@ -125,7 +123,6 @@ async function serverFetch(endpoint: string, options: ApiOptions = {}) {
       headers,
       signal: controller.signal,
     });
-    console.log("serverFetch", url, response);
     clearTimeout(timeoutId);
 
     if (!response.ok) {

@@ -18,12 +18,7 @@
 .baseGradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom right,
-    rgb(253, 242, 248),
-    rgb(250, 245, 255),
-    rgb(236, 254, 255)
-  );
+  background: linear-gradient(to bottom right, rgb(253, 242, 248), rgb(250, 245, 255), rgb(236, 254, 255));
   background-size: 200% 200%;
 }
 
@@ -80,7 +75,7 @@
 .contentContainer {
   width: 100%;
   max-width: 1600px;
-  margin: 0 auto;
+  margin: 0 auto 6em auto;
   padding: 0 0.5rem;
 }
 

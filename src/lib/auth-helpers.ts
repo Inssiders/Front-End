@@ -1,5 +1,7 @@
 "use client";
 
+import { authOptions } from "@/utils/next-auth";
+import { getServerSession } from "next-auth";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 /**
@@ -79,3 +81,7 @@ export function useAuth() {
  */
 export { authOptions } from "@/utils/next-auth";
 export { getServerSession } from "next-auth/next";
+
+export async function getSession() {
+  return await getServerSession(authOptions);
+}

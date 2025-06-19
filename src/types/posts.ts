@@ -15,39 +15,79 @@ export enum Category {
 }
 
 // 카테고리 레이블 매핑
-export const CATEGORY_LABELS: Record<Category, string> = {
-  [Category.KPOP]: "K-POP",
-  [Category.ENTERTAINMENT]: "연예인",
-  [Category.DRAMA]: "드라마",
-  [Category.INFLUENCER]: "인플루언서",
-  [Category.NEWS]: "뉴스",
-  [Category.MOVIE]: "영화",
-  [Category.ANIMATION]: "애니메이션",
-  [Category.CHALLENGE]: "챌린지",
-  [Category.NEW_SLANG]: "신조어",
-  [Category.TRENDING]: "트렌딩",
-  [Category.ETC]: "기타",
-  [Category.USER_CONTENTS]: "사용자 콘텐츠",
+export const CATEGORY_LABELS: Record<CategoryType, string> = {
+  KPOP: "케이팝",
+  ENTERTAINMENT: "예능",
+  DRAMA: "드라마",
+  INFLUENCER: "인플루언서",
+  NEWS: "뉴스",
+  MOVIE: "영화",
+  ANIMATION: "애니메이션",
+  CHALLENGE: "챌린지",
+  NEW_SLANG: "신조어",
+  TRENDING: "트렌딩",
+  ETC: "기타",
+  USER_CONTENTS: "유저 컨텐츠",
+};
+
+export const CATEGORY_IDS: Record<CategoryType, number> = {
+  KPOP: 1,
+  ENTERTAINMENT: 2,
+  DRAMA: 3,
+  INFLUENCER: 4,
+  NEWS: 5,
+  MOVIE: 6,
+  ANIMATION: 7,
+  CHALLENGE: 8,
+  NEW_SLANG: 9,
+  TRENDING: 10,
+  ETC: 99,
+  USER_CONTENTS: 999,
 };
 
 // API에서 받아오는 카테고리 데이터 타입
 export interface CategoryData {
   id: number;
+  type: string;
   name: string;
-  label: string;
-  count: number;
 }
+
+// API 응답의 기본 형식
+export interface ApiResponse<T> {
+  message: string;
+  data: T;
+}
+
+// 좋아요 대상 타입
+export type TargetType = "POST" | "COMMENT";
+
+// 좋아요 API 응답 데이터 타입
+export interface LikeResponseData {
+  target_type: TargetType;
+  target_id: number;
+  liked: boolean;
+  total_like_count: number;
+}
+
+// 좋아요 API 응답 타입
+export type LikeResponse = ApiResponse<LikeResponseData>;
 
 // API에서 받아오는 원본 밈 데이터 타입
 export interface ApiMeme {
+  id: number;
+  account_id: number;
   title: string;
-  content: string;
-  media_url: string;
-  media_upload_time: string; // API 응답에서 "mdeia_upload_time"으로 오타가 있지만 일단 정상명으로 정의
-  user_id: number;
-  category_id: number;
-  created_at: string; // API 응답에서 "createdAt"으로 camelCase이지만 snake_case로 통일
-  updated_at: string;
+  nickname: string;
+  profile_url: string;
+  like_count: number;
+  comment_count: number;
+  content?: string;
+  media_url?: string;
+  media_upload_time?: string;
+  category_type?: string;
+  tags?: string[];
+  created_at?: string;
+  is_liked?: boolean;
 }
 
 // 사용자 정보 타입
@@ -57,24 +97,21 @@ export interface Author {
   profile_image?: string;
 }
 
-// UI에서 사용하는 Post 타입 (기존 호환성 유지)
+// 프론트엔드에서 사용하는 Post 타입
 export interface Post {
-  id: number | string;
+  id: number;
+  account_id: number;
   title: string;
-  content?: string;
-  category_id: number;
+  nickname: string;
+  profile_url: string;
   media_url: string;
-  media_upload_time: string;
-  account_id: number; // user_id를 account_id로 매핑
-  created_at: string;
-  updated_at: string;
-  is_deleted?: boolean;
-
-  // UI에서 필요한 추가 정보 (선택적)
+  like_count: number;
+  comment_count: number;
+  category_id?: number;
+  content?: string;
   author?: Author;
-  likes?: number;
-  comment_count?: number;
   is_liked?: boolean;
+  likes?: number;
 }
 
 // 일반 조회용 페이지네이션 정보 (offset 기반)
@@ -99,14 +136,11 @@ export interface ApiLinks {
   next?: { href: string };
 }
 
-// 일반 조회 API 응답
+// 페이지네이션 응답 타입
 export interface PostsResponse {
-  message: string;
-  data: {
-    memes: ApiMeme[];
-    pageInfo: OffsetPageInfo;
-  };
-  _links: ApiLinks;
+  content: Post[];
+  has_next: boolean;
+  next_cursor: number | null;
 }
 
 // 프로필 조회 API 응답
@@ -119,21 +153,21 @@ export interface ProfilePostsResponse {
   };
 }
 
-// 일반 조회 쿼리 파라미터
+// API 요청 파라미터 타입
 export interface PostsQueryParams {
-  page?: number;
+  last_id?: number;
   size?: number;
+  page?: number;
   keyword?: string;
-  category_id?: number;
-  sort?: string;
+  category_id?: string;
+  profile_filter?: "post" | "like";
 }
 
 // 프로필 조회 쿼리 파라미터
 export interface ProfileQueryParams {
-  profile_filter: "posts" | "likes";
+  profile_filter?: "post" | "like";
+  last_id?: number;
   size?: number;
-  cursor?: string;
-  keyword?: string;
   category_id?: number;
 }
 
@@ -150,7 +184,8 @@ export interface PostsGridProps {
   // 비제어 모드 - 내부에서 데이터 fetch
   category?: string;
   userId?: string;
-  profileFilter?: "posts" | "likes";
+  profileFilter?: "post" | "like";
+  searchQuery?: string; // 검색 쿼리 추가
 
   // 공통 설정
   layout?: "grid" | "feed";
@@ -203,23 +238,35 @@ export interface PostCategoriesProps {
 }
 
 // 카테고리 API 응답
-export interface CategoriesResponse {
-  message: string;
-  data: {
-    categories: CategoryData[];
-  };
-}
+export type CategoryType = keyof typeof Category;
+
+export type CategoriesResponse = ApiResponse<CategoryType[]>;
 
 // API 밈 데이터를 UI Post 타입으로 변환하는 유틸 함수용 타입
 export interface MemeToPostConverter {
   (apiMeme: ApiMeme, id?: number | string): Post;
 }
 
-export type PostData = {
+export interface PostData {
   title: string;
   content: string;
   media_url: string;
   media_upload_time: string;
   category_name: string;
   tags: string[];
-};
+}
+
+export interface CategoryOption {
+  value: Category;
+  label: string;
+}
+
+// 커서 기반 페이지네이션 응답 데이터 타입
+export interface CursorPaginatedData<T> {
+  content: T[];
+  has_next: boolean;
+  next_cursor: number | null;
+}
+
+// 커서 기반 페이지네이션 응답 타입
+export type CursorPaginatedResponse<T> = ApiResponse<CursorPaginatedData<T>>;

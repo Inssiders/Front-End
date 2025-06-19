@@ -1,10 +1,16 @@
-import { cx } from "class-variance-authority";
-import type { ClassValue } from "class-variance-authority/types";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export * from "class-variance-authority";
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
-export type * from "class-variance-authority";
-
-// 중복되는 클래스명 방지하는 유틸함수 작성
-export const cn = (...args: ClassValue[]) => twMerge(cx(args));
+export function formatNumber(value: number): string {
+  if (value >= 1000000) {
+    return `${(value / 1000000).toFixed(1)}M`;
+  }
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(1)}K`;
+  }
+  return value.toString();
+}

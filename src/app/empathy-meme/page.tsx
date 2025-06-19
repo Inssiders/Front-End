@@ -1,3 +1,4 @@
+import { Category, CATEGORY_LABELS, CategoryData } from "@/types/posts";
 import { PAGE_SIZE } from "@/utils/constant";
 import { getCategories, getPosts } from "@/utils/fetch/posts";
 import { Metadata } from "next";
@@ -12,12 +13,17 @@ export const metadata: Metadata = {
 export default async function EmpathyMemePage() {
   const [categoriesResponse, postsResponse] = await Promise.all([
     getCategories(),
-    getPosts({ category: "99", page: 1, size: PAGE_SIZE.POSTS }),
+    getPosts({ category_id: "999", page: 1, size: PAGE_SIZE.POSTS }),
   ]);
 
-  const categories = categoriesResponse.data?.categories || [];
-  const posts = postsResponse.posts || [];
-  const hasNextPage = postsResponse.hasNextPage || false;
+  const categories: CategoryData[] = Object.entries(CATEGORY_LABELS).map(([id, label]) => ({
+    id: parseInt(id),
+    type: Category[parseInt(id) as Category],
+    name: label,
+  }));
+
+  const posts = postsResponse.data?.content || [];
+  const hasNextPage = postsResponse.data?.has_next || false;
 
   return (
     <Suspense
@@ -34,7 +40,7 @@ export default async function EmpathyMemePage() {
         </div>
       }
     >
-      <EmpathyMemeClientWrapper categories={categories} category="99" initialPosts={posts} hasNextPage={hasNextPage} />
+      <EmpathyMemeClientWrapper categories={categories} category="999" initialPosts={posts} hasNextPage={hasNextPage} />
     </Suspense>
   );
 }

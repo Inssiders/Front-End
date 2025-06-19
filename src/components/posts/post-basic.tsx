@@ -1,90 +1,107 @@
-'use client'
-import React, { useEffect, useRef, useState } from 'react'
-import { Card, CardContent } from '../ui/card'
-import { VideoSection } from './components/video-section'
+"use client";
 
-import { Input } from '../ui/input'
-import { Textarea } from '../ui/textarea'
-import HashTagInput from './components/input-hash'
-import CategorySelect from './components/category-select'
-import FeildBox from './components/feild-box'
-import { Button } from '../ui/button'
-import { PostData } from '@/utils/types/posts'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { CategoryOption, PostData } from "@/types/posts";
+import { motion } from "framer-motion";
+import { CategorySelect } from "./components/category-select";
+import { InputHash } from "./components/input-hash";
+import { VideoSection } from "./components/video-section";
 
 interface PostBasicProps {
-    postData: PostData
-    onChange: (data: PostData) => void
-    handlePreviewMode: () => void
-  }
-const categories = [
-    { value: "news", label: "뉴스" },
-    { value: "sports", label: "스포츠" },
-    { value: "music", label: "음악" },
-    { value: "movie", label: "영화" },
-  ];
-
-const PostBasic = ({ handlePreviewMode, onChange, postData }: PostBasicProps) => {
-    const basicRef = useRef<{ [key: string]: any }>({});
-
-
-
-    //api
-    const handleSave = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(basicRef.current)
-
-    };
-    
-    const changeTitleHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onChange({ ...postData, title: e.target.value })
-    }
-    const changeUrlHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onChange({ ...postData, media_url: e.target.value })
-    }
-    const changeTextareaHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        onChange({ ...postData, content: e.target.value })
-    }
-    const hashtagChangeHandler = (tags: string[]) => {
-        onChange({ ...postData, tags })
-    }
-    const categoryChangeHandler = (category_name: string) => {
-        onChange({ ...postData, category_name })
-    }
-    return (
-        <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">밈 작성</h1>
-                <Button onClick={handlePreviewMode}>미리보기</Button>
-            </div>
-            <Card className="w-full">
-                <CardContent>
-                    <FeildBox label="제목">
-                        <Input value={postData.title} onChange={changeTitleHandler} placeholder='제목을 입력하세요.' />
-                    </FeildBox>
-                    <FeildBox label="동영상 URL" >
-                        <Input value={postData.media_url} onChange={changeUrlHandler} placeholder='동영상 URL을 입력하세요.' />
-                        <div className="w-full aspect-video flex items-center justify-center bg-gray-50 md:rounded-l-lg md:rounded-r-none">
-                            <VideoSection mediaUrl={postData.media_url} title='test' isEdit />
-                        </div>
-                    </FeildBox>
-                    <FeildBox label="밈 내용">
-                        <Textarea
-                            placeholder='밈 내용을 입력하세요.'
-                            value={postData.content}
-                            onChange={changeTextareaHandler}
-                        />
-                    </FeildBox>
-                    <FeildBox label="해시태그">
-                        <HashTagInput onChange={hashtagChangeHandler} propsTags={postData.tags} />
-                    </FeildBox>
-                    <FeildBox label="카테고리">
-                        <CategorySelect categories={categories} onChange={categoryChangeHandler} value={postData.category_name} />
-                    </FeildBox>
-                </CardContent>
-
-            </Card>
-
-        </div>
-    )
+  postData: PostData;
+  onChange: (data: PostData) => void;
+  handlePreviewMode: () => void;
+  onSubmit: () => void;
+  isLoading: boolean;
+  categories: CategoryOption[];
 }
 
-export default PostBasic
+const inputVariants = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+};
+
+const PostBasic = ({ postData, onChange, handlePreviewMode, onSubmit, isLoading, categories }: PostBasicProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    onChange({ ...postData, [name]: value });
+  };
+
+  const isSubmitDisabled = !postData.title || !postData.content || !postData.media_url || !postData.category_name;
+
+  return (
+    <motion.div
+      className="space-y-6"
+      initial="initial"
+      animate="animate"
+      variants={{
+        animate: {
+          transition: {
+            staggerChildren: 0.1,
+          },
+        },
+      }}
+    >
+      <motion.div variants={inputVariants} className="space-y-2">
+        <Input
+          name="title"
+          value={postData.title}
+          onChange={handleChange}
+          placeholder="제목을 입력해주세요"
+          className="text-lg font-medium focus:ring-2 focus:ring-purple-500 transition-all duration-300 hover:shadow-md"
+        />
+      </motion.div>
+
+      <motion.div variants={inputVariants} className="space-y-2">
+        <Textarea
+          name="content"
+          value={postData.content}
+          onChange={handleChange}
+          placeholder="내용을 입력해주세요"
+          className="min-h-[120px] focus:ring-2 focus:ring-purple-500 transition-all duration-300 hover:shadow-md resize-none"
+        />
+      </motion.div>
+
+      <motion.div variants={inputVariants}>
+        <VideoSection
+          mediaUrl={postData.media_url}
+          onMediaUrlChange={(url) => onChange({ ...postData, media_url: url })}
+        />
+      </motion.div>
+
+      <motion.div variants={inputVariants}>
+        <CategorySelect
+          selectedCategory={postData.category_name}
+          onCategoryChange={(category) => onChange({ ...postData, category_name: category })}
+        />
+      </motion.div>
+
+      <motion.div variants={inputVariants}>
+        <InputHash tags={postData.tags} onChange={(tags) => onChange({ ...postData, tags })} />
+      </motion.div>
+
+      <motion.div variants={inputVariants} className="flex gap-4 pt-4">
+        <Button
+          type="button"
+          onClick={handlePreviewMode}
+          variant="outline"
+          className="flex-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 transition-all duration-300"
+        >
+          미리보기
+        </Button>
+        <Button
+          type="button"
+          onClick={onSubmit}
+          disabled={isSubmitDisabled || isLoading}
+          className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? "생성 중..." : "밈 생성하기"}
+        </Button>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+export default PostBasic;

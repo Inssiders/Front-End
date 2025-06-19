@@ -1,4 +1,4 @@
-import type { AuthResponse, DeleteAccountResponse } from "@/utils/types/auth";
+import type { AuthResponse, DeleteAccountResponse } from "@/types/auth";
 import { http, HttpResponse } from "msw";
 import { db } from "../db";
 import { mockErrors, mockUsers } from "../seed-data";
@@ -296,7 +296,6 @@ const handlers = [
         { status: 422 }
       );
     }
-    console.log(otp);
     // Mock 환경에서는 "000000"만 허용
     if (otp !== "000000") {
       return HttpResponse.json(

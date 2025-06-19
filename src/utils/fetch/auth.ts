@@ -1,7 +1,7 @@
+import { GRANT_TYPE, type AuthResponse, type DeleteAccountResponse, type TokenRequest } from "@/types/auth";
 import { getServerSession } from "next-auth";
 import { getSession } from "next-auth/react";
 import { authOptions } from "../next-auth";
-import { GRANT_TYPE, type AuthResponse, type DeleteAccountResponse, type TokenRequest } from "../types/auth";
 
 // API fetch wrapper with cookie-based authentication
 export interface ApiFetchOptions extends RequestInit {

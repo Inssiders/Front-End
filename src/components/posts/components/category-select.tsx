@@ -1,41 +1,26 @@
-import React from "react";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CATEGORY_LABELS } from "@/types/posts";
 
-interface CategorySelectProps {
-  onChange: (value: string) => void;
-  value?: string;
-  categories: { value: string, label: string }[];
+export interface CategorySelectProps {
+  selectedCategory: string;
+  onCategoryChange: (category: string) => void;
 }
 
-
-
-const CategorySelect: React.FC<CategorySelectProps> = ({ onChange, value,categories }) => {
+export function CategorySelect({ selectedCategory, onCategoryChange }: CategorySelectProps) {
   return (
-    <Select onValueChange={onChange} value={value}>
-      <SelectTrigger
-        className="w-[180px] h-11 rounded-xl border border-main-200 bg-white shadow-md px-4 text-base font-medium text-main-700 focus:ring-2 focus:ring-main-400 focus:border-main-400 transition-all duration-150"
-      >
-        <SelectValue placeholder="카테고리 선택" />
+    <Select value={selectedCategory} onValueChange={onCategoryChange}>
+      <SelectTrigger className="focus:ring-2 focus:ring-purple-500">
+        <SelectValue placeholder="카테고리를 선택해주세요" />
       </SelectTrigger>
-      <SelectContent className="rounded-xl shadow-lg border-main-100 bg-white">
-        {categories.map((cat) => (
-          <SelectItem
-            key={cat.value}
-            value={cat.value}
-            className="rounded-lg px-4 py-2 pl-8 text-main-700 hover:bg-main-100 focus:bg-main-200 transition-colors cursor-pointer text-base"
-          >
-            {cat.label}
+      <SelectContent>
+        {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
+          <SelectItem key={value} value={value} className="cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900">
+            {label}
           </SelectItem>
         ))}
       </SelectContent>
     </Select>
   );
-};
+}
 
-export default CategorySelect; 
+export default CategorySelect;

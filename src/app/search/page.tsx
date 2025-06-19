@@ -1,3 +1,4 @@
+import { Post } from "@/types/posts";
 import { getPosts } from "@/utils/fetch/posts";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
@@ -43,10 +44,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const page = parseInt(resolvedSearchParams.page || "1");
 
   let initialData: {
-    posts: any[];
+    posts: Post[];
     loading: boolean;
     hasNextPage: boolean;
     totalResults: number;
+    searchTime?: number;
   } = {
     posts: [],
     loading: false,
@@ -57,17 +59,21 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   // 검색어가 있을 때만 초기 데이터 로드
   if (query) {
     try {
+      const startTime = performance.now();
       const response = await getPosts({
         keyword: query,
         page: page,
         size: 20,
       });
+      const endTime = performance.now();
+      const searchTime = (endTime - startTime) / 1000; // 초 단위로 변환
 
       initialData = {
-        posts: response.posts || [],
+        posts: response.data.content || [],
         loading: false,
-        hasNextPage: response.hasNextPage || false,
-        totalResults: response.total || 0,
+        hasNextPage: response.data.has_next || false,
+        totalResults: response.data.content.length || 0,
+        searchTime,
       };
     } catch (error) {
       console.error("Search 페이지 초기 로딩 에러:", error);
@@ -103,6 +109,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         initialLoading={initialData.loading}
         initialHasNextPage={initialData.hasNextPage}
         initialTotalResults={initialData.totalResults}
+        initialSearchTime={initialData.searchTime}
       />
     </Suspense>
   );

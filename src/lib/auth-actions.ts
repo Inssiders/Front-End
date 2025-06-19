@@ -29,7 +29,6 @@ export async function createAccount(data: { email: string; password: string; acc
         Authorization: `Bearer ${data.accessToken}`,
       },
     });
-    console.log("createAccount", response);
 
     return { success: true };
   } catch (error) {
